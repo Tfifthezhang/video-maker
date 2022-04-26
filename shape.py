@@ -18,5 +18,13 @@ class TracedPathExample(Scene):
         self.add(trace, rolling_circle)
         self.play(rolling_circle.animate.shift(8*RIGHT), run_time=4, rate_func=linear)
         
+class BlockChainExample(Scene):
+    def construct(self):
+        rect = Rectangle(width=2.0, height=1.0,color=BLUE)
+        arrow = Arrow(start=rect.get_right(),end=2*RIGHT,color = GOLD,buff=2/1,stroke_width = 5)
+        rect2 = Rectangle(width=2.0, height=1.0,color=BLUE).next_to(arrow)
+        vg = VGroup(rect,arrow,rect2)
+        #vg_group = VGroup([vg for _ in range(5)])
+        self.add(vg)
         
         
