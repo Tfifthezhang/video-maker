@@ -27,4 +27,27 @@ class BlockChainExample(Scene):
         #vg_group = VGroup([vg for _ in range(5)])
         self.add(vg)
         
+class Chinese(Scene):
+    def construct(self):
+        text1 = Text('2020年在武汉爆发的新冠疫情虽然很突然\n但中国人的信心没有被摧毁疫情过后所有人都在努力重建生活',font="sans-serif",font_size=20)
+        text2 = Text('2022年在上海爆发的新冠疫情摧毁的是信心\\\n尤其是餐饮行业、旅游行业、线下零售行业、电商行业\\\n物流行业、娱乐行业、金融行业，甚至农业和工业.....',font="sans-serif",font_size=20)
+        self.play(Transform(text1,text2),run_time=6)
+        
+class MultipleFonts(Scene):
+    def construct(self):
+        morning = Text("வணக்கம்", font="sans-serif")
+        japanese = Text(
+            "日本へようこそ", t2c={"日本": BLUE}
+        )  # works same as ``Text``.
+        mess = Text("Multi-Language", weight=BOLD)
+        russ = Text("Здравствуйте मस नम म ", font="sans-serif")
+        hin = Text("नमस्ते", font="sans-serif")
+        arb = Text(
+            "صباح الخير \n تشرفت بمقابلتك", font="sans-serif"
+        )  # don't mix RTL and LTR languages nothing shows up then ;-)
+        chinese = Text("臂猿「黛比」帶著孩子", font="sans-serif")
+        self.add(morning, japanese, mess, russ, hin, arb, chinese)
+        for i,mobj in enumerate(self.mobjects):
+            mobj.shift(DOWN*(i-3))
+        
         
