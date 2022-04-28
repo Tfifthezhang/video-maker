@@ -1,0 +1,3 @@
+[manim.plugins]
+manim_fonts=manim_fonts
+
