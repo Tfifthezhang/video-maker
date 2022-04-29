@@ -1,0 +1,5 @@
+# This file is used internally by FFMPEG.
+file 'file:/manim/media/videos/algoritms_analysis/1080p60/partial_movie_files/linear_best_time_example/450974505_3896281178_1346963657.mp4'
+file 'file:/manim/media/videos/algoritms_analysis/1080p60/partial_movie_files/linear_best_time_example/34786186_1273344217_2563196194.mp4'
+file 'file:/manim/media/videos/algoritms_analysis/1080p60/partial_movie_files/linear_best_time_example/34786186_506838085_489905987.mp4'
+file 'file:/manim/media/videos/algoritms_analysis/1080p60/partial_movie_files/linear_best_time_example/34786186_3503346753_155968043.mp4'
