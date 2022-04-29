@@ -57,10 +57,13 @@ class linear_time_example(Scene):
         
         self.add(circles)
         
+        texs = VGroup()
         for i in range(n_circles):
-            integ = Tex("${}$".format(i))
+            integ = Integer(number=i)
             integ.move_to(circles[i].get_center())
-            self.add(integ)
+            texs.add(integ)
+        
+        self.add(texs)
             
         # 移动向量
         pointer = Vector(DOWN).next_to(circles.get_center(),UP)
@@ -69,8 +72,19 @@ class linear_time_example(Scene):
         pointer.add_updater(lambda x : x.set_x(tracker.get_value()))
         
         self.add(pointer,tracker)
-
-        for i in range(1,10):
+        
+        # 求和
+        S = Integer(number = sum(te)).move_to(np.array([0,-2,0]))
+        
+        S = Integer(number = S.get_value() + texs[i].get_value()).move_to(S.get_center())
+        #S.add_updater(lambda x: x.set_value(x.get_value()+integ.get_value()))
+        
+        #tracker.add_updater(lambda mobject: mobject.width)
+        for i in range(10):
             self.play(tracker.animate.set_value(circles[i].get_center()[0]))
+            self.play(texs[i].animate.move_to(S.get_center()))
+            #S = Integer(number = S.get_value() + texs[i].get_value()).move_to(S.get_center())
+            self.play(Write(S))
+            self.play(FadeOut(circles[i]))
             self.wait()
         
