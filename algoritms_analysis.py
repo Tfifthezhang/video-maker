@@ -69,8 +69,7 @@ class linear_time_example(Scene):
         pointer.add_updater(lambda x : x.set_x(tracker.get_value()))
         
         self.add(pointer,tracker)
-        
-        #tracker.add_updater(lambda mobject: mobject.width)
+
         for i in range(1,10):
             self.play(tracker.animate.set_value(circles[i].get_center()[0]))
             self.wait()
