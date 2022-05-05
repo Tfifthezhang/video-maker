@@ -258,6 +258,59 @@ class BinarySearch(Scene):
             self.play(Write(text_rel))
             l_text_rel.add(text_rel)
             #self.play(FadeOut(texs[:i]), FadeOut(circles[:i]))
+        
+        self.wait()
+        self.play(FadeOut(point_number))
+        self.wait()
+        
+#         l_text_rel.arrange_submobjects(RIGHT)
+        
+#         self.play(l_text_rel.animate.shift(DOWN))
+        brace_binary = Brace(l_text_rel,direction=UP, color=MAROON)
+        self.play(Write(brace_binary))
+        self.wait()
+        binary_text = Tex('$log 10+1$').next_to(brace_binary,UP)
+        
+        self.play(Write(binary_text))
+        self.wait()
+        
+        self.play(Uncreate(brace_binary),Uncreate(binary_text))
+        
+        self.play(Write(Tex('if $m=n$: Time Complexity:$\log(n)$').scale(0.6).move_to(np.array([0, -2.7, 0]))))
+        
+        
+        # 插入二叉树
+        vertices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        edges = [(4, 1), (4, 7),
+                 (1, 0), (1, 2), (7, 5), (7, 8),
+                 (2, 3), (5, 6), (8, 9)]
+
+        g = nx.DiGraph()
+        g.add_nodes_from(vertices)
+        g.add_edges_from(edges)
+
+        g_test = Graph(list(g.nodes), list(g.edges), layout="tree",
+                       labels=True,
+                       label_fill_color=BLACK,
+                       layout_scale=2,
+                       root_vertex=4,
+                       # vertex_type=Integer,
+                       # vertex_config={i: {'number': i} for i in vertices},
+                       edge_type=Arrow,
+                       edge_config={i: {'max_tip_length_to_length_ratio': 0.01,
+                                        'buff': 5}
+                                    for i in edges}
+        )
+        self.play(FadeTransform(circle_texs, g_test))
+        
+        brace_tree = Brace(g_test, direction=RIGHT, color=MAROON)
+        self.play(Write(brace_tree))
+        self.wait()
+        self.play(l_text_rel.animate.arrange_submobjects(DOWN, buff=1.2).next_to(brace_tree,RIGHT))
+        
+        
+        #self.play()
+        
 
 
 
