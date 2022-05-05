@@ -1,1 +1,1 @@
-manim -qh algoritms_analysis.py BinaryTree
+manim -qh algoritms_analysis.py BinarySearch

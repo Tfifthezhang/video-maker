@@ -269,15 +269,15 @@ class BinarySearch(Scene):
         brace_binary = Brace(l_text_rel,direction=UP, color=MAROON)
         self.play(Write(brace_binary))
         self.wait()
-        binary_text = Tex('$log 10+1$').next_to(brace_binary,UP)
+        binary_text = Tex('$ log(10)+1$').next_to(brace_binary,UP)
         
         self.play(Write(binary_text))
         self.wait()
         
         self.play(Uncreate(brace_binary),Uncreate(binary_text))
-        
-        self.play(Write(Tex('if $m=n$: Time Complexity:$\log(n)$').scale(0.6).move_to(np.array([0, -2.7, 0]))))
-        
+        self.wait()
+        self.play(Write(Text('时间复杂度:log(n)').scale(0.7).move_to(np.array([0, -3, 0]))))
+        self.wait(5)
         
         # 插入二叉树
         vertices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -300,13 +300,16 @@ class BinarySearch(Scene):
                        edge_config={i: {'max_tip_length_to_length_ratio': 0.01,
                                         'buff': 5}
                                     for i in edges}
-        )
-        self.play(FadeTransform(circle_texs, g_test))
-        
+                       )
+
         brace_tree = Brace(g_test, direction=RIGHT, color=MAROON)
-        self.play(Write(brace_tree))
+        self.play(l_text_rel.animate.arrange_submobjects(DOWN, buff=1.2).next_to(brace_tree, RIGHT))
         self.wait()
-        self.play(l_text_rel.animate.arrange_submobjects(DOWN, buff=1.2).next_to(brace_tree,RIGHT))
+
+        self.play(FadeTransform(circle_texs, g_test))
+        self.wait()
+        self.play(Write(brace_tree))
+        self.wait(5)
         
         
         #self.play()
