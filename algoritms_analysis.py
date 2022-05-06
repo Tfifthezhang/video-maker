@@ -7,6 +7,18 @@ import networkx as nx
 class Title(Scene):
     pass
 
+class HardwareTime(Scene):
+    def construct(self):
+        
+        image1 = SVGMobject(file_name="images/内存.svg",
+                            height=1,
+                            stroke_color=WHITE,
+                            stroke_width=2,
+                            fill_opacity=0.5)
+        
+        self.play(Create(image1))
+
+
 
 class FrameTimefunction(Scene):
     def construct(self):
