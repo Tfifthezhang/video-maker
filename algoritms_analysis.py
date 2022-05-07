@@ -7,17 +7,16 @@ import networkx as nx
 class Title(Scene):
     pass
 
+
 class HardwareTime(Scene):
     def construct(self):
-        
         image1 = SVGMobject(file_name="images/内存.svg",
                             height=1,
                             stroke_color=WHITE,
                             stroke_width=2,
                             fill_opacity=0.5)
-        
-        self.play(Create(image1))
 
+        self.play(Create(image1))
 
 
 class FrameTimefunction(Scene):
@@ -269,28 +268,28 @@ class BinarySearch(Scene):
                 text_rel = Tex('${}={}$'.format(number.get_value(), position)).scale(0.6).next_to(point_number, LEFT)
             self.play(Write(text_rel))
             l_text_rel.add(text_rel)
-            #self.play(FadeOut(texs[:i]), FadeOut(circles[:i]))
-        
+            # self.play(FadeOut(texs[:i]), FadeOut(circles[:i]))
+
         self.wait()
         self.play(FadeOut(point_number))
         self.wait()
-        
-#         l_text_rel.arrange_submobjects(RIGHT)
-        
-#         self.play(l_text_rel.animate.shift(DOWN))
-        brace_binary = Brace(l_text_rel,direction=UP, color=MAROON)
+
+        #         l_text_rel.arrange_submobjects(RIGHT)
+
+        #         self.play(l_text_rel.animate.shift(DOWN))
+        brace_binary = Brace(l_text_rel, direction=UP, color=MAROON)
         self.play(Write(brace_binary))
         self.wait()
-        binary_text = Tex('$ log(10)+1$').next_to(brace_binary,UP)
-        
+        binary_text = Tex('$ log(10)+1$').next_to(brace_binary, UP)
+
         self.play(Write(binary_text))
         self.wait()
-        
-        self.play(Uncreate(brace_binary),Uncreate(binary_text))
+
+        self.play(Uncreate(brace_binary), Uncreate(binary_text))
         self.wait()
         self.play(Write(Text('时间复杂度:log(n)').scale(0.7).move_to(np.array([0, -3, 0]))))
         self.wait(5)
-        
+
         # 插入二叉树
         vertices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         edges = [(4, 1), (4, 7),
@@ -322,11 +321,8 @@ class BinarySearch(Scene):
         self.wait()
         self.play(Write(brace_tree))
         self.wait(5)
-        
-        
-        #self.play()
-        
 
+        # self.play()
 
 
 class BinaryTree(Scene):
@@ -351,6 +347,6 @@ class BinaryTree(Scene):
                        edge_config={i: {'max_tip_length_to_length_ratio': 0.01,
                                         'buff': 5}
                                     for i in edges}
-        )
-        #self.add(g_test)
+                       )
+        # self.add(g_test)
         self.play(Write(g_test))
