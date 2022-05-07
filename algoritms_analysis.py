@@ -9,15 +9,83 @@ class Title(Scene):
 
 class HardwareTime(Scene):
     def construct(self):
+        l_file= ['内存.svg','硬盘.svg','CPU.svg','python.svg']
+        l_file_name = ['内存','硬盘','CPU','编程语言']
         
-        image1 = SVGMobject(file_name="images/内存.svg",
+        d_files = dict(zip(l_file_name,l_file))
+        files = VGroup()
+        for i,j in d_files.items():
+            image = SVGMobject(file_name="images/"+j,
                             height=1,
-                            stroke_color=WHITE,
+                            #stroke_color=WHITE,
                             stroke_width=2,
                             fill_opacity=0.5)
+            text = Text(i).next_to(image,UP)
+            file_name_vg = VGroup(image,text)
+            files.add(file_name_vg)
         
-        self.play(Create(image1))
-
+        text = Text('Time Complexity').next_to(files,1.5*UP)
+        
+        self.play(Write(text))
+        
+        files.arrange_submobjects(RIGHT, buff=1)
+        for i in files:
+            self.play(Write(i))
+            self.wait(4)
+            
+class FlattenTime(Scene):
+    def construct(self):
+        
+        title = Tex('Task: $[[1, 2, 3], [4, 5, 6], [7], [8, 9]] \Rightarrow [1, 2, 3, 4, 5, 6, 7, 8, 9]$')
+        self.add(title)
+        self.wait()
+        self.play(title.animate.scale(0.6).move_to(np.array([0, 3.5, 0])))
+        
+        
+        
+        codes = VGroup()
+        code = ['''def func_extend(x):
+    out = []
+    for sublist in x:
+        out.extend(sublist)
+    return out
+            ''',
+            '''def func_for(x):
+    return [item for sublist in x for item in sublist]
+            ''',
+            '''def func_sum_brackets(x):
+    return sum(a, [])
+            ''',
+            '''def func_reduce(x):
+    return functools.reduce(operator.concat, x)
+            ''']
+        texts = ['extend','loop','sum','reduce']
+        d_codes_texts = dict(zip(texts,code))
+        for i,j in d_codes_texts.items():
+            rendered_code = Code(code=j, tab_width=2, background="rectangle",
+                            language="Python", font="Monospace")
+            text = Text(i).next_to(rendered_code,UP)
+            
+            func = VGroup(text,rendered_code)
+            self.play(Create(func))
+            self.wait(4)
+            
+            self.play(FadeOut(func))
+            
+            codes.add(func.scale(0.5))
+            
+        
+        codes.arrange_submobjects(DOWN, buff=0.1)
+        self.play(Write(codes.shift(4*LEFT)))
+        self.wait()
+        
+        image = SVGMobject(file_name="images/"+'out.svg',
+                            height=5.5,
+                            #stroke_color=WHITE,
+                            stroke_width=2,
+                            fill_opacity=1)
+        self.play(Create(image.move_to(2.9*RIGHT)))
+        self.wait(5)
 
 
 class FrameTimefunction(Scene):

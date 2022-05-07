@@ -1,0 +1,3 @@
+[console_scripts]
+matplotx=matplotx:cli
+

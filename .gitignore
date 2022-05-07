@@ -66,8 +66,8 @@ instance/
 # Scrapy stuff:
 .scrapy
 # PNG/html stuff:
-*.png
-*.html
+#*.png
+#*.html
 #JSON stuff:
 *.json
 # Sphinx documentation
