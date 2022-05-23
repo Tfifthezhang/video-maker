@@ -1,1 +1,2 @@
-manim -qh algoritms_analysis.py BinarySearch
+manim -qh algoritms_analysis.py O_frame
+
