@@ -7,42 +7,41 @@ import networkx as nx
 class Title(Scene):
     pass
 
+
 class HardwareTime(Scene):
     def construct(self):
-        l_file= ['内存.svg','硬盘.svg','CPU.svg','python.svg']
-        l_file_name = ['内存','硬盘','CPU','编程语言']
-        
-        d_files = dict(zip(l_file_name,l_file))
+        l_file = ['内存.svg', '硬盘.svg', 'CPU.svg', 'python.svg']
+        l_file_name = ['内存', '硬盘', 'CPU', '编程语言']
+
+        d_files = dict(zip(l_file_name, l_file))
         files = VGroup()
-        for i,j in d_files.items():
-            image = SVGMobject(file_name="images/"+j,
-                            height=1,
-                            #stroke_color=WHITE,
-                            stroke_width=2,
-                            fill_opacity=0.5)
-            text = Text(i).next_to(image,UP)
-            file_name_vg = VGroup(image,text)
+        for i, j in d_files.items():
+            image = SVGMobject(file_name="images/" + j,
+                               height=1,
+                               # stroke_color=WHITE,
+                               stroke_width=2,
+                               fill_opacity=1)
+            text = Text(i).next_to(image, UP)
+            file_name_vg = VGroup(image, text)
             files.add(file_name_vg)
-        
-        text = Text('Time Complexity').next_to(files,1.5*UP)
-        
+
+        text = Text('程序耗时的来源').next_to(files, 1.5 * UP)
+
         self.play(Write(text))
-        
+
         files.arrange_submobjects(RIGHT, buff=1)
         for i in files:
             self.play(Write(i))
             self.wait(4)
-            
+
+
 class FlattenTime(Scene):
     def construct(self):
-        
-        title = Tex('Task: $[[1, 2, 3], [4, 5, 6], [7], [8, 9]] \Rightarrow [1, 2, 3, 4, 5, 6, 7, 8, 9]$')
+        title = Tex(' $[[1, 2, 3], [4, 5, 6], [7], [8, 9]] \Rightarrow [1, 2, 3, 4, 5, 6, 7, 8, 9]$')
         self.add(title)
         self.wait()
-        self.play(title.animate.scale(0.6).move_to(np.array([0, 3.5, 0])))
-        
-        
-        
+        self.play(title.animate.scale(0.7).move_to(np.array([0, 3.5, 0])))
+
         codes = VGroup()
         code = ['''def func_extend(x):
     out = []
@@ -50,66 +49,92 @@ class FlattenTime(Scene):
         out.extend(sublist)
     return out
             ''',
-            '''def func_for(x):
+                '''def func_for(x):
     return [item for sublist in x for item in sublist]
             ''',
-            '''def func_sum_brackets(x):
+                '''def func_sum_brackets(x):
     return sum(a, [])
             ''',
-            '''def func_reduce(x):
+                '''def func_reduce(x):
     return functools.reduce(operator.concat, x)
             ''']
-        texts = ['extend','loop','sum','reduce']
-        d_codes_texts = dict(zip(texts,code))
-        for i,j in d_codes_texts.items():
+        texts = ['extend', '双循环', '求和', 'Reduce']
+        d_codes_texts = dict(zip(texts, code))
+        for i, j in d_codes_texts.items():
             rendered_code = Code(code=j, tab_width=2, background="rectangle",
-                            language="Python", font="Monospace")
-            text = Text(i).next_to(rendered_code,UP)
-            
-            func = VGroup(text,rendered_code)
+                                 language="Python", font="Monospace")
+            text = Text(i).next_to(rendered_code, UP)
+
+            func = VGroup(text, rendered_code)
             self.play(Create(func))
             self.wait(4)
-            
+
             self.play(FadeOut(func))
-            
+
             codes.add(func.scale(0.5))
-            
-        
+
         codes.arrange_submobjects(DOWN, buff=0.1)
-        self.play(Write(codes.shift(4*LEFT)))
+        self.play(Write(codes.shift(4 * LEFT)))
         self.wait()
-        
-        image = SVGMobject(file_name="images/"+'out.svg',
-                            height=5.5,
-                            #stroke_color=WHITE,
-                            stroke_width=2,
-                            fill_opacity=1)
-        self.play(Create(image.move_to(2.9*RIGHT)))
+
+        image = SVGMobject(file_name="images/" + 'out.svg',
+                           height=5,
+                           # stroke_color=WHITE,
+                           stroke_width=2,
+                           fill_opacity=1)
+        self.play(Create(image.shift(3 * RIGHT)))
         self.wait(5)
+
+        self.play(Uncreate(codes), Unwrite(title))
+        self.play(image.animate.shift(3 * LEFT))
+        self.wait()
+
+        brace_x = Brace(image, direction=DOWN, color=MAROON)
+        label_x = Text('问题规模 n').scale(0.5).next_to(brace_x, DOWN)
+        self.play(Create(brace_x), Write(label_x))
+        self.wait(2)
+
+        brace_y = Brace(image, direction=LEFT, color=MAROON)
+        label_y = Text('运行时间 T ').scale(0.5).next_to(brace_y, LEFT)
+        self.play(Create(brace_y), Write(label_y))
+
+
+class O_frame(Scene):
+    def construct(self):
+        texs = VGroup()
+
+        T_tex = MathTex(r'T(n) = 4n^2+2n+2')
+        limit_tex =MathTex(r'\lim\limits_{n \to \infty} \frac{2n}{4n^2} =0')
+        limit_tex2 = MathTex(r'\lim\limits_{n \to \infty} \frac{2}{4n^2} =0')
+        arrow_tex = MathTex(r'\Downarrow')
+        O_tex = MathTex(r'T(n)=\mathrm {O} (n^2)')
+
+        texs.add(T_tex, limit_tex, limit_tex2, arrow_tex, O_tex)
+        texs.arrange_submobjects(DOWN, buff=0.1)
+
+        self.play(Create(texs))
+        self.wait()
+        self.play(texs.animate.scale(0.6).shift(3*RIGHT))
 
 
 class FrameTimefunction(Scene):
     def construct(self):
+
         ax = Axes(x_range=[1, 10], y_range=[0, 150, 10],
                   x_length=8, y_length=6,
                   axis_config={"include_tip": True,
                                "include_numbers": True}
                   )
+
         # labels = ax.get_axis_labels(x_label="x", y_label="y")
 
         ax.move_to(np.array([-2, 0, 0]))
-
-        def constant(x):
-            return 1
 
         def func(x):
             return x ** 2
 
         def func_linear(x):
             return x
-
-        def func_three(x):
-            return x ** 3
 
         def func_log(x):
             return np.log(x) + 1
@@ -337,28 +362,28 @@ class BinarySearch(Scene):
                 text_rel = Tex('${}={}$'.format(number.get_value(), position)).scale(0.6).next_to(point_number, LEFT)
             self.play(Write(text_rel))
             l_text_rel.add(text_rel)
-            #self.play(FadeOut(texs[:i]), FadeOut(circles[:i]))
-        
+            # self.play(FadeOut(texs[:i]), FadeOut(circles[:i]))
+
         self.wait()
         self.play(FadeOut(point_number))
         self.wait()
-        
-#         l_text_rel.arrange_submobjects(RIGHT)
-        
-#         self.play(l_text_rel.animate.shift(DOWN))
-        brace_binary = Brace(l_text_rel,direction=UP, color=MAROON)
+
+        #         l_text_rel.arrange_submobjects(RIGHT)
+
+        #         self.play(l_text_rel.animate.shift(DOWN))
+        brace_binary = Brace(l_text_rel, direction=UP, color=MAROON)
         self.play(Write(brace_binary))
         self.wait()
-        binary_text = Tex('$ log(10)+1$').next_to(brace_binary,UP)
-        
+        binary_text = Tex('$ log(10)+1$').next_to(brace_binary, UP)
+
         self.play(Write(binary_text))
         self.wait()
-        
-        self.play(Uncreate(brace_binary),Uncreate(binary_text))
+
+        self.play(Uncreate(brace_binary), Uncreate(binary_text))
         self.wait()
         self.play(Write(Text('时间复杂度:log(n)').scale(0.7).move_to(np.array([0, -3, 0]))))
         self.wait(5)
-        
+
         # 插入二叉树
         vertices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         edges = [(4, 1), (4, 7),
@@ -390,11 +415,8 @@ class BinarySearch(Scene):
         self.wait()
         self.play(Write(brace_tree))
         self.wait(5)
-        
-        
-        #self.play()
-        
 
+        # self.play()
 
 
 class BinaryTree(Scene):
@@ -419,6 +441,6 @@ class BinaryTree(Scene):
                        edge_config={i: {'max_tip_length_to_length_ratio': 0.01,
                                         'buff': 5}
                                     for i in edges}
-        )
-        #self.add(g_test)
+                       )
+        # self.add(g_test)
         self.play(Write(g_test))
