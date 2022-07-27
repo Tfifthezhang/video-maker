@@ -1,2 +1,2 @@
-manim -qh matiji/binary_exponentiation.py Title
+manim -qh matiji/binary_exponentiation.py Power
 
