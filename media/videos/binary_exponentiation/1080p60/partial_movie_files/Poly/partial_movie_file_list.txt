@@ -1,5 +1,8 @@
 # This file is used internally by FFMPEG.
-file 'file:/manim/media/videos/binary_exponentiation/1080p60/partial_movie_files/Poly/450974505_1262725525_223132457.mp4'
-file 'file:/manim/media/videos/binary_exponentiation/1080p60/partial_movie_files/Poly/34786186_2243117478_2334220719.mp4'
-file 'file:/manim/media/videos/binary_exponentiation/1080p60/partial_movie_files/Poly/34786186_4216097865_2391462496.mp4'
-file 'file:/manim/media/videos/binary_exponentiation/1080p60/partial_movie_files/Poly/34786186_4185870779_1623005312.mp4'
+file 'file:/Users/tfifthezhang/video-maker/media/videos/binary_exponentiation/1080p60/partial_movie_files/Poly/450974505_2825895643_223132457.mp4'
+file 'file:/Users/tfifthezhang/video-maker/media/videos/binary_exponentiation/1080p60/partial_movie_files/Poly/34786186_1936483830_2334220719.mp4'
+file 'file:/Users/tfifthezhang/video-maker/media/videos/binary_exponentiation/1080p60/partial_movie_files/Poly/34786186_961699904_2680189304.mp4'
+file 'file:/Users/tfifthezhang/video-maker/media/videos/binary_exponentiation/1080p60/partial_movie_files/Poly/34786186_4076752445_1975827203.mp4'
+file 'file:/Users/tfifthezhang/video-maker/media/videos/binary_exponentiation/1080p60/partial_movie_files/Poly/34786186_3375341780_975453338.mp4'
+file 'file:/Users/tfifthezhang/video-maker/media/videos/binary_exponentiation/1080p60/partial_movie_files/Poly/34786186_629726892_2477939.mp4'
+file 'file:/Users/tfifthezhang/video-maker/media/videos/binary_exponentiation/1080p60/partial_movie_files/Poly/34786186_3375341780_2357735787.mp4'
