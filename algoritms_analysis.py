@@ -2,6 +2,7 @@ from manim import *
 import numpy as np
 
 import networkx as nx
+from random import shuffle
 
 
 class Title(Scene):
@@ -444,3 +445,66 @@ class BinaryTree(Scene):
                        )
         # self.add(g_test)
         self.play(Write(g_test))
+
+class BogoSort(Scene):
+    def construct(self):
+        l_array = [9, 5, 8, 3, 0, 6, 1, 4, 2, 7]
+        n_circles = len(l_array)
+
+        circles = VGroup(*[Circle(radius=0.5,
+                                  # stroke_width = 3,
+                                  # fill_color = BLACK,
+                                  # fill_opacity = GREEN
+                                  )
+                           for _ in range(n_circles)
+                           ]
+                         )
+        circles.arrange_submobjects(RIGHT, buff=0.3)
+        self.add(circles)
+
+        def greate_texs(positions, l_n):
+            texs = VGroup()
+            for i in range(10):
+                integ = MathTex(l_n[i])
+                integ.move_to(positions[i].get_center())
+                texs.add(integ)
+            return texs
+
+        # texs = greate_texs(circles, l_array)
+        # #self.add(texs)
+
+        title = Text('Bogo Sort').scale(0.8).move_to(np.array([-5, 3.5, 0]))
+        self.add(title)
+
+        n_loop = 6
+
+        l_texs = VGroup()
+        for i in range(n_loop):
+            texs = greate_texs(circles, l_array)
+            shuffle(l_array)
+            l_texs.add(texs)
+
+        l_count = VGroup()
+        for i in range(n_loop):
+            l_count.add(MathTex(i).move_to(np.array([-5, 3.5, 0])))
+
+        for j in range(len(l_texs)-1):
+            self.wait()
+            self.play(TransformMatchingTex(l_texs[j], l_texs[j+1]))
+
+
+
+
+
+
+        # brace_out = Brace(sort_history, direction=RIGHT, color=MAROON)
+        # text_out = Tex('$m=6$').next_to(brace_out, RIGHT)
+        # brace_in = Brace(circle_texs, direction=DOWN, color=MAROON)
+        # text_in = Tex('$n=10$').next_to(brace_in, DOWN)
+        # self.play(Write(brace_in), Write(text_in), Write(brace_out), Write(text_out))
+        # self.wait()
+        # self.play(Write(Tex('Time Complexity:$mn$').move_to(np.array([0, -2, 0]))))
+        # self.wait()
+        # self.play(Write(Tex('if $m=n$: Worst case Time Complexity:$n^2$').scale(0.6).move_to(np.array([0, -2.7, 0]))))
+        # self.wait()
+        # self.play(Write(Tex('if $m=1$: Best case Time Complexity:$n$').scale(0.6).move_to(np.array([0, -3.4, 0]))))
