@@ -1,0 +1,7 @@
+# This file is used internally by FFMPEG.
+file 'file:/manim/media/videos/binary_exponentiation/1080p60/partial_movie_files/Example_Power/450974505_1045102062_2334220719.mp4'
+file 'file:/manim/media/videos/binary_exponentiation/1080p60/partial_movie_files/Example_Power/34786186_41969416_106942714.mp4'
+file 'file:/manim/media/videos/binary_exponentiation/1080p60/partial_movie_files/Example_Power/34786186_1530367541_164955724.mp4'
+file 'file:/manim/media/videos/binary_exponentiation/1080p60/partial_movie_files/Example_Power/34786186_3540401426_796988942.mp4'
+file 'file:/manim/media/videos/binary_exponentiation/1080p60/partial_movie_files/Example_Power/34786186_3784835121_3987616153.mp4'
+file 'file:/manim/media/videos/binary_exponentiation/1080p60/partial_movie_files/Example_Power/34786186_1501868250_63697414.mp4'
