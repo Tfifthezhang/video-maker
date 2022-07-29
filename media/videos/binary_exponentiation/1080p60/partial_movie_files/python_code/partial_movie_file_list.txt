@@ -1,0 +1,5 @@
+# This file is used internally by FFMPEG.
+file 'file:/manim/media/videos/binary_exponentiation/1080p60/partial_movie_files/python_code/450974505_3758220284_223132457.mp4'
+file 'file:/manim/media/videos/binary_exponentiation/1080p60/partial_movie_files/python_code/34786186_3756738130_2700757565.mp4'
+file 'file:/manim/media/videos/binary_exponentiation/1080p60/partial_movie_files/python_code/34786186_1389631647_793993427.mp4'
+file 'file:/manim/media/videos/binary_exponentiation/1080p60/partial_movie_files/python_code/34786186_3756738130_3399354865.mp4'
