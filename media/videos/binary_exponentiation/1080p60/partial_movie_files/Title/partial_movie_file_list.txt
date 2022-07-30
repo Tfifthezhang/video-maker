@@ -1,3 +1,0 @@
-# This file is used internally by FFMPEG.
-file 'file:/Users/tfifthezhang/video-maker/media/videos/binary_exponentiation/1080p60/partial_movie_files/Title/450974505_4271004931_223132457.mp4'
-file 'file:/Users/tfifthezhang/video-maker/media/videos/binary_exponentiation/1080p60/partial_movie_files/Title/34786186_3375341780_2478944419.mp4'
