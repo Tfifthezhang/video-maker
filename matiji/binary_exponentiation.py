@@ -13,7 +13,7 @@ class Title(Scene):
 
 class Power(Scene):
     def construct(self):
-        tex_power = MathTex(r'm^n =', r'm \times m \times m \cdots\cdots m \times m \times m')
+        tex_power = MathTex(r'm^n =', r'm \times m \times m \cdots\cdots m \times m \times m').scale(1.5)
         # self.add(tex_power)
         self.play(Write(tex_power))
 
@@ -21,7 +21,7 @@ class Power(Scene):
         # self.add(brace_exp)
         self.play(Write(brace_exp))
 
-        text_log = Tex('$n$').next_to(brace_exp, DOWN)
+        text_log = Tex('$n$').scale(1.5).next_to(brace_exp, DOWN)
         # self.add(text_log)
         self.play(Write(text_log))
 
@@ -31,9 +31,9 @@ class Power(Scene):
 class Poly(Scene):
     def construct(self):
         V1_obj = VGroup()
-        tex_plus = MathTex(r'n =', r'n_1 + n_2 + n_3 + n_4 + n_5')
-        arrow_tex = MathTex(r'\Downarrow')
-        tex_power = MathTex(r'm^n =', r'm^{n_1} \times m^{n_2} \times m^{n_3} \times m^{n_4} \times m^{n_5}')
+        tex_plus = MathTex(r'n =', r'n_1 + n_2 + n_3 + n_4 + n_5').scale(1.5)
+        arrow_tex = MathTex(r'\Downarrow').scale(1.5)
+        tex_power = MathTex(r'm^n =', r'm^{n_1} \times m^{n_2} \times m^{n_3} \times m^{n_4} \times m^{n_5}').scale(1.5)
 
         V1_obj.add(*[tex_plus, arrow_tex, tex_power])
         V1_obj.arrange_submobjects(DOWN, buff=0.1)
@@ -44,7 +44,7 @@ class Poly(Scene):
 
         V2_obj = VGroup()
         s_tex = [r'm^{n_%d}' % i for i in range(1, 6)]
-        V2_obj.add(*[MathTex(i) for i in s_tex])
+        V2_obj.add(*[MathTex(i).scale(2) for i in s_tex])
 
         V2_obj.arrange_submobjects(RIGHT, buff=0.5)
 
@@ -53,7 +53,7 @@ class Poly(Scene):
 
         V3_obj = VGroup()
         V3_obj.add(
-            *[CurvedArrow(V2_obj[0].get_center() - [0, 0.3, 0], i.get_center() - [0, 0.3, 0], radius=3, tip_length=0.2)
+            *[CurvedArrow(V2_obj[0].get_center() - [0, 0.5, 0], i.get_center() - [0, 0.5, 0], radius=5, tip_length=0.2)
               for i in V2_obj])
         self.play(Write(V3_obj))
         self.wait(4)
@@ -61,7 +61,7 @@ class Poly(Scene):
 
         V4_obj = VGroup()
         V4_obj.add(*[
-            CurvedArrow(V2_obj[i].get_center() - [0, 0.2, 0], V2_obj[i + 1].get_center() - [0, 0.2, 0], radius=1,
+            CurvedArrow(V2_obj[i].get_center() - [0, 0.5, 0], V2_obj[i + 1].get_center() - [0, 0.5, 0], radius=1.5,
                         tip_length=0.2) for i in range(4)])
         self.play(Transform(V3_obj, V4_obj))
         self.wait(4)
@@ -72,20 +72,20 @@ class Binary_Exp(Scene):
         title = Text('二进制方法').scale(0.8).move_to(np.array([-5, 3.5, 0]))
         self.add(title)
 
-        text_binary = MathTex(r'n = n_t2^t + n_{t-1}2^{t-1} + \cdots\cdots n_12^1 + n_02^0')
+        text_binary = MathTex(r'n = n_t2^t + n_{t-1}2^{t-1} + \cdots\cdots n_12^1 + n_02^0').scale(1.5)
         self.play(Create(text_binary))
 
         self.wait(5)
 
         text_exp = MathTex(r'm^n =', r'm^{n_t2^t}', r'\times', r'm^{n_{t-1}2^{t-1}}', r'\times\cdots\cdots',
-                           r'm^{n_12^1}', r'\times', r'm^{n_02^0}')
+                           r'm^{n_12^1}', r'\times', r'm^{n_02^0}').scale(1.3)
         self.play(Transform(text_binary, text_exp))
 
         framebox = [SurroundingRectangle(text_exp[i], buff=.1) for i in [7, 5, 3, 1]]
         text_iter = [MathTex(r'm_0 = m_0^1').next_to(framebox[0], DOWN),
                      MathTex(r'm_1 = m_0^2').next_to(framebox[1], DOWN),
-                     MathTex(r'm_2 = m_1^2').next_to(framebox[2], DOWN),
-                     MathTex(r'm_3 = m_2^2').next_to(framebox[3], DOWN)]
+                     MathTex(r'm_{t-1} = m_{t-2}^2').next_to(framebox[2], DOWN),
+                     MathTex(r'm_{t} = m_{t-1}^2').next_to(framebox[3], DOWN)]
 
         self.play(Create(framebox[0]))
         self.play(Write(text_iter[0]))
@@ -106,7 +106,7 @@ class Example_Power(Scene):
 
         V1_obj = VGroup()
 
-        tex_power = MathTex(r'7^{31} =', r'7 \times 7 \times 7 \cdots\cdots 7 \times 7 \times 7')
+        tex_power = MathTex(r'7^{31} =', r'7 \times 7 \times 7 \cdots\cdots 7 \times 7 \times 7').scale(1.5)
 
         brace_exp = Brace(tex_power[-1], direction=DOWN, color=MAROON)
 
@@ -125,9 +125,9 @@ class Example_Power(Scene):
         # V1_obj.arrange_submobjects(DOWN, buff=0.1)
 
         V2_obj = VGroup()
-        tex_binary = MathTex(r'31 = ', r'(11111)_2', r'= 1+2+4+8+16')
-        arrow_tex = MathTex(r'\Downarrow')
-        tex_comb = MathTex(r'7^{31} =', r'7^1 \times 7^2 \times7^4 \times 7^8 \times 7^{16}')
+        tex_binary = MathTex(r'31 = ', r'(11111)_2', r'= 1+2+4+8+16').scale(1.5)
+        arrow_tex = MathTex(r'\Downarrow').scale(1.5)
+        tex_comb = MathTex(r'7^{31} =', r'7^1 \times 7^2 \times7^4 \times 7^8 \times 7^{16}').scale(1.5)
 
         V2_obj.add(*[tex_binary, arrow_tex, tex_comb])
         V2_obj.arrange_submobjects(DOWN, buff=0.1)
@@ -139,8 +139,9 @@ class Example_Power(Scene):
         # self.play(Write(brace_exp,text_log))
 
         tex_comb2 = MathTex(r'7^{31} =',
-                            r'7^1 \times ({7^1})^2 \times ({7^2})^2 \times ({7^4})^2 \times ({7^8})^2').next_to(V2_obj,
-                                                                                                                DOWN)
+                            r'7^1 \times ({7^1})^2 \times ({7^2})^2 \times ({7^4})^2 \times ({7^8})^2').scale(
+            1.5).next_to(V2_obj,
+                         DOWN)
         # self.add(tex_comb2)
 
         self.play(Transform(tex_comb, tex_comb2))
@@ -148,8 +149,8 @@ class Example_Power(Scene):
         brace_comb = Brace(tex_comb2[-1], direction=DOWN, color=MAROON)
         text_log = MathTex(r'5 = [\log(31)]+1 ').next_to(brace_comb, DOWN)
 
-        self.play(Write(brace_comb,run_time=1))
-        self.play(Write(text_log,run_time=2))
+        self.play(Write(brace_comb, run_time=1))
+        self.play(Write(text_log, run_time=2))
 
         self.wait(2)
 
@@ -189,7 +190,7 @@ class Matiji(Scene):
         self.add(image)
 
         self.wait(5)
-        math_tex = MathTex(r'2^k-1=', r'(111...111)_2').next_to(image, DOWN)
+        math_tex = MathTex(r'2^k-1=', r'(111...111)_2').scale(1.5).next_to(image, DOWN)
         tex_brace = Brace(math_tex[-1], direction=DOWN, color=MAROON)
         text_log = MathTex(r'k').next_to(tex_brace, DOWN)
 
@@ -212,3 +213,12 @@ class matiji_code(Scene):
         self.play(Write(rendered_code))
 
         self.wait(3)
+
+
+class screen(Scene):
+    def construct(self):
+        svg = SVGMobject('images/bird.svg').scale(2)
+
+        text = Text('像小鸟一样努力').next_to(svg, DOWN)
+
+        self.play(SpinInFromNothing(svg))
