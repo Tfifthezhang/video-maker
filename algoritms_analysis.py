@@ -105,7 +105,7 @@ class O_frame(Scene):
         texs = VGroup()
 
         T_tex = MathTex(r'T(n) = 4n^2+2n+2')
-        limit_tex =MathTex(r'\lim\limits_{n \to \infty} \frac{2n}{4n^2} =0')
+        limit_tex = MathTex(r'\lim\limits_{n \to \infty} \frac{2n}{4n^2} =0')
         limit_tex2 = MathTex(r'\lim\limits_{n \to \infty} \frac{2}{4n^2} =0')
         arrow_tex = MathTex(r'\Downarrow')
         O_tex = MathTex(r'T(n)=\mathrm {O} (n^2)')
@@ -115,12 +115,11 @@ class O_frame(Scene):
 
         self.play(Create(texs))
         self.wait()
-        self.play(texs.animate.scale(0.6).shift(3*RIGHT))
+        self.play(texs.animate.scale(0.6).shift(3 * RIGHT))
 
 
 class FrameTimefunction(Scene):
     def construct(self):
-
         ax = Axes(x_range=[1, 10], y_range=[0, 150, 10],
                   x_length=8, y_length=6,
                   axis_config={"include_tip": True,
@@ -446,6 +445,7 @@ class BinaryTree(Scene):
         # self.add(g_test)
         self.play(Write(g_test))
 
+
 class BogoSort(Scene):
     def construct(self):
         l_array = [9, 5, 8, 3, 0, 6, 1, 4, 2, 7]
@@ -488,14 +488,9 @@ class BogoSort(Scene):
         for i in range(n_loop):
             l_count.add(MathTex(i).move_to(np.array([-5, 3.5, 0])))
 
-        for j in range(len(l_texs)-1):
+        for j in range(len(l_texs) - 1):
             self.wait()
-            self.play(TransformMatchingTex(l_texs[j], l_texs[j+1]))
-
-
-
-
-
+            self.play(TransformMatchingTex(l_texs[j], l_texs[j + 1]))
 
         # brace_out = Brace(sort_history, direction=RIGHT, color=MAROON)
         # text_out = Tex('$m=6$').next_to(brace_out, RIGHT)
