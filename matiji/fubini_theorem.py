@@ -17,13 +17,13 @@ class Fubini_question(Scene):
         # self.add(tex_power)
         self.play(Write(tex_fubini))
 
-#         brace_exp = Brace(tex_power[-1], direction=DOWN, color=MAROON)
-#         # self.add(brace_exp)
-#         self.play(Write(brace_exp))
+        #         brace_exp = Brace(tex_power[-1], direction=DOWN, color=MAROON)
+        #         # self.add(brace_exp)
+        #         self.play(Write(brace_exp))
 
-#         text_log = Tex('$n$').scale(1.5).next_to(brace_exp, DOWN)
-#         # self.add(text_log)
-#         self.play(Write(text_log))
+        #         text_log = Tex('$n$').scale(1.5).next_to(brace_exp, DOWN)
+        #         # self.add(text_log)
+        #         self.play(Write(text_log))
 
         self.wait(2)
 
@@ -34,9 +34,10 @@ class Fubini_function(Scene):
                 (bottom_left[0], top_right[1]),
                 (bottom_left[0], bottom_left[1]),
                 (top_right[0], bottom_left[1]),
-        ]
+                ]
+
     def construct(self):
-        axes = Axes(x_range=[1, 15 , 1],
+        axes = Axes(x_range=[1, 15, 1],
                     y_range=[0, 15, 1],
                     x_length=8,
                     axis_config={"color": GREEN},
@@ -55,23 +56,55 @@ class Fubini_function(Scene):
 
         plot = VGroup(axes, labels, multiplicative_inverse_graph, multiplicative_inverse_label)
         self.play(Write(plot))
-        
-        l_values = [1,2,3,4,6,8]
-        
-        
-        def get_rectangle(x,y):
+        self.play(plot.animate.shift(2 * LEFT))
+
+        l_values = [1, 2, 3, 4, 6, 8]
+
+        def get_rectangle(x, y):
             polygon = Polygon(
-                *[axes.c2p(*i) for i in self.get_rectangle_corners((x, 0), (int(15/y),y))])
+                *[axes.c2p(*i) for i in self.get_rectangle_corners((x, 0), (int(15 / y), y))])
             polygon.stroke_width = 1
-            polygon.set_fill(BLUE, opacity=0.5)
+            polygon.set_fill(BLUE, opacity=1)
             polygon.set_stroke(YELLOW_B)
             return polygon
-        
+
+        tex_group = VGroup()
+        text_iter = [r'15 = \lfloor \frac{15}{1} \rfloor',
+                     r'7 = \lfloor \frac{15}{2} \rfloor',
+                     r'5 = \lfloor \frac{15}{3} \rfloor',
+                     r'3 = \lfloor \frac{15}{4} \rfloor',
+                     r'2 = \lfloor \frac{15}{6} \rfloor',
+                     r'1 = \lfloor \frac{15}{8} \rfloor']
+        for i in text_iter:
+            tex_group.add(MathTex(i).scale(0.8))
+
+        tex_group.arrange_submobjects(DOWN, buff=0.15)
+        tex_group.shift(5 * RIGHT)
+
         areas = VGroup()
         for t in l_values:
-            areas.add(get_rectangle(t,int(15/t)))
-        
-        self.play(Write(areas))
+            areas.add(get_rectangle(t, int(15 / t)))
+
+        for s in range(len(l_values)):
+            self.play(Create(areas[s]))
+            self.play(Write(tex_group[s]))
+            self.wait(1)
+
+        trans_tex = [MathTex(r'3 = \lfloor \frac{15}{5} \rfloor').scale(0.8).next_to(tex_group[3], 0 * LEFT),
+                     MathTex(r'2 = \lfloor \frac{15}{7} \rfloor').scale(0.8).next_to(tex_group[4], 0 * RIGHT),
+                     [MathTex(r'1 = \lfloor \frac{15}{9} \rfloor').scale(0.8).next_to(tex_group[5], 0 * LEFT),
+                      MathTex(r'1 = \lfloor \frac{15}{10} \rfloor').scale(0.8).next_to(tex_group[5], 0 * LEFT),
+                      MathTex(r'1 = \lfloor \frac{15}{11} \rfloor').scale(0.8).next_to(tex_group[5], 0 * LEFT),
+                      MathTex(r'1 = \lfloor \frac{15}{12} \rfloor').scale(0.8).next_to(tex_group[5], 0 * LEFT),
+                      MathTex(r'1 = \lfloor \frac{15}{13} \rfloor').scale(0.8).next_to(tex_group[5], 0 * LEFT),
+                      MathTex(r'1 = \lfloor \frac{15}{14} \rfloor').scale(0.8).next_to(tex_group[5], 0 * LEFT),
+                      MathTex(r'1 = \lfloor \frac{15}{15} \rfloor').scale(0.8).next_to(tex_group[5], 0 * LEFT)]
+                     ]
+
+        self.play(Transform(tex_group[3], trans_tex[0]), run_time=2)
+        self.play(Transform(tex_group[4], trans_tex[1]), run_time=2)
+        for j in trans_tex[-1]:
+            self.play(Transform(tex_group[5], j))
 
         self.wait(2)
 
