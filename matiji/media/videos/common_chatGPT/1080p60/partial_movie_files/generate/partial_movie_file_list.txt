@@ -1,0 +1,6 @@
+# This file is used internally by FFMPEG.
+file 'file:/manim/matiji/media/videos/common_chatGPT/1080p60/partial_movie_files/generate/450974505_2879819713_1279215027.mp4'
+file 'file:/manim/matiji/media/videos/common_chatGPT/1080p60/partial_movie_files/generate/34786186_2879819713_1632835489.mp4'
+file 'file:/manim/matiji/media/videos/common_chatGPT/1080p60/partial_movie_files/generate/34786186_2879819713_1140277393.mp4'
+file 'file:/manim/matiji/media/videos/common_chatGPT/1080p60/partial_movie_files/generate/34786186_2879819713_1807343713.mp4'
+file 'file:/manim/matiji/media/videos/common_chatGPT/1080p60/partial_movie_files/generate/34786186_2879819713_3647072516.mp4'

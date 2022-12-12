@@ -1,3 +1,3 @@
-manim -qh fubini_theorem.py Fubini_function
+manim -qh common_chatGPT.py generate2
 
 

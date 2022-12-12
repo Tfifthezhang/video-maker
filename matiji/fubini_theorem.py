@@ -41,8 +41,7 @@ class Fubini_function(Scene):
                     y_range=[0, 15, 1],
                     x_length=8,
                     axis_config={"color": GREEN},
-                    x_axis_config={"numbers_to_include": np.arange(1, 15, 1),
-                                   "numbers_with_elongated_ticks": np.arange(0, 15, 1)},
+                    x_axis_config={"numbers_to_include": np.arange(1, 15, 1),"numbers_with_elongated_ticks": np.arange(0, 15, 1)},
                     tips=False,
                     )
 
