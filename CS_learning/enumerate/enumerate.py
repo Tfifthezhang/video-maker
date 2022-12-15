@@ -14,6 +14,19 @@ class Title(Scene):
         self.wait(2)
 
 
+class enumerate_example(Scene):
+    def construct(self):
+        l_n = list(range(1, 101))
+        circle_number = CommonFunc.add_shape_object(l_n).scale(0.55)
+        self.play(FadeIn(circle_number, lag_ratio=0.5))
+        # self.play(circle_number.animate.shift(2*LEFT))
+
+        def if_prime(n):
+            for j in range(2, n//2):
+                if n % j == 0:
+                    return True
+            return False
+
 class source_code(Scene):
     def construct(self):
         title = Text('An Example').scale(0.8).move_to(np.array([-5, 3.5, 0]))
@@ -149,7 +162,7 @@ class handshake(Scene):
             self.play(tracker_1.animate.set_value(integers_1[i].get_center()[0]))
             self.play(Indicate(code.code[0]))
             # 第二个循环
-            for j in range(i+1, len(integers_2)):
+            for j in range(i + 1, len(integers_2)):
                 # 对应的代码进行闪烁
                 self.play(tracker_2.animate.set_value(integers_2[j].get_center()[0]))
                 self.play(Indicate(code.code[1]))
@@ -173,9 +186,51 @@ class handshake(Scene):
         self.wait()
 
 
-class FastPower(Scene):
+class faster_hash(Scene):
     def construct(self):
-        pass
+        l_n = list(range(-5, 5))
+        integers_1 = CommonFunc.get_Integer(l_n).scale(0.8).shift(3 * RIGHT)
+        self.add(integers_1)
+
+        var = CommonFunc.variable_tracker(label=Tex('$\\text{res}$'), color=GREEN).next_to(integers_1, 9 * UP)
+        self.add(var)
+        #
+        source_table = CommonFunc.add_table([[Tex('$\\text{key}$')],
+                                             [Tex('$\\text{value}$')]]).next_to(integers_1, 5 * DOWN).scale(0.6)
+
+        pointer_1, tracker_1, label_1 = CommonFunc.pointer_tracker(integers_1)
+        self.play(Create(pointer_1), FadeIn(label_1))
+
+        code = CommonFunc.add_code('enumerate/code3.py', 'python').next_to(integers_1, LEFT * 0.5)
+        self.play(Create(code))
+
+        self.play(Indicate(code.code[0]))
+        self.play(Create(source_table))
+        self.play(FadeOut(source_table))
+        hash_map = {}
+        sum_res = 0
+        table_group = VGroup()
+        for i in range(len(integers_1)):
+            # 对应的代码进行闪烁
+            self.play(tracker_1.animate.set_value(integers_1[i].get_center()[0]))
+            self.play(Indicate(code.code[1]))
+
+            self.play(Indicate(code.code[2]))
+            if hash_map.get(0 - integers_1[i].get_value()):
+                self.play(Indicate(code.code[3]))
+                sum_res += 1
+                self.play(var.tracker.animate.set_value(sum_res))
+            else:
+                self.play(Indicate(code.code[5]))
+                table = CommonFunc.add_table([[Tex('${}$'.format(integers_1[i].get_value()))],
+                                              [Text('True').scale(0.7)]]).next_to(integers_1, 4 * DOWN).scale(0.5)
+                self.play(FadeIn(table))
+                hash_map[integers_1[i].get_value()] = True
+                table_group.add(table)
+                self.play(FadeOut(table))
+
+        table_group.arrange_submobjects(RIGHT, buff=0.05).next_to(integers_1, 7 * DOWN)
+        self.play(Create(table_group))
 
 
 class screen(Scene):

@@ -26,6 +26,28 @@ class CommonFunc:
         return circle_texs
 
     @classmethod
+    def add_shape_object(cls, l_n, color=BLUE, rows=10, cols=10):
+        n_circles = len(l_n)
+
+        circles = VGroup(*[Circle(radius=0.5,
+                                  color=color
+                                  )
+                           for _ in range(n_circles)
+                           ]
+                         )
+        circles.arrange_in_grid(rows=rows, cols=cols, buff=0.2)
+
+        texs = VGroup()
+        for i in range(n_circles):
+            integer = Integer(number=l_n[i])
+            integer.move_to(circles[i].get_center())
+            texs.add(integer)
+
+        circle_texs = VGroup(circles, texs)
+
+        return circle_texs
+
+    @classmethod
     def get_Integer(cls, l_n, color=BLUE):
         integers = VGroup(*[Integer(number=i,
                                     color=color,
@@ -86,6 +108,11 @@ class CommonFunc:
         arrow = Arrow(start_object, end_object, buff=buff)
         return arrow
 
+    @classmethod
+    def add_table(cls, table_content, row_labels=None, col_labels=None, include_outer_lines=True):
+        table = MobjectTable(table=table_content, row_labels=row_labels, col_labels=col_labels,
+                             include_outer_lines=include_outer_lines)
+        return table
 
     @classmethod
     def copy_move(cls, l_object, destination, shrinkage=0.5):
