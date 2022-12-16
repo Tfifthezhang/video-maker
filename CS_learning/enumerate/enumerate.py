@@ -1,10 +1,40 @@
 from manim import *
 import numpy as np
+import math
 import sys
 
 sys.path.append('..')
 
 from CS_learning.common_func import CommonFunc
+
+
+class logo(Scene):
+    def construct(self):
+        phanton = CommonFunc.add_function(lambda x: 0.3 * np.sin(5 * x), x_range=(-3, 3))
+        start, end = phanton.get_start(), phanton.get_end()
+
+        e_minus = CommonFunc.add_arrow(np.array([-5, 2, 0]), start,
+                                       color=RED, max_tip_length_to_length_ratio=0.05)
+        e_plus = CommonFunc.add_arrow(start, np.array([-5, -2, 0]),
+                                      color=RED, max_tip_length_to_length_ratio=0.05)
+
+        q_average = CommonFunc.add_arrow(np.array([5, 2, 0]), end,
+                                         color=GREEN, max_tip_length_to_length_ratio=0.05)
+        q = CommonFunc.add_arrow(end, np.array([5, -2, 0]),
+                                 color=GREEN, max_tip_length_to_length_ratio=0.05)
+
+        self.play(GrowArrow(e_minus))
+        self.play(GrowArrow(e_plus))
+        self.wait()
+        self.play(GrowFromPoint(phanton, start))
+        self.wait()
+        self.play(GrowArrow(q_average))
+        self.play(GrowArrow(q))
+
+        text = Text('pretending to learn').scale(0.8).next_to(phanton, UP)
+        group = VGroup(phanton, e_minus, e_plus, q_average, q, text)
+
+        self.play(Write(text))
 
 
 class Title(Scene):
@@ -19,18 +49,41 @@ class enumerate_example(Scene):
         l_n = list(range(1, 101))
         circle_number = CommonFunc.add_shape_object(l_n).scale(0.55)
         self.play(FadeIn(circle_number, lag_ratio=0.5))
-        # self.play(circle_number.animate.shift(2*LEFT))
 
         def if_prime(n):
-            for j in range(2, n//2):
+            for j in range(2, int(np.sqrt(n)) + 1):
                 if n % j == 0:
-                    return True
-            return False
+                    return False
+            return True
+
+        circles = circle_number[0]
+        numbers = circle_number[1]
+        r = circles[0].get_radius()
+        for i in range(len(numbers)):
+            if if_prime(numbers[i].get_value()):
+                circles[i].become(Circle(radius=r, color=RED).scale(0.55), match_center=True)
+                self.wait(1)
+
+        self.play(circle_number.animate.shift(3.5 * LEFT))
+
+        text0 = Text('Elements of enumeration algorithm:').scale(0.5).next_to(circle_number, RIGHT + 0.5 * UP)
+        text1 = Text('1. Minimize the enumeration range').scale(0.4).next_to(text0, 3 * DOWN)
+        text2 = Text('2. Optimize selection algorithm').scale(0.4).next_to(text1, 3 * DOWN)
+        text3 = Text('3. choose an appropriate enumeration order').scale(0.4).next_to(text2, 3 * DOWN)
+
+        self.play(Write(text0), Write(text1), Write(text2), Write(text3))
+
+        self.wait(5)
+
 
 class source_code(Scene):
     def construct(self):
         title = Text('An Example').scale(0.8).move_to(np.array([-5, 3.5, 0]))
         self.add(title)
+        topic = Paragraph('\t Given an array of numbers where each number is unique,',
+                          ' \t find the number of pairs of numbers in the array that sum to 0.').set_color(
+            MAROON).scale(0.4).next_to(title, DOWN + 0.5 * RIGHT)
+        self.play(FadeIn(topic))
 
         l_n = list(range(-5, 5))
         integers_1 = CommonFunc.get_Integer(l_n).scale(0.8).shift(3 * RIGHT)
@@ -42,22 +95,19 @@ class source_code(Scene):
 
         # 追踪数据点（外层循环）
         pointer_1, tracker_1, label_1 = CommonFunc.pointer_tracker(integers_1)
-        self.add(pointer_1, label_1)
+        self.play(FadeIn(label_1), Write(pointer_1))
 
         # 追踪数据点（内层循环）
         y_2 = integers_2[0].get_center()[1]
         pointer_2, tracker_2, label_2 = CommonFunc.pointer_tracker(integers_2, label_name='y', y=y_2, direction=UP,
                                                                    position=DOWN)
-        self.add(pointer_2, label_2)
+        self.play(FadeIn(label_2), Write(pointer_2))
 
         var = CommonFunc.variable_tracker(label=Tex('$\\text{res}$'), color=GREEN).next_to(integers_1, 9 * UP)
-        self.add(var)
+        self.play(Create(var))
 
         code = CommonFunc.add_code('enumerate/code1.py', 'python').next_to(integers_1, LEFT * 3.5)
         self.play(Create(code))
-
-        text = 'Given an array of numbers where each number is unique,' \
-               ' find the number of pairs of numbers in the array that sum to 0.'
 
         sum_result = 0
         # 第一个循环
@@ -231,6 +281,50 @@ class faster_hash(Scene):
 
         table_group.arrange_submobjects(RIGHT, buff=0.05).next_to(integers_1, 7 * DOWN)
         self.play(Create(table_group))
+
+        time_complex = Tex('Time Complexity:$n$', color=GREEN).scale(0.6).next_to(code, DOWN)
+        self.play(Write(time_complex))
+
+class FrameTimefunction(Scene):
+    def construct(self):
+        ax = Axes(x_range=[1, 10], y_range=[0, 150, 10],
+                  x_length=8, y_length=6,
+                  axis_config={"include_tip": True,
+                               "include_numbers": True}
+                  )
+
+        # labels = ax.get_axis_labels(x_label="x", y_label="y")
+
+        ax.move_to(np.array([-2, 0, 0]))
+
+        def func(x):
+            return x ** 2
+
+        def func_linear(x):
+            return x
+
+        def func_log(x):
+            return np.log(x) + 1
+
+        def func_linear_log(x):
+            return x * np.log(x)
+
+        def func_n_Factorial(x):
+            return np.power(x, 6)
+
+        self.play(Create(ax))
+        self.wait()
+
+        l_func = [func_log, func_linear, func_linear_log, func, func_n_Factorial]
+        texs = ["$\log n$", "$n$", "$n \log n$", "$n^2$", "$n!$"]
+        colors = [TEAL, GREEN, YELLOW, GOLD, MAROON]
+
+        for i in range(len(l_func)):
+            graph = ax.plot(l_func[i], x_range=[1, 9], color=colors[i], use_smoothing=True)
+            graph_label = ax.get_graph_label(graph=graph, label=Tex(texs[i]))
+            self.play(Create(graph), Write(graph_label))
+            self.wait()
+
 
 
 class screen(Scene):

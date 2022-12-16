@@ -104,8 +104,9 @@ class CommonFunc:
         return dashedline
 
     @classmethod
-    def add_arrow(cls, start_object, end_object, buff=0):
-        arrow = Arrow(start_object, end_object, buff=buff)
+    def add_arrow(cls, start_object, end_object, buff=0, color=RED, max_tip_length_to_length_ratio=0.1):
+        arrow = Arrow(start_object, end_object, buff=buff,
+                      color=color, max_tip_length_to_length_ratio=max_tip_length_to_length_ratio)
         return arrow
 
     @classmethod
@@ -113,6 +114,11 @@ class CommonFunc:
         table = MobjectTable(table=table_content, row_labels=row_labels, col_labels=col_labels,
                              include_outer_lines=include_outer_lines)
         return table
+
+    @classmethod
+    def add_function(cls, func, color=BLUE, x_range=(-1, 1)):
+        func_graph = FunctionGraph(func, color=color, x_range=x_range)
+        return func_graph
 
     @classmethod
     def copy_move(cls, l_object, destination, shrinkage=0.5):
