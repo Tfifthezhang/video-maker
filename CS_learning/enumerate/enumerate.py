@@ -31,7 +31,7 @@ class logo(Scene):
         self.play(GrowArrow(q_average))
         self.play(GrowArrow(q))
 
-        text = Text('pretending to learn').scale(0.8).next_to(phanton, UP)
+        text = Paragraph('假装学习', '\n \t pretend to learn').scale(0.8).next_to(phanton, UP)
         group = VGroup(phanton, e_minus, e_plus, q_average, q, text)
 
         self.play(Write(text))
@@ -78,11 +78,13 @@ class enumerate_example(Scene):
 
 class source_code(Scene):
     def construct(self):
-        title = Text('An Example').scale(0.8).move_to(np.array([-5, 3.5, 0]))
+        title = Text('例子:',font='SIL-Hei-Med-Jian').scale(0.8).move_to(np.array([-5, 3.5, 0]))
         self.add(title)
+        subtitle = Text('一个数组中的数互不相同，其中和为0的数对有多少对').scale(0.6).next_to(title, RIGHT)
+        self.add(subtitle)
         topic = Paragraph('\t Given an array of numbers where each number is unique,',
-                          ' \t find the number of pairs of numbers in the array that sum to 0.').set_color(
-            MAROON).scale(0.4).next_to(title, DOWN + 0.5 * RIGHT)
+                          '\t find the number of pairs of numbers in the array that sum to 0.').set_color(
+            MAROON).scale(0.4).next_to(subtitle, DOWN)
         self.play(FadeIn(topic))
 
         l_n = list(range(-5, 5))
@@ -131,7 +133,7 @@ class source_code(Scene):
                     # variable进行跟踪
                     self.play(var.tracker.animate.set_value(sum_result))
 
-        time_complex = Tex('Time Complexity:$n^2$').scale(0.6).next_to(code, DOWN)
+        time_complex = Tex('时间复杂度（Time Complexity）:$n^2$').scale(0.6).next_to(code, DOWN)
         self.play(Write(time_complex))
         self.wait()
 
@@ -285,17 +287,10 @@ class faster_hash(Scene):
         time_complex = Tex('Time Complexity:$n$', color=GREEN).scale(0.6).next_to(code, DOWN)
         self.play(Write(time_complex))
 
-class FrameTimefunction(Scene):
+
+class time_compare(Scene):
     def construct(self):
-        ax = Axes(x_range=[1, 10], y_range=[0, 150, 10],
-                  x_length=8, y_length=6,
-                  axis_config={"include_tip": True,
-                               "include_numbers": True}
-                  )
-
-        # labels = ax.get_axis_labels(x_label="x", y_label="y")
-
-        ax.move_to(np.array([-2, 0, 0]))
+        ax = CommonFunc.add_axes(x_range=[1, 10], y_range=[0, 150, 10], x_length=8, y_length=6)
 
         def func(x):
             return x ** 2
@@ -303,28 +298,21 @@ class FrameTimefunction(Scene):
         def func_linear(x):
             return x
 
-        def func_log(x):
-            return np.log(x) + 1
-
-        def func_linear_log(x):
-            return x * np.log(x)
-
-        def func_n_Factorial(x):
-            return np.power(x, 6)
+        def func_sum(x):
+            return x ** 2 / 2
 
         self.play(Create(ax))
         self.wait()
 
-        l_func = [func_log, func_linear, func_linear_log, func, func_n_Factorial]
-        texs = ["$\log n$", "$n$", "$n \log n$", "$n^2$", "$n!$"]
-        colors = [TEAL, GREEN, YELLOW, GOLD, MAROON]
+        l_func = [func, func_sum, func_linear]
+        texs = ["$n^2$", "$\\frac{n^2}{2}$", '$n$']
+        colors = [YELLOW, GOLD, MAROON]
 
         for i in range(len(l_func)):
-            graph = ax.plot(l_func[i], x_range=[1, 9], color=colors[i], use_smoothing=True)
+            graph = ax.plot(l_func[i], x_range=[1, 10], color=colors[i], use_smoothing=True)
             graph_label = ax.get_graph_label(graph=graph, label=Tex(texs[i]))
             self.play(Create(graph), Write(graph_label))
             self.wait()
-
 
 
 class screen(Scene):
