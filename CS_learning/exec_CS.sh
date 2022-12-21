@@ -1,3 +1,1 @@
-manim -qh enumerate/enumerate.py source_code
-
-
+manim -qh enumerate/enumerate.py Title

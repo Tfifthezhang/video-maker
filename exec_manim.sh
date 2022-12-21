@@ -1,3 +1,3 @@
-manim -qh matiji/binary_exponentiation.py screen
+manim -qh example/dragon.py Dragon
 
 
