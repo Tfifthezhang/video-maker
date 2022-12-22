@@ -1,0 +1,4 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/tfifthefrank/video-maker/Physics_learning/media/videos/example/1080p60/partial_movie_files/TexFalling/2902699114_795458434_747742588.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Physics_learning/media/videos/example/1080p60/partial_movie_files/TexFalling/3931933789_4001982855_846126677.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Physics_learning/media/videos/example/1080p60/partial_movie_files/TexFalling/3931933789_4001982855_1797522477.mp4'

@@ -1,0 +1,9 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/enumerate/1080p60/partial_movie_files/time_compare/2902699114_1782848129_223132457.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/enumerate/1080p60/partial_movie_files/time_compare/3931933789_329969645_2903057716.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/enumerate/1080p60/partial_movie_files/time_compare/3931933789_894954959_1352333630.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/enumerate/1080p60/partial_movie_files/time_compare/3931933789_329969645_2237378785.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/enumerate/1080p60/partial_movie_files/time_compare/3931933789_1596611718_1599882379.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/enumerate/1080p60/partial_movie_files/time_compare/3931933789_329969645_2765093363.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/enumerate/1080p60/partial_movie_files/time_compare/3931933789_3165205367_2250958577.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/enumerate/1080p60/partial_movie_files/time_compare/3931933789_329969645_1732966453.mp4'

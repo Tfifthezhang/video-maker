@@ -42,6 +42,9 @@ class logo(Scene):
 
         self.play(FadeIn(text_cn), Create(text_en))
 
+        svg_image = SVGMobject('svg_icon/bird.svg', fill_color=MAROON).scale(1).next_to(phanton, 2 * UP)
+        self.play(SpinInFromNothing(svg_image))
+
         self.play(Succession(*[Transform(phanton, phanton_group[i]) for i in range(len(phanton_group))], run_time=5))
 
 
@@ -61,7 +64,7 @@ class Title(Scene):
         self.play(GrowFromPoint(text, svg_group[0].get_center(), run_time=2))
         self.wait(3)
 
-        subtext = Text('-- 列举出问题所有可能的解，再进行筛选').scale(0.5).next_to(text, 1.5*DOWN)
+        subtext = Text('-- 列举出问题所有可能的解，再进行筛选').scale(0.5).next_to(text, 1.5 * DOWN)
         self.play(Write(subtext))
 
 
@@ -350,10 +353,24 @@ class time_compare(Scene):
             self.wait()
 
 
-class screen(Scene):
+class thanks_end(Scene):
     def construct(self):
-        svg = SVGMobject('images/bird.svg').scale(2)
+        svg_image = SVGMobject('svg_icon/bird.svg', fill_color=MAROON).scale(1.5).shift(2 * UP)
 
-        text = Text('像小鸟一样努力').next_to(svg, DOWN)
+        text_moto = Text('像小鸟一样努力').scale(0.4).next_to(svg_image, DOWN)
 
-        self.play(SpinInFromNothing(svg))
+        text = Text('特别感谢', font='SIL-Hei-Med-Jian').next_to(svg_image, 4 * DOWN)
+
+        self.play(SpinInFromNothing(svg_image))
+        # self.play(FadeIn(text_moto))
+
+        self.play(Create(text))
+
+        # horizon_line = Line(text.get_center()+5*LEFT, text.get_center()+5*RIGHT).shift(5*DOWN)
+
+        names = ['轩哥码题', '溪亭日暮']
+        name_group = VGroup(*[Text(i) for i in names])
+        name_group.arrange_submobjects(RIGHT, buff=1).scale(0.6).next_to(text, 5 * DOWN)
+
+        self.play(FadeIn(name_group, lag_ratio=0.5, run_time=4))
+        self.wait(2)

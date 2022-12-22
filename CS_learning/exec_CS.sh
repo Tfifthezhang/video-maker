@@ -1,1 +1,1 @@
-manim -qh enumerate/enumerate.py Title
+manim -qh enumerate/enumerate.py logo
