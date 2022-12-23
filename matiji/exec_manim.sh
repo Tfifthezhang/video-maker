@@ -1,3 +1,3 @@
-manim -qh common_chatGPT.py generate2
+manim -qh common_chatGPT.py Title
 
 

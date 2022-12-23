@@ -63,7 +63,7 @@ class Title(Scene):
         self.play(GrowFromPoint(text, svg_group[0].get_center(), run_time=2))
         self.wait(3)
 
-        subtext = Text('-- 列举出问题所有可能的解，再进行筛选').scale(0.5).next_to(text, 1.5 * DOWN)
+        subtext = Text('-- 列举出问题所有可能的解').scale(0.5).next_to(text, 1.5 * DOWN)
         self.play(Write(subtext))
 
 
@@ -101,7 +101,7 @@ class enumerate_example(Scene):
         text1_cn = Text('1. 确定枚举空间').scale(0.5).next_to(text0_en, 3 * DOWN)
         text1_en = Text('enumeration scope').scale(0.4).next_to(text1_cn, DOWN)
 
-        text2_cn = Text('3. 选择合适的枚举顺序').scale(0.5).next_to(text1_en, 3 * DOWN)
+        text2_cn = Text('2. 选择合适的枚举顺序').scale(0.5).next_to(text1_en, 3 * DOWN)
         text2_en = Text('choose an appropriate enumeration order').scale(0.4).next_to(text2_cn, DOWN)
 
         text3_cn = Text('3. 构造筛选方法').scale(0.5).next_to(text2_en, 3 * DOWN)
