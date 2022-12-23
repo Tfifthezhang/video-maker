@@ -32,15 +32,14 @@ class logo(Scene):
 
         group = VGroup(phanton, e_minus, e_plus, q_average, q)
 
-        self.play(group.animate.scale(0.6).shift(UP))
+        self.play(group.animate.scale(0.6))
 
         phanton_group = VGroup(*[CommonFunc.add_function(lambda x: 0.3 * np.sin(5 * x - np.pi * 0.5 * dx),
-                                                         x_range=(-3, 3)).scale(0.6).shift(UP) for dx in range(41)])
+                                                         x_range=(-3, 3)).scale(0.6) for dx in range(41)])
 
-        text_cn = Text('假装学习', font='HiraginoSansGB-W3').scale(0.8).next_to(group, DOWN)
-        text_en = Text('Pretending to Learn').scale(0.8).next_to(text_cn, DOWN)
+        text_cn = Text('迷路的小画家', font='HiraginoSansGB-W3').scale(0.7).next_to(group, DOWN)
 
-        self.play(FadeIn(text_cn), Create(text_en))
+        self.play(FadeIn(text_cn), run_time=3)
 
         svg_image = SVGMobject('svg_icon/bird.svg', fill_color=MAROON).scale(1).next_to(phanton, 2 * UP)
         self.play(SpinInFromNothing(svg_image))
@@ -80,33 +79,45 @@ class enumerate_example(Scene):
                     return False
             return True
 
+        not_prime_group = VGroup()
+
         circles = circle_number[0]
         numbers = circle_number[1]
         r = circles[0].get_radius()
         for i in range(len(numbers)):
             if if_prime(numbers[i].get_value()):
                 circles[i].become(Circle(radius=r, color=RED).scale(0.55), match_center=True)
-                self.wait(1)
+                self.wait(0.25)
+            else:
+                not_prime_group.add(circles[i], numbers[i])
 
         self.play(circle_number.animate.shift(3.5 * LEFT))
 
         text0_cn = Text('枚举算法的要素', font='SIL-Hei-Med-Jian').scale(0.8).next_to(circle_number, 7 * RIGHT + 0.5 * UP)
         text0_en = Text('Elements of enumeration algorithm').scale(0.5).next_to(text0_cn, DOWN)
         self.play(Write(text0_cn), Write(text0_en))
+        self.wait(1)
+
+        text1_cn = Text('1. 确定枚举空间').scale(0.5).next_to(text0_en, 3 * DOWN)
+        text1_en = Text('enumeration scope').scale(0.4).next_to(text1_cn, DOWN)
+
+        text2_cn = Text('3. 选择合适的枚举顺序').scale(0.5).next_to(text1_en, 3 * DOWN)
+        text2_en = Text('choose an appropriate enumeration order').scale(0.4).next_to(text2_cn, DOWN)
+
+        text3_cn = Text('3. 构造筛选方法').scale(0.5).next_to(text2_en, 3 * DOWN)
+        text3_en = Text('filtering methods').scale(0.4).next_to(text3_cn, DOWN)
+
+        vec = Vector(LEFT).next_to(circle_number, 0.5*DOWN)
+
+        self.play(Write(text1_cn), Write(text1_en))
+        self.play(Circumscribe(circle_number, shape=Rectangle, time_width=4, run_time=4))
+        self.play(Write(text2_cn), Write(text2_en))
+        self.play(Create(vec))
+        self.play(Flash(circles[-4], time_width=4, run_time=4))
+        self.play(Write(text3_cn), Write(text3_en))
+        self.play(Uncreate(vec))
+        self.play(FadeOut(not_prime_group, run_time=3))
         self.wait(5)
-
-        text1_cn = Text('1. 减少枚举空间').scale(0.5).next_to(text0_en, 3 * DOWN)
-        text1_en = Text('reduce enumeration scope').scale(0.4).next_to(text1_cn, DOWN)
-
-        text2_cn = Text('2. 优化筛选方法').scale(0.5).next_to(text1_en, 3 * DOWN)
-        text2_en = Text(' optimize filtering methods').scale(0.4).next_to(text2_cn, DOWN)
-
-        text3_cn = Text('3. 选择合适枚举顺序').scale(0.5).next_to(text2_en, 3 * DOWN)
-        text3_en = Text('choose an appropriate enumeration order').scale(0.4).next_to(text3_cn, DOWN)
-
-        self.play(Write(text1_cn), Write(text1_en),
-                  Write(text2_cn), Write(text2_en),
-                  Write(text3_cn), Write(text3_en))
 
 
 class source_code(Scene):
@@ -120,6 +131,8 @@ class source_code(Scene):
             MAROON).scale(0.5).next_to(subtitle, DOWN)
         self.play(FadeIn(topic))
 
+        self.wait(4)
+
         l_n = list(range(-5, 5))
         integers_1 = CommonFunc.get_Integer(l_n).scale(0.8).shift(3 * RIGHT)
         integers_2 = CommonFunc.get_Integer(l_n, color=RED).scale(0.8).next_to(integers_1, DOWN * 2)
@@ -132,14 +145,17 @@ class source_code(Scene):
         pointer_1, tracker_1, label_1 = CommonFunc.pointer_tracker(integers_1)
         self.play(FadeIn(label_1), Write(pointer_1))
 
+        self.wait(3)
         # 追踪数据点（内层循环）
         y_2 = integers_2[0].get_center()[1]
         pointer_2, tracker_2, label_2 = CommonFunc.pointer_tracker(integers_2, label_name='y', y=y_2, direction=UP,
                                                                    position=DOWN)
         self.play(FadeIn(label_2), Write(pointer_2))
+        self.wait(3)
 
         code = CommonFunc.add_code('enumerate/code1.py', 'python').next_to(integers_1, LEFT * 3.5)
         self.play(Create(code))
+        self.wait(3)
 
         var = CommonFunc.variable_tracker(label=Tex('$\\text{res}$'), color=GREEN).next_to(code, UP)
         self.play(Create(var))
@@ -167,9 +183,9 @@ class source_code(Scene):
                     self.play(var.tracker.animate.set_value(sum_result))
 
         time_consume = Text('时间复杂度（Time Complexity)').scale(0.6).next_to(code, DOWN)
-        time_complex = Tex('$n^2$').scale(0.8).next_to(time_consume, RIGHT)
+        time_complex = Tex('$O(n^2)$').scale(0.8).next_to(time_consume, DOWN)
         self.play(Write(time_consume), Write(time_complex))
-        self.wait()
+        self.wait(3)
 
 
 class fast_code(Scene):
@@ -212,6 +228,7 @@ class fast_code(Scene):
         arrow = CommonFunc.add_arrow(zero_explain, zero_situation, buff=0.1)
         self.play(GrowFromCenter(zero_explain), Write(arrow))
         self.play(FocusOn(zero_situation, run_time=5))
+        self.wait(4)
 
 
 class handshake(Scene):
@@ -234,8 +251,11 @@ class handshake(Scene):
                                                                    position=DOWN)
         self.play(FadeIn(label_2), Write(pointer_2))
 
+        self.wait(4)
+
         code = CommonFunc.add_code('enumerate/code2.py', 'python').next_to(integers_1, LEFT * 3.5)
         self.play(Create(code))
+        self.wait(4)
 
         var = CommonFunc.variable_tracker(label=Tex('$\\frac{\\text{res}}{2}$'), color=GREEN).next_to(code, UP)
         self.add(var)
@@ -267,9 +287,9 @@ class handshake(Scene):
         self.play(FadeIn(final_var))
 
         time_consume = Text('时间复杂度（Time Complexity)').scale(0.6).next_to(code, DOWN)
-        time_complex = Tex('$\\frac{n^2}{2}$').scale(0.8).next_to(time_consume, RIGHT)
+        time_complex = Tex('$\\frac{n^2}{2}\\in O(n^2)$').scale(0.8).next_to(time_consume, DOWN)
         self.play(Write(time_consume), Write(time_complex))
-        self.wait()
+        self.wait(4)
 
 
 class faster_hash(Scene):
@@ -286,8 +306,11 @@ class faster_hash(Scene):
         pointer_1, tracker_1, label_1 = CommonFunc.pointer_tracker(integers_1)
         self.play(Create(pointer_1), FadeIn(label_1))
 
+        self.wait(3)
+
         code = CommonFunc.add_code('enumerate/code3.py', 'python').next_to(integers_1, LEFT * 0.2)
         self.play(Create(code))
+        self.wait(3)
 
         var = CommonFunc.variable_tracker(label=Tex('$\\frac{\\text{res}}{2}$'), color=GREEN).next_to(code, UP)
         self.add(var)
@@ -319,11 +342,12 @@ class faster_hash(Scene):
 
         table_group.arrange_submobjects(RIGHT, buff=0.05).next_to(integers_1, 7 * DOWN)
         self.play(Create(table_group))
+        self.wait(4)
 
         time_consume = Text('时间复杂度（Time Complexity)').scale(0.5).next_to(code, DOWN)
-        time_complex = Tex('$n$').scale(0.8).next_to(time_consume, DOWN)
+        time_complex = Tex('$O(n)$').scale(0.8).next_to(time_consume, DOWN)
         self.play(Write(time_consume), Write(time_complex))
-        self.wait()
+        self.wait(3)
 
 
 class time_compare(Scene):
