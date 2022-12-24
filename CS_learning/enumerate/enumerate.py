@@ -51,14 +51,20 @@ class Title(Scene):
     def construct(self):
         svg_object = SVGMobject('svg_icon/book.svg', fill_color=BLUE)
         svg_group = VGroup(*[svg_object.copy() for _ in range(10)]).scale(0.4)
-        svg_group.arrange_submobjects(RIGHT, buff=0.2).shift(2 * UP)
+        svg_group.arrange_submobjects(RIGHT, buff=0.2).shift(1 * UP)
+
+        brace = Brace(svg_group, direction=UP, color=MAROON)
+
+        section_text = Text('基础算法优化').scale(0.9).next_to(brace, UP)
 
         self.play(Create(svg_group))
         self.wait(5)
 
+        self.play(FadeIn(brace), Create(section_text))
+
         self.play(Indicate(svg_group[0], run_time=2))
 
-        text = Text('枚举算法    Enumeration Algorithm ').next_to(svg_group, DOWN * 4)
+        text = Text('枚举算法    Enumeration Algorithm ').scale(0.7).next_to(svg_group, DOWN * 3)
 
         self.play(GrowFromPoint(text, svg_group[0].get_center(), run_time=2))
         self.wait(3)
@@ -74,6 +80,8 @@ class enumerate_example(Scene):
         self.play(FadeIn(circle_number, lag_ratio=0.5))
 
         def if_prime(n):
+            if n == 1:
+                return False
             for j in range(2, int(np.sqrt(n)) + 1):
                 if n % j == 0:
                     return False
@@ -91,6 +99,8 @@ class enumerate_example(Scene):
             else:
                 not_prime_group.add(circles[i], numbers[i])
 
+        self.wait(5)
+
         self.play(circle_number.animate.shift(3.5 * LEFT))
 
         text0_cn = Text('枚举算法的要素', font='SIL-Hei-Med-Jian').scale(0.8).next_to(circle_number, 7 * RIGHT + 0.5 * UP)
@@ -107,7 +117,7 @@ class enumerate_example(Scene):
         text3_cn = Text('3. 构造筛选方法').scale(0.5).next_to(text2_en, 3 * DOWN)
         text3_en = Text('filtering methods').scale(0.4).next_to(text3_cn, DOWN)
 
-        vec = Vector(LEFT).next_to(circle_number, 0.5*DOWN)
+        vec = Vector(LEFT).next_to(circle_number, 0.5 * DOWN)
 
         self.play(Write(text1_cn), Write(text1_en))
         self.play(Circumscribe(circle_number, shape=Rectangle, time_width=4, run_time=4))
@@ -352,7 +362,7 @@ class faster_hash(Scene):
 
 class time_compare(Scene):
     def construct(self):
-        ax = CommonFunc.add_axes(x_range=[1, 10], y_range=[0, 150, 10], x_length=8, y_length=6)
+        ax = CommonFunc.add_axes(x_range=[1, 10], y_range=[0, 150, 10], x_length=8, y_length=6).shift(LEFT + 0.3 * UP)
 
         def func(x):
             return x ** 2
@@ -370,10 +380,13 @@ class time_compare(Scene):
         texs = ["$n^2$", "$\\frac{n^2}{2}$", '$n$']
         colors = [YELLOW, GOLD, MAROON]
 
+        texts = ['暴力枚举', '利用对称性', '利用额外空间']
+
         for i in range(len(l_func)):
             graph = ax.plot(l_func[i], x_range=[1, 10], color=colors[i], use_smoothing=True)
             graph_label = ax.get_graph_label(graph=graph, label=Tex(texs[i]))
-            self.play(Create(graph), Write(graph_label))
+            text = Text(texts[i]).scale(0.6).next_to(graph_label, RIGHT)
+            self.play(Create(graph), Write(graph_label), Write(text))
             self.wait()
 
 
