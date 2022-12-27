@@ -128,5 +128,63 @@ class CommonFunc:
         return axes
 
     @classmethod
-    def copy_move(cls, l_object, destination, shrinkage=0.5):
-        pass
+    def add_bar_axes(cls, mod=10):
+
+        axes = Axes(
+            x_range =(0, mod+0.5),
+            x_axis_config={
+                "unit_size": 10 / mod,
+                "include_tip": False,
+            },
+            y_range=(0, 100, 2),
+            y_axis_config={
+                "unit_size": 0.055,
+                "include_tip": False,
+            },
+        )
+
+        x_labels = VGroup()
+        for x in range(mod):
+            digit = Integer(x)
+            digit.scale(1)
+            digit.next_to(axes.x_axis.n2p(x + 1), DOWN, MED_SMALL_BUFF)
+            x_labels.add(digit)
+        x_labels.set_submobject_colors_by_gradient(*[YELLOW, BLUE])
+        axes.add(x_labels)
+        axes.x_labels = x_labels
+
+        # y_labels = VGroup()
+        # for y in range(25, 100, 25):
+        #     label = Integer(y)
+        #     label.next_to(axes.y_axis.n2p(y), LEFT, MED_SMALL_BUFF)
+        #     y_labels.add(label)
+        # axes.add(y_labels)
+
+        x_axis_label = Text('数字').scale(0.6)
+        x_axis_label.next_to(axes.x_axis.get_end(), RIGHT, buff=MED_LARGE_BUFF)
+        axes.add(x_axis_label)
+
+        y_axis_label = Text("计数分布").scale(0.6)
+        y_axis_label.next_to(axes.y_axis.get_end(), UP, buff=MED_LARGE_BUFF)
+        # y_axis_label.set_color(self.bar_colors[0])
+        axes.add(y_axis_label)
+
+        axes.center()
+        axes.to_edge(DOWN)
+
+        return axes
+
+    @classmethod
+    def add_axes_bar(cls, axes, mod, bar_width=0.5):
+        bars = VGroup()
+        for x in range(mod):
+            bar = Rectangle(
+                height=0.1,
+                width=bar_width,
+                fill_opacity=1,
+            ).next_to(axes.x_axis.n2p(x + 1), 0.1*UP)
+            bars.add(bar)
+        bars.set_submobject_colors_by_gradient(*[YELLOW, BLUE])
+        bars.set_stroke(WHITE, 1)
+
+        return bars

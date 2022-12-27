@@ -1,3 +1,3 @@
-manim -qh example/dragon.py Dragon
+manim -qh reservoir.py reservoir_solve
 
 
