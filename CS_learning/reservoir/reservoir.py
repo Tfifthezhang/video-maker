@@ -12,6 +12,8 @@ from manim import *
 import numpy as np
 import sys
 
+sys.path.append('..')
+
 from CS_learning.common_func import CommonFunc
 import random
 
@@ -201,7 +203,7 @@ class reservoir_problem(Scene):
 
 
     def insert_image(self):
-        image = SVGMobject('images/question.svg', fill_color=RED, color=BLUE).scale(0.8).shift(DOWN)
+        image = SVGMobject('../../images/question.svg', fill_color=RED, color=BLUE).scale(0.8).shift(DOWN)
         self.play(SpinInFromNothing(image))
 
 
@@ -395,10 +397,10 @@ class reservoir_general(Scene):
         self.image_insert()
 
     def image_insert(self):
-        paper = ImageMobject('images/reservoir.png').scale(1.35)
+        paper = ImageMobject('../../images/reservoir.png').scale(1.35)
         self.play(SpinInFromNothing(paper))
         self.play(paper.animate.move_to(2 * LEFT))
-        image = ImageMobject('images/jeffrey_vitter.jpg').to_edge(2 * RIGHT)
+        image = ImageMobject('../../images/jeffrey_vitter.jpg').to_edge(2 * RIGHT)
         self.play(FadeIn(image))
         self.play(Write(Text('Jeffrey Vitter').scale(0.6).next_to(image, DOWN)))
 
