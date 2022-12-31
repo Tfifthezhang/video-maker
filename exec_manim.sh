@@ -1,3 +1,3 @@
-manim -qh reservoir.py reservoir_solve
+manim -qh reservoir.py random_sampling
 
 

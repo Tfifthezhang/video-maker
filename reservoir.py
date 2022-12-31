@@ -56,31 +56,6 @@ class logo(Scene):
         self.play(Succession(*[Transform(phanton, phanton_group[i]) for i in range(len(phanton_group))], run_time=5))
 
 
-class Title(Scene):
-    def construct(self):
-        svg_object = SVGMobject('svg_icon/book.svg', fill_color=BLUE)
-        svg_group = VGroup(*[svg_object.copy() for _ in range(10)]).scale(0.4)
-        svg_group.arrange_submobjects(RIGHT, buff=0.2).shift(1 * UP)
-
-        brace = Brace(svg_group, direction=UP, color=MAROON)
-
-        section_text = Text('基础算法优化').scale(0.9).next_to(brace, UP)
-
-        self.play(Create(svg_group))
-        self.wait(5)
-
-        self.play(FadeIn(brace), Create(section_text))
-
-        self.play(Indicate(svg_group[0], run_time=2))
-
-        text = Text('枚举算法    Enumeration Algorithm ').scale(0.7).next_to(svg_group, DOWN * 3)
-
-        self.play(GrowFromPoint(text, svg_group[0].get_center(), run_time=2))
-        self.wait(3)
-
-        subtext = Text('-- 列举出问题所有可能的解').scale(0.5).next_to(text, 1.5 * DOWN)
-        self.play(Write(subtext))
-
 
 class intro(Scene):
     def construct(self):
@@ -126,13 +101,16 @@ class random_sampling(Scene):
         C.add_updater(lambda c: c.set_value(s))
         text = Text('0-9的随机数').scale(0.6).next_to(C, UP)
         self.add(text, C)
-        for _ in range(1000):
+        for _ in range(520):
             s = random.randint(0, 9)
             bar = bars[s]
-            d_bar_height[s] = d_bar_height[s] + 1
-            self.play(bar.animate.stretch_to_fit_height(0.1 * d_bar_height[s]).move_to(bar.get_bottom(), DOWN * 0.1))
+            if d_bar_height[s] <= 50:
+                d_bar_height[s] = d_bar_height[s] + 1
+                self.play(bar.animate.stretch_to_fit_height(0.1 * d_bar_height[s]).move_to(bar.get_bottom(), DOWN * 0.1))
+            else:
+                pass
 
-        tex = Tex('$P=\\frac{1}{N}$').scale(0.7).next_to(text, UP)
+        tex = Tex('$P=\\frac{1}{n}$',color=MAROON).scale(0.8).next_to(text, UP)
         self.play(Write(tex))
         self.wait(10)
 
@@ -178,7 +156,11 @@ class certainly_sampling(Scene):
 
 class reservoir_problem(Scene):
     def construct(self):
-        l_n = list(range(1, 100))
+        self.slide_reservoir()
+        self.insert_image()
+
+    def slide_reservoir(self):
+        l_n = list(range(1, 200))
         n = len(l_n)
         random.shuffle(l_n)
         circle_number = CommonFunc.add_shape_object(l_n, rows=1, cols=n, color=MAROON_A).scale(0.6)
@@ -190,32 +172,38 @@ class reservoir_problem(Scene):
 
         stride = circles[0].width + SMALL_BUFF
 
-        start_n = 10
-        for i in range(start_n):
+        for i in range(100):
             self.play(circle_number.animate.shift(stride * LEFT))
+            if i == 50:
+                target_circles = VGroup(*[Circle().scale(0.55) for _ in range(10)]).scale(0.6)
+                target_circles.arrange_submobjects(RIGHT, buff=SMALL_BUFF)
+                target_circles.to_edge(2 * DOWN)
+                sr = SurroundingRectangle(target_circles, buff=SMALL_BUFF)
+                self.add(sr)
 
-        text1_cn = Text('当n很大或着未知，尤其是不能将n个元素全部加载到内存：').scale(0.6).to_edge(UP + LEFT)
-        text1_en = Paragraph('The size of the population n is not known to the algorithm and',
-                             'is typically too large for all n items to fit into main memory').scale(0.3).next_to(
-            text1_cn, DOWN)
+                self.play(FadeIn(target_circles), run_time=3)
 
-        self.play(Write(text1_cn), Write(text1_en))
+                text1_cn = Text('当n很大或着未知，尤其是不能将n个元素全部加载到内存：').scale(0.6).to_edge(UP + LEFT)
+                text1_en = Paragraph('The size of the population n is not known to the algorithm and',
+                                     'is typically too large for all n items to fit into main memory').scale(0.4).next_to(
+                    text1_cn, DOWN)
 
-        target_circles = VGroup(*[Circle().scale(0.55) for _ in range(10)]).scale(0.6)
-        target_circles.arrange_submobjects(RIGHT, buff=SMALL_BUFF)
-        target_circles.to_edge(2 * DOWN)
-        sr = SurroundingRectangle(target_circles, buff=SMALL_BUFF)
-        self.play(Create(sr))
+                text2_cn = Text('1.每个元素只能访问一次').scale(0.5).next_to(text1_en, DOWN).shift(3*LEFT)
+                text2_en = Text('Each element can only be accessed once').scale(0.4).next_to(text2_cn)
+                text3_cn = Text('2.每个元素采样概率相等').scale(0.5).next_to(text2_cn, DOWN)
+                text3_en = Text('Each element has an equal probability of being sampled').scale(0.4).next_to(text3_cn)
 
-        self.play(FadeIn(target_circles), run_time=3)
+                self.play(Write(text1_cn), Write(text1_en))
+                self.wait(3)
+                self.play(Write(text2_cn), Write(text2_en))
+                self.wait(1)
+                self.play(Write(text3_cn), Write(text3_en))
 
-        for s in range(start_n, start_n + 10):
-            number = numbers[s].copy()
-            self.play(number.animate.move_to(target_circles[s - start_n].get_center()))
 
-        #
-        # for _ in range(10):
-        #     self.play(circle_number.animate.shift(stride * LEFT))
+    def insert_image(self):
+        image = SVGMobject('images/question.svg', fill_color=RED, color=BLUE).scale(0.8).shift(DOWN)
+        self.play(SpinInFromNothing(image))
+
 
 
 class reservoir_function(Scene):
@@ -268,7 +256,7 @@ class reservoir_function(Scene):
         random_value = CommonFunc.variable_tracker(label='random', start=0).scale(0.8).next_to(sr, UP)
         self.add(random_value)
 
-        rands = [4, 10, 6, 12, 6]
+        rands = [0, 10, 6, 12, 6]
         for i in range(5):
             number_new = numbers_m_out[i].copy()
             m_out_vg = VGroup(brace_sample, numbers_m_out[i])
@@ -281,10 +269,13 @@ class reservoir_function(Scene):
             rand = rands[i]
             self.play(random_value.tracker.animate.set_value(rand))
             if rand < 10:
+                rand_text = Tex('$<=9$').scale(0.9).next_to(random_value)
+                self.play(FadeIn(rand_text))
                 self.play(Indicate(number_m[rand]))
                 self.play(FadeOut(number_m[rand]))
                 number_m[rand] = number_new
                 self.play(number_new.animate.move_to(target_circles[rand].get_center()))
+                self.play(FadeOut(rand_text))
             else:
                 pass
             self.play(FadeOut(brace_m_out), FadeOut(text_m_out))
@@ -362,33 +353,175 @@ class reservoir_solve(Scene):
 
             self.play(FadeOut(brace_m_out), FadeOut(text_m_out))
 
+        sr_frac, sr_frac_text = CommonFunc.surround_box_and_text(P_vg[1:], Tex('$P(random \\neq 1)$'),
+                                                                 position=UP)
+        self.play(Create(sr_frac), Write(sr_frac_text))
+
         final_answer = Tex('$=\\frac{10}{15}$').scale(0.9).next_to(P_vg[-1])
         self.play(Write(final_answer))
+        self.wait(5)
+
+        self.play(FadeOut(sr_frac), FadeOut(sr_frac_text))
 
         retain_group = VGroup(*[Tex('$P({})=1$'.format(dx)).scale(0.8).next_to(sr, UP + LEFT) for dx in range(1, 11)])
         self.play(Succession(*[Transform(P_text, retain_group[i]) for i in range(len(retain_group))]))
 
         self.wait(5)
 
-        P_out_text = Tex('$P(11) = $').scale(0.8).next_to(P_text, 2*UP)
+        P_out_text = Tex('$P(11) = $').scale(0.8).next_to(P_text, 2 * UP)
         self.play(GrowFromPoint(P_out_text, P_text.get_center()))
 
         frac_out = Tex('$\\frac{10}{11}$', color=RED).scale(0.9).next_to(P_out_text)
         self.play(Write(frac_out))
+        self.play(Indicate(frac_out, run_time=3))
+
+        sr_frac, sr_frac_text = CommonFunc.surround_box_and_text(frac_out, Tex('$P(random \\in [0,9])$'), position=UP)
+        self.play(Create(sr_frac), Write(sr_frac_text))
 
         P_out_vg, out_final_answer = P_vg[2:].copy(), final_answer.copy()
         self.play(P_out_vg.animate.next_to(frac_out))
         self.play(out_final_answer.animate.next_to(P_out_vg))
 
-        out_group = VGroup(*[Tex('$P({})=$'.format(dx)).scale(0.8).next_to(P_text, 2*UP) for dx in range(11, 16)])
-        for j in range(len(out_group)-1):
-            self.play(Transform(P_out_text, out_group[j+1]))
-            self.play(Transform(VGroup(frac_out, P_out_vg[:j+1]),
-                                Tex('$\\frac{%d}{%d}$' % (10, 11+j+1), color=RED).scale(0.9).next_to(P_out_text)))
+        out_group = VGroup(*[Tex('$P({})=$'.format(dx)).scale(0.8).next_to(P_text, 2 * UP) for dx in range(11, 16)])
+        for j in range(len(out_group) - 1):
+            self.play(Transform(P_out_text, out_group[j + 1]))
+            self.play(Transform(VGroup(frac_out, P_out_vg[:j + 1]),
+                                Tex('$\\frac{%d}{%d}$' % (10, 11 + j + 1), color=RED).scale(0.9).next_to(P_out_text)))
 
 
+class reservoir_general(Scene):
+    def construct(self):
+        self.generate_final()
+        self.image_insert()
+
+    def image_insert(self):
+        paper = ImageMobject('images/reservoir.png').scale(1.35)
+        self.play(SpinInFromNothing(paper))
+        self.play(paper.animate.move_to(2 * LEFT))
+        image = ImageMobject('images/jeffrey_vitter.jpg').to_edge(2 * RIGHT)
+        self.play(FadeIn(image))
+        self.play(Write(Text('Jeffrey Vitter').scale(0.6).next_to(image, DOWN)))
+
+    def generate_final(self):
+        l_n = list(range(1, 16))
+        n = len(l_n)
+        circle_number = CommonFunc.add_shape_object(l_n, rows=1, cols=n, color=MAROON_A).scale(0.7)
+        circles = circle_number[0]
+        numbers = circle_number[1]
+
+        circle_number.to_edge(3 * UP)
+
+        self.play(FadeIn(circle_number))
+
+        circles_m = circles[0:10]
+
+        brace_sample = Brace(circles_m, DOWN, color=YELLOW)
+        m_text = Tex('$m=10$').scale(0.8).next_to(brace_sample, DOWN)
+        self.play(Create(brace_sample), Write(m_text))
+
+        brace_total = Brace(circles, UP, color=BLUE)
+        n_text = Tex('$n=15$').scale(0.8).next_to(brace_total, UP)
+        self.play(Create(brace_total), Write(n_text))
+
+        # 推广到一般情况
+
+        numbers[9].become(Tex('$...$'), match_center=True)
+        m_text.become(Tex('$m$'), match_center=True)
+
+        numbers[-1].become(Tex('$...$'), match_center=True)
+        n_text.become(Tex('$n$'), match_center=True)
+
+        P_text_1 = MathTex('P(i|i\\in[1,m])=',
+                           '1',
+                           '\\times \\frac{m}{m+1}',
+                           '\\times \\frac{m+1}{m+2}',
+                           '\\times \\frac{m+1}{m+2}',
+                           '\\times \\frac{m+2}{m+3}',
+                           '\\times ...',
+                           '\\times \\frac{n-1}{n}',
+                           '= \\frac{m}{n}').scale(0.6).to_edge(6 * DOWN)
+
+        P_text_2 = MathTex('P(i|i\\in[m+1,n])=',
+                           '\\frac{m}{m+1}',
+                           '\\times \\frac{m+1}{m+2}',
+                           '\\times \\frac{m+1}{m+2}',
+                           '\\times \\frac{m+2}{m+3}',
+                           '\\times ...',
+                           '\\times \\frac{n-1}{n}',
+                           '= \\frac{m}{n}').scale(0.6).next_to(P_text_1, DOWN)
+
+        self.play(Write(P_text_1))
+        text_1_group = VGroup(*[SurroundingRectangle(P_text_1[i], color=GREEN_A) for i in range(1, 8)])
+        self.play(Create(text_1_group[0]))
+        self.play(Succession(*[ReplacementTransform(text_1_group[0], text_1_group[i])
+                               for i in range(len(text_1_group))]))
+
+        self.play(FadeOut(text_1_group))
+
+        self.play(Write(P_text_2))
+        text_2_group = VGroup(*[SurroundingRectangle(P_text_2[i], color=GREEN_B) for i in range(1, 7)])
+        self.play(Create(text_2_group[0]))
+        self.play(Succession(*[ReplacementTransform(text_2_group[0], text_2_group[i])
+                               for i in range(len(text_2_group))]))
+        self.play(FadeOut(text_2_group))
+        self.wait(5)
 
 
+class reservoir_display(Scene):
+    def construct(self):
+        l_n = list(range(1, 100))
+        n = len(l_n)
+        random.shuffle(l_n)
+        circle_number = CommonFunc.add_shape_object(l_n, rows=1, cols=n, color=MAROON_A).scale(0.6)
+        circles = circle_number[0]
+        numbers = circle_number[1]
+
+        circle_number.to_edge(LEFT, buff=SMALL_BUFF)
+
+        circle_number.shift(UP)
+        self.play(Write(circle_number))
+
+        stride = abs(numbers[0].get_center()[0]-numbers[1].get_center()[0])
+
+        target_circles = VGroup(*[Circle().scale(0.55) for _ in range(10)]).scale(0.6)
+        target_circles.arrange_submobjects(RIGHT, buff=SMALL_BUFF)
+        target_circles.to_edge(2 * DOWN)
+        sr = SurroundingRectangle(target_circles, buff=SMALL_BUFF)
+        self.play(Create(sr))
+
+        self.play(FadeIn(target_circles))
+
+        number_m = VGroup()
+        for s in range(10):
+            number = numbers[s].copy()
+            number_m.add(number)
+            self.play(number.animate.move_to(target_circles[s].get_center()))
+
+        # start_n = 10
+        # for i in range(start_n):
+        #     self.play(circle_number.animate.shift(stride * LEFT))
+
+        Vec = Vector(UP).next_to(circles[10].get_center(), DOWN)
+        self.add(Vec)
+
+        random_value = CommonFunc.variable_tracker(label='random', start=0).scale(0.8).next_to(sr, UP)
+        self.add(random_value)
+
+        for i in range(10, 20):
+            number_new = numbers[i].copy()
+            rand = random.randint(0, i)
+            self.play(random_value.tracker.animate.set_value(rand))
+            if rand < 10:
+                rand_text = Tex('$<=9$').scale(0.9).next_to(random_value)
+                self.play(FadeIn(rand_text))
+                self.play(Indicate(number_m[rand]))
+                self.play(FadeOut(number_m[rand]))
+                number_m[rand] = number_new
+                self.play(number_new.animate.move_to(target_circles[rand].get_center()))
+                self.play(FadeOut(rand_text))
+            else:
+                pass
+            self.play(circle_number.animate.shift(stride * LEFT))
 
 
 class thanks_end(Scene):

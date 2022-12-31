@@ -78,6 +78,13 @@ class CommonFunc:
         return var
 
     @classmethod
+    def surround_box_and_text(cls, mobject, text_object, position):
+        sr = SurroundingRectangle(mobject, color=BLUE, buff=SMALL_BUFF)
+        sr_des = text_object.scale(0.7).next_to(sr, position)
+        return sr, sr_des
+
+
+    @classmethod
     def add_code(cls, code_path, language):
         listing = Code(
             code_path,
