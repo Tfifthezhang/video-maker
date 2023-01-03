@@ -1,1 +1,1 @@
-manim -qh reservoir/reservoir.py reservoir_example
+manim -qh optimize_algorithms/optimize_algorithm.py contour_bowl
