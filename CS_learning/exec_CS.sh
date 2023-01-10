@@ -1,1 +1,1 @@
-manim -qh optimize_algorithms/optimize_algorithm.py normal_neassery
+manim -qh recursion/recursion.py recursion_example

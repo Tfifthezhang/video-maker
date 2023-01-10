@@ -86,59 +86,67 @@ class Title(Scene):
 
 class recursion_example(Scene):
     def construct(self):
-        l_n = list(range(1, 101))
-        circle_number = CommonFunc.add_shape_object(l_n).scale(0.55)
+        circle_number, var, pointer, tracker, label = self.iteration_progress()
+        for i in [var, pointer, tracker, label]:
+            self.play(FadeOut(i))
+        self.play(circle_number.animate.to_edge(UP))
+
+        self.write_tex(circle_number[1])
+
+    def iteration_progress(self):
+        l_n = list(range(1, 11))
+        random.shuffle(l_n)
+        circle_number = CommonFunc.add_shape_object(l_n).scale(0.8)
         self.play(FadeIn(circle_number, lag_ratio=0.5))
-
-        def if_prime(n):
-            if n == 1:
-                return False
-            for j in range(2, int(np.sqrt(n)) + 1):
-                if n % j == 0:
-                    return False
-            return True
-
-        not_prime_group = VGroup()
-
-        circles = circle_number[0]
         numbers = circle_number[1]
-        r = circles[0].get_radius()
+
+        y = numbers[0].get_center()[1]
+        pointer, tracker, label = CommonFunc.pointer_tracker(numbers, label_name='a', y=y, direction=UP,
+                                                             position=DOWN)
+        self.add(pointer, tracker, label)
+
+        var = CommonFunc.variable_tracker(label=Tex('$S$'), color=GREEN).next_to(circle_number, UP)
+        self.play(Create(var))
+
+        s = 0
         for i in range(len(numbers)):
-            if if_prime(numbers[i].get_value()):
-                circles[i].become(Circle(radius=r, color=RED).scale(0.55), match_center=True)
-                self.wait(0.25)
+            self.play(tracker.animate.set_value(numbers[i].get_center()[0]))
+            i_number = numbers[i].copy()
+            i_value = numbers[i].get_value()
+            s = s + i_value
+
+            self.play(i_number.animate.move_to(var))
+            self.play(FadeOut(i_number))
+
+            self.play(var.tracker.animate.set_value(s))
+
+        return circle_number, var, pointer, tracker, label
+
+    def write_tex(self, m_object):
+        n = len(m_object)
+        string_text = ['S_{}'.format(i) for i in range(n)]
+        y = m_object.get_center()[1]
+
+        vg_text = VGroup()
+        vg_brace = VGroup()
+        for i in range(0, n):
+            if i == 0:
+                brace = Brace(m_object[:i + 1], DOWN, color=MAROON, buff=SMALL_BUFF)
             else:
-                not_prime_group.add(circles[i], numbers[i])
+                brace = Brace(m_object[:i + 1], DOWN, color=MAROON, buff=vg_brace.height + 0.3 + SMALL_BUFF)
+            # text_start = MathTex(string_text[i-1]+'+a_{}'.format(i)).scale(0.6).next_to(brace, DOWN)
+            text_end = MathTex(string_text[i]).scale(0.5).next_to(brace, 0.5 * DOWN)
+
+            vg_text.add(text_end)
+            vg_brace.add(brace)
+
+            self.play(Write(brace))
+            self.play(FadeIn(text_end))
+            # self.play(TransformMatchingTex(text_start, text_end))
 
         self.wait(5)
-
-        self.play(circle_number.animate.shift(3.5 * LEFT))
-
-        text0_cn = Text('枚举算法的要素', font='SIL-Hei-Med-Jian').scale(0.8).next_to(circle_number, 7 * RIGHT + 0.5 * UP)
-        text0_en = Text('Elements of enumeration algorithm').scale(0.5).next_to(text0_cn, DOWN)
-        self.play(Write(text0_cn), Write(text0_en))
-        self.wait(1)
-
-        text1_cn = Text('1. 确定枚举空间').scale(0.5).next_to(text0_en, 3 * DOWN)
-        text1_en = Text('enumeration scope').scale(0.4).next_to(text1_cn, DOWN)
-
-        text2_cn = Text('2. 选择合适的枚举顺序').scale(0.5).next_to(text1_en, 3 * DOWN)
-        text2_en = Text('choose an appropriate enumeration order').scale(0.4).next_to(text2_cn, DOWN)
-
-        text3_cn = Text('3. 构造筛选方法').scale(0.5).next_to(text2_en, 3 * DOWN)
-        text3_en = Text('filtering methods').scale(0.4).next_to(text3_cn, DOWN)
-
-        vec = Vector(LEFT).next_to(circle_number, 0.5 * DOWN)
-
-        self.play(Write(text1_cn), Write(text1_en))
-        self.play(Circumscribe(circle_number, shape=Rectangle, time_width=4, run_time=4))
-        self.play(Write(text2_cn), Write(text2_en))
-        self.play(Create(vec))
-        self.play(Flash(circles[-4], time_width=4, run_time=4))
-        self.play(Write(text3_cn), Write(text3_en))
-        self.play(Uncreate(vec))
-        self.play(FadeOut(not_prime_group, run_time=3))
-        self.wait(5)
+        self.play(FadeOut(vg_brace))
+        self.play(vg_text.animate.arrange_submobjects(RIGHT, buff=0.3).scale(2))
 
 
 class source_code(Scene):
@@ -422,7 +430,3 @@ class thanks_end(Scene):
 
         self.play(FadeIn(name_group, lag_ratio=0.5, run_time=4))
         self.wait(2)
-
-
-
-
