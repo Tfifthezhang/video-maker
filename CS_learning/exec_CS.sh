@@ -1,1 +1,1 @@
-manim -qh optimize_algorithms/optimize_algorithm.py contour_bowl
+manim -qh optimize_algorithms/optimize_algorithm.py normal_neassery
