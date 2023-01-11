@@ -195,3 +195,11 @@ class CommonFunc:
         bars.set_stroke(WHITE, 1)
 
         return bars
+
+    @classmethod
+    def add_curvearrow(cls, start, end):
+        curved_arrow = CurvedArrow(start_point=start, end_point=end,
+                    radius=1, angle=-180, start_angle=0,
+                    arc_center=np.array([0, 0, 0]),
+                    tip_length=0.1)
+        return curved_arrow

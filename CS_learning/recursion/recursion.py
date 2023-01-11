@@ -91,7 +91,8 @@ class recursion_example(Scene):
             self.play(FadeOut(i))
         self.play(circle_number.animate.to_edge(UP))
 
-        self.write_tex(circle_number[1])
+        vg_text = self.write_tex(circle_number[1])
+        self.recursion_intro(vg_text)
 
     def iteration_progress(self):
         l_n = list(range(1, 11))
@@ -147,6 +148,27 @@ class recursion_example(Scene):
         self.wait(5)
         self.play(FadeOut(vg_brace))
         self.play(vg_text.animate.arrange_submobjects(RIGHT, buff=0.3).scale(2))
+
+        return vg_text
+
+    def recursion_intro(self, vg_text):
+        n = len(vg_text)
+        iteration_curves = VGroup(*[CurvedArrow(vg_text[i].get_corner(DOWN), vg_text[i+1].get_corner(DOWN),
+                                                radius=0.8, angle=TAU/4,
+                                                tip_length=0.1, color=RED) for i in range(n-1)])
+        self.play(Create(iteration_curves))
+
+        iteration_text = Text('迭代法').scale(0.6).next_to(iteration_curves, DOWN)
+        self.play(Create(iteration_text))
+
+        recursion_curves = VGroup(*[CurvedArrow(vg_text[i].get_corner(UP), vg_text[i-1].get_corner(UP),
+                                                radius=0.8, angle=TAU/4,
+                                                tip_length=0.1, color=BLUE) for i in range(n-1, 0, -1)])
+        self.play(Write(recursion_curves))
+        interation_text = Text('递归法').scale(0.6).next_to(recursion_curves, UP)
+
+
+
 
 
 class source_code(Scene):
