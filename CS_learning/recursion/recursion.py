@@ -92,7 +92,8 @@ class recursion_example(Scene):
         self.play(circle_number.animate.to_edge(UP))
 
         vg_text = self.write_tex(circle_number[1])
-        self.recursion_intro(vg_text)
+        recur_code = self.recursion_intro(vg_text)
+        self.play(recur_code.animate.shift(LEFT+UP))
 
     def iteration_progress(self):
         l_n = list(range(1, 11))
@@ -147,7 +148,7 @@ class recursion_example(Scene):
 
         self.wait(5)
         self.play(FadeOut(vg_brace))
-        self.play(vg_text.animate.arrange_submobjects(RIGHT, buff=0.3).scale(2))
+        self.play(vg_text.animate.arrange_submobjects(RIGHT, buff=0.3).scale(2).shift(UP))
 
         return vg_text
 
@@ -159,13 +160,47 @@ class recursion_example(Scene):
         self.play(Create(iteration_curves))
 
         iteration_text = Text('迭代法').scale(0.6).next_to(iteration_curves, DOWN)
+        self.play(Write(iteration_text))
+
         self.play(Create(iteration_text))
+
+        iter_code = CommonFunc.add_code('recursion/iter_code.py', 'python').to_edge(DOWN)
+        self.play(Create(iter_code))
+        self.wait(3)
 
         recursion_curves = VGroup(*[CurvedArrow(vg_text[i].get_corner(UP), vg_text[i-1].get_corner(UP),
                                                 radius=0.8, angle=TAU/4,
                                                 tip_length=0.1, color=BLUE) for i in range(n-1, 0, -1)])
         self.play(Write(recursion_curves))
-        interation_text = Text('递归法').scale(0.6).next_to(recursion_curves, UP)
+        recursion_text = Text('递归法').scale(0.6).next_to(recursion_curves, UP)
+        self.play(Write(recursion_text))
+        recur_code = CommonFunc.add_code('recursion/recur_code.py', 'python').to_edge(DOWN)
+
+        self.play(Transform(iter_code, recur_code, run_time=3))
+        self.wait(3)
+
+        vg_vanish = VGroup(*[recursion_text, recursion_curves, iter_code, iteration_text, iteration_curves])
+
+        self.play(FadeOut(vg_vanish),FadeOut(vg_text))
+
+        return recur_code
+
+    def recursion_indicate(self, recur_code, circle_number):
+        numbers = circle_number
+        # y = numbers[0].get_center()[1]
+        # pointer, tracker, label = CommonFunc.pointer_tracker(numbers, label_name='a', y=y, direction=UP,
+        #                                                      position=DOWN)
+        # self.add(pointer, tracker, label)
+
+        # var = CommonFunc.variable_tracker(label=Tex('$S$'), color=GREEN).next_to(recur_code, UP)
+        # self.play(Create(var))
+
+        s = VGroup(*[RoundedRectangle(corner_radius=0.5, height=1.5) for i in range(9)])
+        s.arrange_submobjects(UP, buff=0.2).scale(0.35).next_to(recur_code, 2*RIGHT)
+
+        self.play(Create(s))
+
+
 
 
 
