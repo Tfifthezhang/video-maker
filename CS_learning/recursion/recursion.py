@@ -93,7 +93,9 @@ class recursion_example(Scene):
 
         vg_text = self.write_tex(circle_number[1])
         recur_code = self.recursion_intro(vg_text)
-        self.play(recur_code.animate.shift(LEFT+UP))
+        self.play(recur_code.animate.shift(4*LEFT, 2*UP))
+
+        self.stack(recur_code, circle_number)
 
     def iteration_progress(self):
         l_n = list(range(1, 11))
@@ -162,8 +164,6 @@ class recursion_example(Scene):
         iteration_text = Text('迭代法').scale(0.6).next_to(iteration_curves, DOWN)
         self.play(Write(iteration_text))
 
-        self.play(Create(iteration_text))
-
         iter_code = CommonFunc.add_code('recursion/iter_code.py', 'python').to_edge(DOWN)
         self.play(Create(iter_code))
         self.wait(3)
@@ -185,8 +185,9 @@ class recursion_example(Scene):
 
         return recur_code
 
-    def recursion_indicate(self, recur_code, circle_number):
-        numbers = circle_number
+    def stack(self, recur_code, circle_number):
+        numbers = circle_number[1]
+        n=len(numbers)
         # y = numbers[0].get_center()[1]
         # pointer, tracker, label = CommonFunc.pointer_tracker(numbers, label_name='a', y=y, direction=UP,
         #                                                      position=DOWN)
@@ -195,10 +196,18 @@ class recursion_example(Scene):
         # var = CommonFunc.variable_tracker(label=Tex('$S$'), color=GREEN).next_to(recur_code, UP)
         # self.play(Create(var))
 
-        s = VGroup(*[RoundedRectangle(corner_radius=0.5, height=1.5) for i in range(9)])
-        s.arrange_submobjects(UP, buff=0.2).scale(0.35).next_to(recur_code, 2*RIGHT)
+        s = VGroup(*[RoundedRectangle(corner_radius=0.5, height=1.5) for i in range(10)])
+        s.arrange_submobjects(UP, buff=0.2).scale(0.35).next_to(recur_code, 15*RIGHT)
+
+        for i in range(n, 0, -1):
+            if i != 1:
+                sum_number = numbers[:10]
+                self.play(Indicate(numbers[:10]))
+
 
         self.play(Create(s))
+
+        self.wait(3)
 
 
 
