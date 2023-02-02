@@ -93,7 +93,7 @@ class recursion_example(Scene):
 
         vg_text = self.write_tex(circle_number[1])
         recur_code = self.recursion_intro(vg_text)
-        self.play(recur_code.animate.shift(4*LEFT, 2*UP))
+        self.play(recur_code.animate.shift(4 * LEFT, 2 * UP))
 
         self.stack(recur_code, circle_number)
 
@@ -119,7 +119,7 @@ class recursion_example(Scene):
             i_value = numbers[i].get_value()
             s = s + i_value
 
-            self.play(i_number.animate.move_to(var))
+            self.play(i_number.animate.move_to(var.get_center()+1.5*RIGHT))
             self.play(FadeOut(i_number))
 
             self.play(var.tracker.animate.set_value(s))
@@ -156,9 +156,9 @@ class recursion_example(Scene):
 
     def recursion_intro(self, vg_text):
         n = len(vg_text)
-        iteration_curves = VGroup(*[CurvedArrow(vg_text[i].get_corner(DOWN), vg_text[i+1].get_corner(DOWN),
-                                                radius=0.8, angle=TAU/4,
-                                                tip_length=0.1, color=RED) for i in range(n-1)])
+        iteration_curves = VGroup(*[CurvedArrow(vg_text[i].get_corner(DOWN), vg_text[i + 1].get_corner(DOWN),
+                                                radius=0.8, angle=TAU / 4,
+                                                tip_length=0.1, color=RED) for i in range(n - 1)])
         self.play(Create(iteration_curves))
 
         iteration_text = Text('迭代法').scale(0.6).next_to(iteration_curves, DOWN)
@@ -168,9 +168,9 @@ class recursion_example(Scene):
         self.play(Create(iter_code))
         self.wait(3)
 
-        recursion_curves = VGroup(*[CurvedArrow(vg_text[i].get_corner(UP), vg_text[i-1].get_corner(UP),
-                                                radius=0.8, angle=TAU/4,
-                                                tip_length=0.1, color=BLUE) for i in range(n-1, 0, -1)])
+        recursion_curves = VGroup(*[CurvedArrow(vg_text[i].get_corner(UP), vg_text[i - 1].get_corner(UP),
+                                                radius=0.8, angle=TAU / 4,
+                                                tip_length=0.1, color=BLUE) for i in range(n - 1, 0, -1)])
         self.play(Write(recursion_curves))
         recursion_text = Text('递归法').scale(0.6).next_to(recursion_curves, UP)
         self.play(Write(recursion_text))
@@ -181,13 +181,13 @@ class recursion_example(Scene):
 
         vg_vanish = VGroup(*[recursion_text, recursion_curves, iter_code, iteration_text, iteration_curves])
 
-        self.play(FadeOut(vg_vanish),FadeOut(vg_text))
+        self.play(FadeOut(vg_vanish), FadeOut(vg_text))
 
         return recur_code
 
     def stack(self, recur_code, circle_number):
         numbers = circle_number[1]
-        n=len(numbers)
+        n = len(numbers)
         # y = numbers[0].get_center()[1]
         # pointer, tracker, label = CommonFunc.pointer_tracker(numbers, label_name='a', y=y, direction=UP,
         #                                                      position=DOWN)
@@ -197,23 +197,73 @@ class recursion_example(Scene):
         # self.play(Create(var))
 
         s = VGroup(*[RoundedRectangle(corner_radius=0.5, height=1.5) for i in range(10)])
-        s.arrange_submobjects(UP, buff=0.2).scale(0.35).next_to(recur_code, 15*RIGHT)
+        s.arrange_submobjects(UP, buff=0.2).scale(0.35).next_to(recur_code, 15 * RIGHT)
 
-        for i in range(n, 0, -1):
-            if i != 1:
-                sum_number = numbers[:10]
-                self.play(Indicate(numbers[:10]))
+        vg_sum_text = VGroup()
+        for i in range(n - 1, -1, -1):
+            sum_number = numbers[:i + 1]
+            self.play(Indicate(recur_code.code[-1]))
+            self.play(Wiggle(sum_number))
 
+            brace = Brace(sum_number, DOWN)
+            sum_text = MathTex('S_{}'.format(i)).scale(0.6).next_to(brace, DOWN)
 
-        self.play(Create(s))
+            self.play(FadeIn(brace), FadeIn(sum_text))
+
+            sum_text_move = sum_text.copy()
+
+            self.play(Create(s[-i - 1]))
+            self.play(sum_text_move.animate.move_to(s[-i - 1].get_center()))
+            vg_sum_text.add(sum_text_move)
+
+            self.play(FadeOut(brace), FadeOut(sum_text))
 
         self.wait(3)
 
+        # 递归关系
+        stack_curves = VGroup(*[CurvedArrow(s[i].get_corner(RIGHT), s[i + 1].get_corner(RIGHT),
+                                            radius=0.4, angle=TAU / 4,
+                                            tip_length=0.1, color=RED) for i in range(n - 1)])
+        vg_stack_text = VGroup()
+        vg_stack_minus = VGroup()
+        for stack in range(len(stack_curves)):
+            self.play(FadeIn(stack_curves[stack]))
+            relation_tex = MathTex('-', color=MAROON).scale(0.6).next_to(stack_curves[stack], RIGHT)
+            self.play(Create(relation_tex))
+            copy_number = numbers[-stack-1].copy()
+            self.play(copy_number.animate.move_to(relation_tex.get_center()+RIGHT))
 
+            vg_stack_minus.add(relation_tex)
+            vg_stack_text.add(copy_number)
 
+        # 触发边界条件
 
+        var = CommonFunc.variable_tracker(label=Tex('$S$'), color=GREEN).next_to(recur_code, 2*RIGHT)
+        self.play(Create(var))
 
+        for re_index in range(n - 1, -1, -1):
+            if re_index == n-1:
+                value = numbers[-re_index-1].get_value()
+                self.play(Indicate(recur_code.code[1:3]))
+                self.play(FadeOut(s[re_index]))
+                self.play(vg_sum_text[re_index].animate.move_to(var.get_center() + RIGHT))
+                self.wait(2)
+                self.play(FadeOut(vg_sum_text[re_index]))
+            else:
+                value = value + vg_stack_text[re_index].get_value()
+                self.play(Indicate(recur_code.code[-1]))
+                self.play(FadeOut(stack_curves[re_index]))
+                self.play(FadeOut(vg_stack_minus[re_index]))
+                self.play(FadeOut(s[re_index]))
+                tex = Tex('$+$').scale(0.6).next_to(var, RIGHT)
+                self.play(FadeIn(tex))
+                self.play(vg_stack_text[re_index].animate.move_to(var.get_center()+1.5*RIGHT))
+                self.wait(2)
+                self.play(FadeOut(vg_stack_text[re_index]))
+                self.play(FadeOut(tex))
+                self.play(FadeOut(vg_sum_text[re_index]), FadeOut(vg_sum_text[re_index]))
 
+            self.play(var.tracker.animate.set_value(value))
 
 class source_code(Scene):
     def construct(self):
