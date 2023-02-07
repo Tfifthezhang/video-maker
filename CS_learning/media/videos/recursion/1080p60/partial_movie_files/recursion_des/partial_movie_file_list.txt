@@ -1,2 +1,11 @@
 # This file is used internally by FFMPEG.
 file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/recursion/1080p60/partial_movie_files/recursion_des/2902699114_3752221331_223132457.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/recursion/1080p60/partial_movie_files/recursion_des/3931933789_2916721323_925005865.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/recursion/1080p60/partial_movie_files/recursion_des/3931933789_286449662_1302936316.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/recursion/1080p60/partial_movie_files/recursion_des/3931933789_2655290967_1533800215.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/recursion/1080p60/partial_movie_files/recursion_des/3931933789_1599412963_3829435786.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/recursion/1080p60/partial_movie_files/recursion_des/3931933789_149209162_1881542933.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/recursion/1080p60/partial_movie_files/recursion_des/3931933789_2761102435_2764586947.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/recursion/1080p60/partial_movie_files/recursion_des/3931933789_3545561228_375681959.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/recursion/1080p60/partial_movie_files/recursion_des/3931933789_2983528506_1821857731.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/recursion/1080p60/partial_movie_files/recursion_des/3931933789_2745697264_3949550246.mp4'

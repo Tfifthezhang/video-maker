@@ -268,24 +268,102 @@ class recursion_example(Scene):
 
 class recursion_des(Scene):
     def construct(self):
-        self.title()
+        text0_cn, text0_en = self.title()
+        text1_cn, text1_en, vg_anim = self.attrs1(text0_en)
+        text2_cn, text2_en = self.attrs2(text1_en, vg_anim)
+        text3_cn, text3_en = self.attrs3(text2_en)
 
     def title(self):
-        text0_cn = Text('递归的要素', font='SIL-Hei-Med-Jian').scale(0.8).to_edge(4*RIGHT + UP)
+        text0_cn = Text('递归的要素', font='SIL-Hei-Med-Jian').scale(0.8).to_edge(4 * RIGHT + UP)
         text0_en = Text('Elements of recursion algorithm').scale(0.5).next_to(text0_cn, DOWN)
 
         self.play(Write(text0_cn), Write(text0_en))
 
-    def attrs1(self):
-        text = Text('枚举是将问题横向划分，递归是将问题纵向拆分，不断将问题规模缩小').scale(0.5).next_to(text0_en, 3 * DOWN)
-        # text1_cn = Text('1. 确定枚举空间').scale(0.5).next_to(text0_en, 3 * DOWN)
-        # text1_en = Text('enumeration scope').scale(0.4).next_to(text1_cn, DOWN)
+        return text0_cn, text0_en
 
-    def attrs2(self):
-        text = Text('解决问题的方法与问题规模无关')
+    def attrs_1_anim(self):
+        l_n = list(range(1, 11))
+        n = len(l_n)
+        random.shuffle(l_n)
+        circle_number = CommonFunc.add_shape_object(l_n).scale(0.8)
+        m_object = circle_number[1]
 
-    def attrs3(self):
-        text = Text('必须包含终止条件，终止条件即初始状态')
+        string_text = ['S_{}'.format(i) for i in range(n)]
+        y = m_object.get_center()[1]
+
+        vg_text = VGroup()
+        vg_brace = VGroup()
+        for i in range(0, n):
+            if i == 0:
+                brace = Brace(m_object[:i + 1], DOWN, color=MAROON, buff=SMALL_BUFF)
+            else:
+                brace = Brace(m_object[:i + 1], DOWN, color=MAROON, buff=vg_brace.height + 0.3 + SMALL_BUFF)
+            text_end = MathTex(string_text[i]).scale(0.5).next_to(brace, 0.5 * DOWN)
+
+            vg_text.add(text_end)
+            vg_brace.add(brace)
+
+        #     self.play(Write(brace))
+        #     self.play(FadeIn(text_end))
+        #
+        # self.wait(5)
+        # self.play(FadeOut(vg_brace))
+        # self.play(vg_text.animate.arrange_submobjects(RIGHT, buff=0.3).scale(2).shift(UP))
+
+        vg_total = VGroup(m_object, vg_text, vg_brace)
+
+        return vg_total
+
+    def attrs1(self, text0_en):
+        text1_cn = Text('1. 将问题纵向拆分，缩减问题规模').scale(0.5).next_to(text0_en, 3 * DOWN)
+        text1_en = Text('enumeration scope').scale(0.4).next_to(text1_cn, DOWN)
+
+
+        vg_anim = self.attrs_1_anim().scale(0.7).to_edge(LEFT).shift(3 * UP)
+        self.play(FadeIn(vg_anim))
+
+        vec = Vector(UP).next_to(vg_anim, RIGHT)
+        self.play(Write(vec))
+
+        self.play(Write(text1_cn), Write(text1_en))
+
+        self.play(Unwrite(vec))
+        return text1_cn, text1_en, vg_anim
+
+    def attrs2(self, text1_en, vg_anim):
+        text2_cn = Text('2. 解决方法与问题规模无关').scale(0.5).next_to(text1_en, 3 * DOWN)
+        text2_en = Text('enumeration scope').scale(0.4).next_to(text2_cn, DOWN)
+
+        self.play(FadeOut(vg_anim[0]), FadeOut(vg_anim[-1]))
+        vg_text = vg_anim[1]
+        vg_text.arrange_submobjects(RIGHT, buff=0.2).scale(2).to_edge(LEFT)
+        self.play(Create(vg_text))
+
+        recursion_tex = MathTex('S_n = S_{n-1} + a_n').scale(0.8).next_to(vg_text, UP)
+
+        self.play(AddTextWordByWord(recursion_tex))
+
+        n = len(vg_text)
+        recursion_curves = VGroup(*[CurvedArrow(vg_text[i].get_corner(UP), vg_text[i - 1].get_corner(UP),
+                                                radius=0.8, angle=TAU / 4,
+                                                tip_length=0.1, color=BLUE) for i in range(n - 1, 0, -1)])
+        self.play(Write(recursion_curves))
+
+        self.play()
+
+        self.play(Write(text2_cn), Write(text2_en))
+
+
+
+        return text2_cn, text2_en
+
+    def attrs3(self, text2_en):
+        text3_cn = Text('3. 包含终止条件，终止条件即初始状态').scale(0.5).next_to(text2_en, 3 * DOWN)
+        text3_en = Text('enumeration scope').scale(0.4).next_to(text3_cn, DOWN)
+
+        self.play(Write(text3_cn), Write(text3_en))
+
+        return text3_cn, text3_en
 
 
 class thanks_end(Scene):
