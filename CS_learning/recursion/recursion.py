@@ -80,7 +80,7 @@ class Title(Scene):
         self.play(GrowFromPoint(text, svg_group[0].get_center(), run_time=2))
         self.wait(3)
 
-        subtext = Text('-- 调用函数自身的方法').scale(0.5).next_to(text, 1.5 * DOWN)
+        subtext = Text('-- 如果你不明白，请参见"递归"').scale(0.5).next_to(text, 1.5 * DOWN)
         self.play(Write(subtext))
 
 
@@ -119,7 +119,7 @@ class recursion_example(Scene):
             i_value = numbers[i].get_value()
             s = s + i_value
 
-            self.play(i_number.animate.move_to(var.get_center()+1.5*RIGHT))
+            self.play(i_number.animate.move_to(var.get_center() + 1.5 * RIGHT))
             self.play(FadeOut(i_number))
 
             self.play(var.tracker.animate.set_value(s))
@@ -230,20 +230,20 @@ class recursion_example(Scene):
             self.play(FadeIn(stack_curves[stack]))
             relation_tex = MathTex('-', color=MAROON).scale(0.6).next_to(stack_curves[stack], RIGHT)
             self.play(Create(relation_tex))
-            copy_number = numbers[-stack-1].copy()
-            self.play(copy_number.animate.move_to(relation_tex.get_center()+RIGHT))
+            copy_number = numbers[-stack - 1].copy()
+            self.play(copy_number.animate.move_to(relation_tex.get_center() + RIGHT))
 
             vg_stack_minus.add(relation_tex)
             vg_stack_text.add(copy_number)
 
         # 触发边界条件
 
-        var = CommonFunc.variable_tracker(label=Tex('$S$'), color=GREEN).next_to(recur_code, 2*RIGHT)
+        var = CommonFunc.variable_tracker(label=Tex('$S$'), color=GREEN).next_to(recur_code, 2 * RIGHT)
         self.play(Create(var))
 
         for re_index in range(n - 1, -1, -1):
-            if re_index == n-1:
-                value = numbers[-re_index-1].get_value()
+            if re_index == n - 1:
+                value = numbers[-re_index - 1].get_value()
                 self.play(Indicate(recur_code.code[1:3]))
                 self.play(FadeOut(s[re_index]))
                 self.play(vg_sum_text[re_index].animate.move_to(var.get_center() + RIGHT))
@@ -257,7 +257,7 @@ class recursion_example(Scene):
                 self.play(FadeOut(s[re_index]))
                 tex = Tex('$+$').scale(0.6).next_to(var, RIGHT)
                 self.play(FadeIn(tex))
-                self.play(vg_stack_text[re_index].animate.move_to(var.get_center()+1.5*RIGHT))
+                self.play(vg_stack_text[re_index].animate.move_to(var.get_center() + 1.5 * RIGHT))
                 self.wait(2)
                 self.play(FadeOut(vg_stack_text[re_index]))
                 self.play(FadeOut(tex))
@@ -265,264 +265,27 @@ class recursion_example(Scene):
 
             self.play(var.tracker.animate.set_value(value))
 
-class source_code(Scene):
+
+class recursion_des(Scene):
     def construct(self):
-        title = Text('例子:', font='SIL-Hei-Med-Jian').scale(0.8).move_to(np.array([-5, 3.5, 0]))
-        self.add(title)
-        subtitle = Text('一个数组中的数互不相同，其中和为0的数对有多少对').scale(0.6).next_to(title, RIGHT)
-        self.add(subtitle)
-        topic = Paragraph('\t Given an array of numbers where each number is unique,',
-                          '\t find the number of pairs of numbers in the array that sum to 0.').set_color(
-            MAROON).scale(0.5).next_to(subtitle, DOWN)
-        self.play(FadeIn(topic))
+        self.title()
 
-        self.wait(4)
+    def title(self):
+        text0_cn = Text('递归的要素', font='SIL-Hei-Med-Jian').scale(0.8).to_edge(4*RIGHT + UP)
+        text0_en = Text('Elements of recursion algorithm').scale(0.5).next_to(text0_cn, DOWN)
 
-        l_n = list(range(-5, 5))
-        integers_1 = CommonFunc.get_Integer(l_n).scale(0.8).shift(3 * RIGHT)
-        integers_2 = CommonFunc.get_Integer(l_n, color=RED).scale(0.8).next_to(integers_1, DOWN * 2)
+        self.play(Write(text0_cn), Write(text0_en))
 
-        self.add(integers_1)
-        self.wait(2)
-        self.play(FadeIn(integers_2))
+    def attrs1(self):
+        text = Text('枚举是将问题横向划分，递归是将问题纵向拆分，不断将问题规模缩小').scale(0.5).next_to(text0_en, 3 * DOWN)
+        # text1_cn = Text('1. 确定枚举空间').scale(0.5).next_to(text0_en, 3 * DOWN)
+        # text1_en = Text('enumeration scope').scale(0.4).next_to(text1_cn, DOWN)
 
-        # 追踪数据点（外层循环）
-        pointer_1, tracker_1, label_1 = CommonFunc.pointer_tracker(integers_1)
-        self.play(FadeIn(label_1), Write(pointer_1))
+    def attrs2(self):
+        text = Text('解决问题的方法与问题规模无关')
 
-        self.wait(3)
-        # 追踪数据点（内层循环）
-        y_2 = integers_2[0].get_center()[1]
-        pointer_2, tracker_2, label_2 = CommonFunc.pointer_tracker(integers_2, label_name='y', y=y_2, direction=UP,
-                                                                   position=DOWN)
-        self.play(FadeIn(label_2), Write(pointer_2))
-        self.wait(3)
-
-        code = CommonFunc.add_code('enumerate/code1.py', 'python').next_to(integers_1, LEFT * 3.5)
-        self.play(Create(code))
-        self.wait(3)
-
-        var = CommonFunc.variable_tracker(label=Tex('$\\text{res}$'), color=GREEN).next_to(code, UP)
-        self.play(Create(var))
-
-        sum_result = 0
-        # 第一个循环
-        for i in range(len(integers_1)):
-            # 对应的代码进行闪烁
-            self.play(Indicate(code.code[0]))
-            self.play(tracker_1.animate.set_value(integers_1[i].get_center()[0]))
-            # 第二个循环
-            for j in range(len(integers_2)):
-                # 对应的代码进行闪烁
-                self.play(Indicate(code.code[1]))
-                self.play(tracker_2.animate.set_value(integers_2[j].get_center()[0]))
-                if integers_1[i].get_value() + integers_2[j].get_value() == 0:
-                    # 添加动画效果，表示符合条件
-                    self.play(Indicate(code.code[2]))
-                    self.play(ApplyWave(label_1), ApplyWave(label_2))
-                    # 对记分板进行更新
-                    sum_result += 1
-                    # 对应的代码进行闪烁
-                    self.play(Indicate(code.code[3]))
-                    # variable进行跟踪
-                    self.play(var.tracker.animate.set_value(sum_result))
-
-        time_consume = Text('时间复杂度（Time Complexity)').scale(0.6).next_to(code, DOWN)
-        time_complex = Tex('$O(n^2)$').scale(0.8).next_to(time_consume, DOWN)
-        self.play(Write(time_consume), Write(time_complex))
-        self.wait(3)
-
-
-class fast_code(Scene):
-    def construct(self):
-        text = Text('重复计算(Double counting)')
-        self.play(text.animate.scale(0.8).shift(3 * UP))
-        tex = Tex('$a+b=b+a$').next_to(text, DOWN)
-        self.play(Write(tex))
-
-        self.wait(3)
-
-        l_n = list(range(-5, 5))
-        integers_1 = CommonFunc.get_Integer(l_n).scale(1.2)
-        integers_2 = CommonFunc.get_Integer(l_n, color=RED).scale(1.2).next_to(integers_1, DOWN * 5)
-        self.add(integers_1, integers_2)
-
-        n = len(integers_1)
-        wait_delete = VGroup()
-        for i in range(n):
-            line = CommonFunc.add_line(integers_1[0], integers_2[i])
-            dashline = CommonFunc.add_dashed_line(integers_1[i], integers_2[0])
-
-            self.play(Create(line))
-            coor1 = Text('({},{})'.format(integers_1[0].get_value(),
-                                          integers_2[i].get_value())).scale(0.4).next_to(integers_2[i], DOWN)
-            self.play(Write(coor1))
-            self.play(Create(dashline))
-            coor2 = Text('({},{})'.format(integers_1[i].get_value(),
-                                          integers_2[0].get_value())).scale(0.4).next_to(integers_1[i], UP)
-            self.play(Write(coor2))
-            self.play(Uncreate(line), Uncreate(dashline))
-            wait_delete.add(coor1, coor2)
-
-        self.play(FadeOut(wait_delete))
-
-        zero_situation = Text('({},{})'.format(0, 0)).scale(0.6).next_to(integers_1[5], UP)
-        self.play(Write(zero_situation))
-
-        zero_explain = Tex('$0+0=0$').scale(0.6).next_to(zero_situation, 2 * UP + 4 * RIGHT)
-        arrow = CommonFunc.add_arrow(zero_explain, zero_situation, buff=0.1)
-        self.play(GrowFromCenter(zero_explain), Write(arrow))
-        self.play(FocusOn(zero_situation, run_time=5))
-        self.wait(4)
-
-
-class handshake(Scene):
-    def construct(self):
-        title = Text('减少重复计算(reduce double counting)').scale(0.8).shift(3 * UP)
-        self.add(title)
-        l_n = list(range(-5, 5))
-        integers_1 = CommonFunc.get_Integer(l_n).scale(0.8).shift(3 * RIGHT)
-        integers_2 = CommonFunc.get_Integer(l_n, color=RED).scale(0.8).next_to(integers_1, DOWN * 2)
-
-        self.play(Create(integers_1), Create(integers_2))
-
-        # 追踪数据点（外层循环）
-        pointer_1, tracker_1, label_1 = CommonFunc.pointer_tracker(integers_1)
-        self.play(FadeIn(label_1), Write(pointer_1))
-
-        # 追踪数据点（内层循环）
-        y_2 = integers_2[0].get_center()[1]
-        pointer_2, tracker_2, label_2 = CommonFunc.pointer_tracker(integers_2, label_name='y', y=y_2, direction=UP,
-                                                                   position=DOWN)
-        self.play(FadeIn(label_2), Write(pointer_2))
-
-        self.wait(4)
-
-        code = CommonFunc.add_code('enumerate/code2.py', 'python').next_to(integers_1, LEFT * 3.5)
-        self.play(Create(code))
-        self.wait(4)
-
-        var = CommonFunc.variable_tracker(label=Tex('$\\frac{\\text{res}}{2}$'), color=GREEN).next_to(code, UP)
-        self.add(var)
-
-        sum_result = 0
-        # 第一个循环
-        for i in range(len(integers_1)):
-            # 对应的代码进行闪烁
-            self.play(tracker_1.animate.set_value(integers_1[i].get_center()[0]))
-            self.play(Indicate(code.code[0]))
-            # 第二个循环
-            for j in range(i + 1, len(integers_2)):
-                # 对应的代码进行闪烁
-                self.play(tracker_2.animate.set_value(integers_2[j].get_center()[0]))
-                self.play(Indicate(code.code[1]))
-                if integers_1[i].get_value() + integers_2[j].get_value() == 0:
-                    # 添加动画效果，表示符合条件
-                    self.play(Indicate(code.code[2]))
-                    self.play(ApplyWave(label_1), ApplyWave(label_2))
-                    # 对记分板进行更新
-                    sum_result += 1
-                    # 对应的代码进行闪烁
-                    self.play(Indicate(code.code[3]))
-                    # variable进行跟踪
-                    self.play(var.tracker.animate.set_value(sum_result))
-
-        self.play(FadeOut(var))
-        final_var = Tex('$\\text{res}=8$').next_to(code, UP)
-        self.play(FadeIn(final_var))
-
-        time_consume = Text('时间复杂度（Time Complexity)').scale(0.6).next_to(code, DOWN)
-        time_complex = Tex('$\\frac{n^2}{2}\\in O(n^2)$').scale(0.8).next_to(time_consume, DOWN)
-        self.play(Write(time_consume), Write(time_complex))
-        self.wait(4)
-
-
-class faster_hash(Scene):
-    def construct(self):
-        title = Text('空间换时间（Trade space for time）').scale(0.8).shift(3 * UP)
-        self.add(title)
-        l_n = list(range(-5, 5))
-        integers_1 = CommonFunc.get_Integer(l_n).scale(0.8).shift(3 * RIGHT)
-        self.add(integers_1)
-
-        source_table = CommonFunc.add_table([[Tex('$\\text{key}$')],
-                                             [Tex('$\\text{value}$')]]).next_to(integers_1, 5 * DOWN).scale(0.6)
-
-        pointer_1, tracker_1, label_1 = CommonFunc.pointer_tracker(integers_1)
-        self.play(Create(pointer_1), FadeIn(label_1))
-
-        self.wait(3)
-
-        code = CommonFunc.add_code('enumerate/code3.py', 'python').next_to(integers_1, LEFT * 0.2)
-        self.play(Create(code))
-        self.wait(3)
-
-        var = CommonFunc.variable_tracker(label=Tex('$\\frac{\\text{res}}{2}$'), color=GREEN).next_to(code, UP)
-        self.add(var)
-
-        self.play(Indicate(code.code[0]))
-        self.play(Create(source_table))
-        self.play(FadeOut(source_table))
-        hash_map = {}
-        sum_res = 0
-        table_group = VGroup()
-        for i in range(len(integers_1)):
-            # 对应的代码进行闪烁
-            self.play(tracker_1.animate.set_value(integers_1[i].get_center()[0]))
-            self.play(Indicate(code.code[1]))
-
-            self.play(Indicate(code.code[2]))
-            if hash_map.get(0 - integers_1[i].get_value()):
-                self.play(Indicate(code.code[3]))
-                sum_res += 1
-                self.play(var.tracker.animate.set_value(sum_res))
-            else:
-                self.play(Indicate(code.code[5]))
-                table = CommonFunc.add_table([[Tex('${}$'.format(integers_1[i].get_value()))],
-                                              [Text('True').scale(0.7)]]).next_to(integers_1, 4 * DOWN).scale(0.5)
-                self.play(FadeIn(table))
-                hash_map[integers_1[i].get_value()] = True
-                table_group.add(table)
-                self.play(FadeOut(table))
-
-        table_group.arrange_submobjects(RIGHT, buff=0.05).next_to(integers_1, 7 * DOWN)
-        self.play(Create(table_group))
-        self.wait(4)
-
-        time_consume = Text('时间复杂度（Time Complexity)').scale(0.5).next_to(code, DOWN)
-        time_complex = Tex('$O(n)$').scale(0.8).next_to(time_consume, DOWN)
-        self.play(Write(time_consume), Write(time_complex))
-        self.wait(3)
-
-
-class time_compare(Scene):
-    def construct(self):
-        ax = CommonFunc.add_axes(x_range=[1, 10], y_range=[0, 150, 10], x_length=8, y_length=6).shift(LEFT + 0.3 * UP)
-
-        def func(x):
-            return x ** 2
-
-        def func_linear(x):
-            return x
-
-        def func_sum(x):
-            return x ** 2 / 2
-
-        self.play(Create(ax))
-        self.wait()
-
-        l_func = [func, func_sum, func_linear]
-        texs = ["$n^2$", "$\\frac{n^2}{2}$", '$n$']
-        colors = [YELLOW, GOLD, MAROON]
-
-        texts = ['暴力枚举', '利用对称性', '利用额外空间']
-
-        for i in range(len(l_func)):
-            graph = ax.plot(l_func[i], x_range=[1, 10], color=colors[i], use_smoothing=True)
-            graph_label = ax.get_graph_label(graph=graph, label=Tex(texs[i]))
-            text = Text(texts[i]).scale(0.6).next_to(graph_label, RIGHT)
-            self.play(Create(graph), Write(graph_label), Write(text))
-            self.wait()
+    def attrs3(self):
+        text = Text('必须包含终止条件，终止条件即初始状态')
 
 
 class thanks_end(Scene):
