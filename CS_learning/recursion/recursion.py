@@ -318,7 +318,6 @@ class recursion_des(Scene):
         text1_cn = Text('1. 将问题纵向拆分，缩减问题规模').scale(0.5).next_to(text0_en, 3 * DOWN)
         text1_en = Text('enumeration scope').scale(0.4).next_to(text1_cn, DOWN)
 
-
         vg_anim = self.attrs_1_anim().scale(0.7).to_edge(LEFT).shift(3 * UP)
         self.play(FadeIn(vg_anim))
 
@@ -339,7 +338,7 @@ class recursion_des(Scene):
         vg_text.arrange_submobjects(RIGHT, buff=0.2).scale(2).to_edge(LEFT)
         self.play(Create(vg_text))
 
-        recursion_tex = MathTex('S_n = S_{n-1} + a_n', color=MAROON).scale(0.8).next_to(vg_text, 3*UP)
+        recursion_tex = MathTex('S_n = S_{n-1} + a_n', color=MAROON).scale(0.8).next_to(vg_text, 3 * UP)
 
         self.play(AddTextWordByWord(recursion_tex))
 
@@ -364,7 +363,7 @@ class recursion_des(Scene):
         text3_en = Text('enumeration scope').scale(0.4).next_to(text3_cn, DOWN)
 
         s = VGroup()
-        v_stack = RoundedRectangle(corner_radius=0.5, height=1.2, color=BLUE).scale(0.35).to_edge(6*LEFT+2*DOWN)
+        v_stack = RoundedRectangle(corner_radius=0.5, height=1.2, color=BLUE).scale(0.35).to_edge(6 * LEFT + 2 * DOWN)
         self.play(FadeIn(v_stack))
         s.add(v_stack)
 
@@ -378,7 +377,6 @@ class recursion_des(Scene):
 
         # brace = Brace(s[:10], direction=LEFT, color=MAROON)
         # self.play(Write(brace))
-
 
         vec = Vector(RIGHT).next_to(s[9], RIGHT, buff=0.01)
         self.play(Create(vec))
@@ -395,14 +393,33 @@ class recursion_des(Scene):
         return text3_cn, text3_en
 
 
-class recursion_josephus(Scene):
+class recursion_maxvalue(Scene):
     def construct(self):
-        pass
-    def josephus_des(self):
-        l_n = list(range(1, 11))
-        random.shuffle(l_n)
-        circle_number = CommonFunc.add_shape_object(l_n).scale(0.8)
+        self.maxvalue_des()
 
+    def maxvalue_des(self):
+        n = 16
+        l_n = list(range(0, n))
+        random.shuffle(l_n)
+        circle_number = CommonFunc.add_shape_object(l_n, cols=n).scale(0.6).to_edge(2*UP)
+        circles = circle_number[0]
+        numbers = circle_number[1]
+
+        self.play(Create(circle_number))
+
+        code_two_max = CommonFunc.add_code('recursion/two_max.py', 'python').next_to(circle_number, 5*DOWN+LEFT)
+
+        self.play(Write(code_two_max))
+        #
+        # for i in range(n - 1, -1, -1):
+        #     sr = SurroundingRectangle(circles[:i], buff=0.05, color=YELLOW)
+        #     self.play(Write(sr))
+        #     self.play(Unwrite(sr))
+
+        recursion_tex = MathTex('M_n = \max(M_{n-1},a_n)').scale(0.8).next_to(circle_number, 2*DOWN)
+        self.play(Write(recursion_tex))
+
+        # self.play(circle_number.animate.to_edge(UP))
 
 
 class thanks_end(Scene):
