@@ -398,6 +398,17 @@ class recursion_maxvalue(Scene):
         self.maxvalue_des()
 
     def maxvalue_des(self):
+        title = Text('例子:', font='SIL-Hei-Med-Jian').scale(0.8).move_to(np.array([-5, 3.5, 0]))
+        self.add(title)
+        subtitle = Text('不使用内置函数，用递归来找出一个数组中的最大值').scale(0.6).next_to(title, RIGHT)
+        self.add(subtitle)
+        topic = Paragraph('\t Given an array of numbers where each number is unique,',
+                          '\t find the number of pairs of numbers in the array that sum to 0.').set_color(
+            MAROON).scale(0.5).next_to(subtitle, DOWN)
+
+        return title, subtitle, topic
+
+    def maxvalue_des(self):
         n = 16
         l_n = list(range(0, n))
         random.shuffle(l_n)
