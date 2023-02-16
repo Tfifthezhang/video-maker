@@ -1,3 +1,3 @@
-manim -qh reservoir.py random_sampling
+manim -qh example/fern.py Fern --disable_caching
 
 

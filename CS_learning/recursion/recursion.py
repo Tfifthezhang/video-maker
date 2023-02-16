@@ -17,6 +17,12 @@ sys.path.append('..')
 from CS_learning.common_func import CommonFunc
 import random
 
+FRAME_WIDTH = config.frame_width
+FRAME_HEIGH = config.frame_height
+
+FRAME_X_RADIUS = config.frame_x_radius
+FRAME_Y_RADIUS = config.frame_y_radius
+
 
 class logo(Scene):
     def construct(self):
@@ -393,6 +399,76 @@ class recursion_des(Scene):
         return text3_cn, text3_en
 
 
+class recursion_core(Scene):
+    def construct(self):
+        pass
+
+    def fibonacci_example(self):
+        pass
+
+
+class HanoiTower(Scene):
+    def construct(self):
+        self.diskes1 = VGroup()
+        self.diskes2 = VGroup()
+        self.diskes3 = VGroup()
+        self.diskes = VGroup(self.diskes1, self.diskes2, self.diskes3)
+        self.hanoi = VGroup()
+
+        poles = self.drawPin()
+        self.setHanoi(5, poles[0])
+        self.moveDisk(0, 2, poles)
+        self.moveDisk(0, 1, poles)
+
+    def drawPin(self):
+        with_line = Line(np.array([0, 2.5, 0]), np.array([0, -2.5, 0]),color=MAROON)
+
+        left_line = with_line.copy().shift(4*LEFT)
+
+        right_line = with_line.copy().shift(4*RIGHT)
+
+        self.play(FadeIn(left_line, right_line, with_line))
+
+        poles = VGroup(left_line, with_line, right_line)
+
+        return poles
+
+    def setHanoi(self, order, pole):
+        for i in range(order):
+            disk = RoundedRectangle(fill_opacity=1, color=BLUE, stroke_width=0.1,
+                                    width=3/5*(order - i), height=0.5, corner_radius=0.25)
+            disk.move_to(pole.get_end() + np.array([0, 0.25+i * 0.5, 0]))
+            self.hanoi.add(disk)
+            self.diskes1.add(disk)
+        self.play(Create(self.hanoi))
+
+    def moveDisk(self, src, dest, poles):
+        disk = self.diskes[src][-1]
+        self.diskes[src].remove(disk)
+        self.diskes[dest].add(disk)
+        path = VGroup()
+        vertices = [poles[src].get_start(),
+                    poles[dest].get_start(),
+                    poles[dest].get_end()
+                    + np.array([0, 0.25+(len(self.diskes[dest]) - 1) * 0.5, 0])]
+        path.set_points_as_corners(vertices)
+        self.play(MoveAlongPath(disk, path,run_time=2))
+
+    def solveHanoi(self, order, src, dest):
+        # 问题拆分
+        temp = ({0, 1, 2} - {src, dest}).pop()
+        if order == 1:
+            self.moveDisk(src, dest)
+        elif order == 2:
+            self.moveDisk(src, temp)
+            self.moveDisk(src, dest)
+            self.moveDisk(temp, dest)
+        else:
+            self.solveHanoi(order - 1, src, temp)
+            self.solveHanoi(1, src, dest)
+            self.solveHanoi(order - 1, temp, dest)
+
+
 class recursion_maxvalue(Scene):
     def construct(self):
         self.maxvalue_des()
@@ -412,13 +488,13 @@ class recursion_maxvalue(Scene):
         n = 16
         l_n = list(range(0, n))
         random.shuffle(l_n)
-        circle_number = CommonFunc.add_shape_object(l_n, cols=n).scale(0.6).to_edge(2*UP)
+        circle_number = CommonFunc.add_shape_object(l_n, cols=n).scale(0.6).to_edge(2 * UP)
         circles = circle_number[0]
         numbers = circle_number[1]
 
         self.play(Create(circle_number))
 
-        code_two_max = CommonFunc.add_code('recursion/two_max.py', 'python').next_to(circle_number, 5*DOWN+LEFT)
+        code_two_max = CommonFunc.add_code('recursion/two_max.py', 'python').next_to(circle_number, 5 * DOWN + LEFT)
 
         self.play(Write(code_two_max))
         #
@@ -427,7 +503,7 @@ class recursion_maxvalue(Scene):
         #     self.play(Write(sr))
         #     self.play(Unwrite(sr))
 
-        recursion_tex = MathTex('M_n = \max(M_{n-1},a_n)').scale(0.8).next_to(circle_number, 2*DOWN)
+        recursion_tex = MathTex('M_n = \max(M_{n-1},a_n)').scale(0.8).next_to(circle_number, 2 * DOWN)
         self.play(Write(recursion_tex))
 
         # self.play(circle_number.animate.to_edge(UP))
