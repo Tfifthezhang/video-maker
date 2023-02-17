@@ -413,15 +413,100 @@ class HanoiTower(Scene):
         self.diskes2 = VGroup()
         self.diskes3 = VGroup()
         self.diskes = VGroup(self.diskes1, self.diskes2, self.diskes3)
+        self.poles = None
         self.hanoi = VGroup()
 
-        poles = self.drawPin()
-        self.setHanoi(5, poles[0])
-        self.moveDisk(0, 2, poles)
-        self.moveDisk(0, 1, poles)
+
+        self.drawPin()
+
+        # self.recursion_explain()
+        # code = self.recursion_move()
+
+        self.setHanoi(5, 0)
+        self.solveHanoi(5, 0, 2)
+
+    def recursion_explain(self):
+        # 第一步，移动5个盘子
+        self.move_explain(s=5)
+
+        # 第二步，移动4个盘子
+        self.move_explain(s=4)
+
+        # 第三步，移动3个盘子
+        self.move_explain(s=3)
+
+        # 第四步，移动2个盘子
+        self.move_explain(s=2)
+
+        # 第五步，移动1个盘子
+        self.move_explain(s=1)
+
+        # 可以发现，移动任意的盘子都只需要三步
+        # self.recursion_move()
+
+    def recursion_move(self):
+        text = MathTex('{{MultiMove}}({{n}}, {{a, b, c}})').scale(0.8).to_edge(UP)
+        self.play(Write(text))
+        self.play(Indicate(text.submobjects[-2], run_time=4))
+        # first
+        arrow1 = CommonFunc.add_arrow(self.poles[0].get_center(),
+                                      self.poles[1].get_center(), color=GREY, buff=0.5)
+        self.play(Write(arrow1))
+        text1 = MathTex('MultiMove(n-1, a, c, b)').scale(0.6).next_to(arrow1, UP)
+        self.play(ReplacementTransform(text.copy(), text1))
+
+        # second
+        cur_arrow = CommonFunc.add_arrow(self.poles[0].get_end(),
+                                         self.poles[2].get_end(), color=GREY, buff=1)
+        self.play(Write(cur_arrow))
+        text3 = MathTex('SingleMove(a,c)').scale(0.6).next_to(cur_arrow, UP)
+        self.play(Write(text3))
+
+        # thrid
+        arrow2 = CommonFunc.add_arrow(self.poles[1].get_center(),
+                                      self.poles[2].get_center(), color=GREY, buff=0.5)
+        self.play(Write(arrow2))
+        text2 = MathTex('MultiMove(n-1, b, a, c)').scale(0.6).next_to(arrow2, UP)
+        self.play(ReplacementTransform(text.copy(), text2))
+
+        text_code = VGroup(text, text1, text3, text2)
+        self.play(FadeOut(arrow1), FadeOut(arrow2), FadeOut(cur_arrow))
+
+        code = CommonFunc.add_code('recursion/multimove.py', 'python').scale(1.2)
+
+        self.play(text_code.animate.arrange_submobjects(DOWN, buff=0.3))
+        self.wait(2)
+        self.play(Transform(text_code, code))
+
+        self.wait(3)
+        return code
+
+    def move_explain(self, s=5):
+        cn_text = Text('如何移动 {} 个物品？'.format(s)).scale(0.6).to_edge(UP)
+        en_text = Text('How to move {} items'.format(s)).scale(0.4).next_to(cn_text, DOWN)
+        self.setHanoi(s, 0)
+        self.play(Create(cn_text), Create(en_text))
+        self.diskes[0].remove(*self.diskes[0][1:])
+        self.setHanoi(s-1, 1, color=TEAL)
+
+        self.moveDisk(0, 2)
+
+        self.diskes[1].remove(*self.diskes[1][:])
+        self.setHanoi(s, 2)
+
+        self.play(Uncreate(self.diskes[2]))
+        self.clearHanoi()
+        self.play(Uncreate(cn_text), Uncreate(en_text))
+
+
+    def clearHanoi(self):
+        self.diskes1 = VGroup()
+        self.diskes2 = VGroup()
+        self.diskes3 = VGroup()
+        self.diskes = VGroup(self.diskes1, self.diskes2, self.diskes3)
 
     def drawPin(self):
-        with_line = Line(np.array([0, 2.5, 0]), np.array([0, -2.5, 0]),color=MAROON)
+        with_line = Line(np.array([0, 2.5, 0]), np.array([0, -2.5, 0]), color=MAROON)
 
         left_line = with_line.copy().shift(4*LEFT)
 
@@ -431,28 +516,28 @@ class HanoiTower(Scene):
 
         poles = VGroup(left_line, with_line, right_line)
 
-        return poles
+        self.poles = poles
 
-    def setHanoi(self, order, pole):
+    def setHanoi(self, order, index_pole, color=GREEN):
         for i in range(order):
-            disk = RoundedRectangle(fill_opacity=1, color=BLUE, stroke_width=0.1,
+            disk = RoundedRectangle(fill_opacity=1, color=color, stroke_color=WHITE, stroke_width=0.8,
                                     width=3/5*(order - i), height=0.5, corner_radius=0.25)
-            disk.move_to(pole.get_end() + np.array([0, 0.25+i * 0.5, 0]))
-            self.hanoi.add(disk)
-            self.diskes1.add(disk)
-        self.play(Create(self.hanoi))
+            disk.move_to(self.poles[index_pole].get_end() + np.array([0, 0.25+i * 0.5, 0]))
+            self.diskes[index_pole].add(disk)
+        self.play(FadeIn(self.diskes[index_pole]))
 
-    def moveDisk(self, src, dest, poles):
+    def moveDisk(self, src, dest):
         disk = self.diskes[src][-1]
         self.diskes[src].remove(disk)
         self.diskes[dest].add(disk)
         path = VGroup()
-        vertices = [poles[src].get_start(),
-                    poles[dest].get_start(),
-                    poles[dest].get_end()
+        vertices = [disk.get_center(),
+                    self.poles[src].get_start(),
+                    self.poles[dest].get_start(),
+                    self.poles[dest].get_end()
                     + np.array([0, 0.25+(len(self.diskes[dest]) - 1) * 0.5, 0])]
         path.set_points_as_corners(vertices)
-        self.play(MoveAlongPath(disk, path,run_time=2))
+        self.play(MoveAlongPath(disk, path, run_time=2))
 
     def solveHanoi(self, order, src, dest):
         # 问题拆分
