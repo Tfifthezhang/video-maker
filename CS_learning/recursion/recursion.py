@@ -118,6 +118,8 @@ class recursion_example(Scene):
         var = CommonFunc.variable_tracker(label=Tex('$S$'), color=GREEN).next_to(circle_number, UP)
         self.play(Create(var))
 
+        plus_sign = MathTex('+').scale(0.8).next_to(var, 2 * RIGHT)
+
         s = 0
         for i in range(len(numbers)):
             self.play(tracker.animate.set_value(numbers[i].get_center()[0]))
@@ -125,8 +127,9 @@ class recursion_example(Scene):
             i_value = numbers[i].get_value()
             s = s + i_value
 
-            self.play(i_number.animate.move_to(var.get_center() + 1.5 * RIGHT))
-            self.play(FadeOut(i_number))
+            self.play(Write(plus_sign))
+            self.play(i_number.animate.move_to(plus_sign.get_right()+0.5*RIGHT))
+            self.play(FadeOut(i_number), FadeOut(plus_sign))
 
             self.play(var.tracker.animate.set_value(s))
 
@@ -279,6 +282,9 @@ class recursion_des(Scene):
         text2_cn, text2_en = self.attrs2(text1_en, vg_anim)
         text3_cn, text3_en = self.attrs3(text2_en)
 
+        self.play(text2_cn.animate.scale(1.5), text2_en.animate.scale(1.5))
+        self.play(Circumscribe(VGroup(text2_cn, text2_en)))
+
     def title(self):
         text0_cn = Text('递归的要素', font='SIL-Hei-Med-Jian').scale(0.8).to_edge(4 * RIGHT + UP)
         text0_en = Text('Elements of recursion algorithm').scale(0.5).next_to(text0_cn, DOWN)
@@ -401,10 +407,66 @@ class recursion_des(Scene):
 
 class recursion_core(Scene):
     def construct(self):
-        pass
+        self.fibonacci_example()
+        self.maxvalue()
 
     def fibonacci_example(self):
-        pass
+        text = Text('斐波那契数列 Fibonacci Sequence').scale(0.8).to_edge(UP)
+        self.play(Write(text))
+        l_n = [1,1,2,3,5,8,13,21,34,55,89]
+        n = len(l_n)
+        circle_number = CommonFunc.add_shape_object(l_n, rows=1, cols=n, color=BLUE).scale(0.8)
+        circles = circle_number[0]
+        numbers = circle_number[1]
+
+        self.play(Create(circle_number))
+
+        tex = MathTex('Fib(n-1)+Fib(n-2)').scale(0.8).next_to(circle_number, UP)
+        self.play(Write(tex))
+
+        for i in range(n-1, 1, -1):
+            sr = SurroundingRectangle(circles[i-2:i+1], buff=SMALL_BUFF, fill_opacity=0.4)
+            n1_arrow = CommonFunc.add_curvearrow(circles[i-1].get_bottom(), circles[i].get_bottom(), radius=2)
+            n2_arrow = CommonFunc.add_curvearrow(circles[i-2].get_bottom(), circles[i].get_bottom(), radius=2)
+
+            self.play(Create(sr))
+
+            self.play(Create(n1_arrow), Create(n2_arrow))
+
+            self.wait(2)
+            self.play(FadeOut(sr), FadeOut(n1_arrow), FadeOut(n2_arrow))
+
+        self.wait(3)
+        self.clear()
+
+    def maxvalue(self):
+        text = Text('一个数组中的最大值 the maximum value in an array').scale(0.8).to_edge(UP)
+        self.play(Write(text))
+
+        n = 11
+        l_n = list(range(11, n+11))
+        random.shuffle(l_n)
+        circle_number = CommonFunc.add_shape_object(l_n, cols=n, buff=4*SMALL_BUFF).scale(0.8)
+        circles = circle_number[0]
+        numbers = circle_number[1]
+
+        self.play(Create(circle_number))
+
+        recursion_tex = MathTex('M_n = \max(M_{n-1},a_n)').scale(0.8).next_to(circle_number, UP)
+        self.play(Write(recursion_tex))
+
+        for i in range(n-1, 0, -1):
+            sr_rest = SurroundingRectangle(circles[:i], buff=SMALL_BUFF)
+            brace = Brace(sr_rest, DOWN)
+            brace_text = Text('前{}个数字的最大值 Maximum value of the first {}'.format(i,i)).scale(0.5).next_to(brace, DOWN)
+
+            sr = SurroundingRectangle(circles[i], color=RED, buff=SMALL_BUFF)
+
+            self.play(Create(sr), Create(sr_rest), Create(brace), Create(brace_text))
+
+            self.wait(2)
+            self.play(FadeOut(sr), FadeOut(sr_rest), FadeOut(brace), FadeOut(brace_text))
+
 
 
 class HanoiTower(Scene):
@@ -414,16 +476,35 @@ class HanoiTower(Scene):
         self.diskes3 = VGroup()
         self.diskes = VGroup(self.diskes1, self.diskes2, self.diskes3)
         self.poles = None
-        self.hanoi = VGroup()
+        self.code = None
 
 
         self.drawPin()
 
-        # self.recursion_explain()
-        # code = self.recursion_move()
+        self.hanoi_intro()
+        self.recursion_explain()
+        self.recursion_move()
 
-        self.setHanoi(5, 0)
+        self.setHanoi(5, 0, fill_opacity=0.5)
         self.solveHanoi(5, 0, 2)
+
+    def hanoi_intro(self):
+        self.setHanoi(5, 0)
+        intro = Text('汉诺塔问题 Tower of Hanoi').scale(0.7).to_edge(UP+LEFT)
+
+        claim1 = Text('每次只能移动一个圆盘 Only one disk may be moved at a time').scale(0.4).to_edge(2.5*UP+LEFT)
+        claim2 = Text('大盘不能叠在小盘上面 No disk may be placed on top of a disk that is smaller than it').scale(0.4).to_edge(3.5*UP+LEFT)
+
+        self.play(Write(intro))
+
+        self.play(Write(claim1), Write(claim2))
+
+        self.wait(3)
+
+        self.play(Unwrite(intro), Unwrite(claim1), Unwrite(claim2))
+
+        self.play(FadeOut(self.diskes[0]))
+        self.clearHanoi()
 
     def recursion_explain(self):
         # 第一步，移动5个盘子
@@ -441,8 +522,6 @@ class HanoiTower(Scene):
         # 第五步，移动1个盘子
         self.move_explain(s=1)
 
-        # 可以发现，移动任意的盘子都只需要三步
-        # self.recursion_move()
 
     def recursion_move(self):
         text = MathTex('{{MultiMove}}({{n}}, {{a, b, c}})').scale(0.8).to_edge(UP)
@@ -476,10 +555,12 @@ class HanoiTower(Scene):
 
         self.play(text_code.animate.arrange_submobjects(DOWN, buff=0.3))
         self.wait(2)
-        self.play(Transform(text_code, code))
+        self.play(ReplacementTransform(text_code, code))
+
+        self.code = code
 
         self.wait(3)
-        return code
+        self.play(code.animate.scale(0.4).to_edge(UP))
 
     def move_explain(self, s=5):
         cn_text = Text('如何移动 {} 个物品？'.format(s)).scale(0.6).to_edge(UP)
@@ -487,14 +568,16 @@ class HanoiTower(Scene):
         self.setHanoi(s, 0)
         self.play(Create(cn_text), Create(en_text))
         self.diskes[0].remove(*self.diskes[0][1:])
+        self.wait(1)
         self.setHanoi(s-1, 1, color=TEAL)
 
         self.moveDisk(0, 2)
 
         self.diskes[1].remove(*self.diskes[1][:])
+        self.wait(1)
         self.setHanoi(s, 2)
 
-        self.play(Uncreate(self.diskes[2]))
+        self.play(FadeOut(self.diskes[2]))
         self.clearHanoi()
         self.play(Uncreate(cn_text), Uncreate(en_text))
 
@@ -518,9 +601,9 @@ class HanoiTower(Scene):
 
         self.poles = poles
 
-    def setHanoi(self, order, index_pole, color=GREEN):
+    def setHanoi(self, order, index_pole, color=GREEN, fill_opacity=1):
         for i in range(order):
-            disk = RoundedRectangle(fill_opacity=1, color=color, stroke_color=WHITE, stroke_width=0.8,
+            disk = RoundedRectangle(fill_opacity=fill_opacity, color=color, stroke_color=WHITE, stroke_width=0.8,
                                     width=3/5*(order - i), height=0.5, corner_radius=0.25)
             disk.move_to(self.poles[index_pole].get_end() + np.array([0, 0.25+i * 0.5, 0]))
             self.diskes[index_pole].add(disk)
@@ -543,34 +626,31 @@ class HanoiTower(Scene):
         # 问题拆分
         temp = ({0, 1, 2} - {src, dest}).pop()
         if order == 1:
+            self.play(Indicate(self.code.code[3]))
             self.moveDisk(src, dest)
         elif order == 2:
+            self.play(Indicate(self.code.code[2]))
             self.moveDisk(src, temp)
+            self.play(Indicate(self.code.code[3]))
             self.moveDisk(src, dest)
+            self.play(Indicate(self.code.code[4]))
             self.moveDisk(temp, dest)
+
         else:
+            self.play(Indicate(self.code.code[2]))
             self.solveHanoi(order - 1, src, temp)
+            self.play(Indicate(self.code.code[3]))
             self.solveHanoi(1, src, dest)
+            self.play(Indicate(self.code.code[4]))
             self.solveHanoi(order - 1, temp, dest)
 
 
 class recursion_maxvalue(Scene):
     def construct(self):
-        self.maxvalue_des()
+        pass
 
     def maxvalue_des(self):
-        title = Text('例子:', font='SIL-Hei-Med-Jian').scale(0.8).move_to(np.array([-5, 3.5, 0]))
-        self.add(title)
-        subtitle = Text('不使用内置函数，用递归来找出一个数组中的最大值').scale(0.6).next_to(title, RIGHT)
-        self.add(subtitle)
-        topic = Paragraph('\t Given an array of numbers where each number is unique,',
-                          '\t find the number of pairs of numbers in the array that sum to 0.').set_color(
-            MAROON).scale(0.5).next_to(subtitle, DOWN)
-
-        return title, subtitle, topic
-
-    def maxvalue_des(self):
-        n = 16
+        n = 11
         l_n = list(range(0, n))
         random.shuffle(l_n)
         circle_number = CommonFunc.add_shape_object(l_n, cols=n).scale(0.6).to_edge(2 * UP)

@@ -26,7 +26,7 @@ class CommonFunc:
         return circle_texs
 
     @classmethod
-    def add_shape_object(cls, l_n, color=BLUE, rows=10, cols=10):
+    def add_shape_object(cls, l_n, color=BLUE, rows=10, cols=10, buff=0.2):
         n_circles = len(l_n)
 
         circles = VGroup(*[Circle(radius=0.5,
@@ -35,7 +35,7 @@ class CommonFunc:
                            for _ in range(n_circles)
                            ]
                          )
-        circles.arrange_in_grid(rows=rows, cols=cols, buff=0.2)
+        circles.arrange_in_grid(rows=rows, cols=cols, buff=buff)
 
         texs = VGroup()
         for i in range(n_circles):

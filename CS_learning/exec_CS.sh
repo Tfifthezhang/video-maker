@@ -1,1 +1,1 @@
-manim -qh recursion/recursion.py HanoiTower
+manim -qh recursion/recursion.py recursion_example
