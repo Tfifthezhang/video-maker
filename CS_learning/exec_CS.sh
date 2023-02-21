@@ -1,1 +1,1 @@
-manim -qh recursion/recursion.py recursion_des
+manim -qh maximum_likelihood/maximum_likelihood.py NormalDistribution

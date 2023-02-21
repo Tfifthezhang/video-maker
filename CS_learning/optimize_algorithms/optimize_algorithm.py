@@ -116,6 +116,7 @@ class normal_neassery(ThreeDScene):
         var = CommonFunc.variable_tracker(label=Text('迭代次数'), start=0, color=RED).scale(0.6).next_to(surface, DOWN+RIGHT)
         self.add(var)
         self.play(var.tracker.animate.set_value(s))
+
 class contour_bowl(ThreeDScene):
     # CONFIG = {'inital_start': np.array([-2, 2]),
     #           'axes_x_range': [-4, 4],
