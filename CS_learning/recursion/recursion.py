@@ -79,11 +79,11 @@ class Title(Scene):
 
         self.play(FadeIn(brace), Create(section_text))
 
-        self.play(Indicate(svg_group[2], run_time=2))
+        self.play(Indicate(svg_group[1], run_time=2))
 
         text = Text('递归算法    Recursion Algorithm ').scale(0.7).next_to(svg_group, DOWN * 3)
 
-        self.play(GrowFromPoint(text, svg_group[0].get_center(), run_time=2))
+        self.play(GrowFromPoint(text, svg_group[1].get_center(), run_time=2))
         self.wait(3)
 
         subtext = Text('-- 如果你不明白，请参见"递归"').scale(0.5).next_to(text, 1.5 * DOWN)
@@ -286,8 +286,8 @@ class recursion_des(Scene):
         self.play(Circumscribe(VGroup(text2_cn, text2_en)))
 
     def title(self):
-        text0_cn = Text('递归的要素', font='SIL-Hei-Med-Jian').scale(0.8).to_edge(4 * RIGHT + UP)
-        text0_en = Text('Elements of recursion algorithm').scale(0.5).next_to(text0_cn, DOWN)
+        text0_cn = Text('递归的要素', font='SIL-Hei-Med-Jian').scale(0.8).to_edge(7 * RIGHT + UP)
+        text0_en = Text('Elements of recursion algorithm',color=MAROON).scale(0.5).next_to(text0_cn, DOWN)
 
         self.play(Write(text0_cn), Write(text0_en))
 
@@ -328,7 +328,7 @@ class recursion_des(Scene):
 
     def attrs1(self, text0_en):
         text1_cn = Text('1. 将问题纵向拆分，缩减问题规模').scale(0.5).next_to(text0_en, 3 * DOWN)
-        text1_en = Text('enumeration scope').scale(0.4).next_to(text1_cn, DOWN)
+        text1_en = Text('Vertically decompose the problem to reduce its size',color=MAROON).scale(0.4).next_to(text1_cn, DOWN)
 
         vg_anim = self.attrs_1_anim().scale(0.7).to_edge(LEFT).shift(3 * UP)
         self.play(FadeIn(vg_anim))
@@ -343,7 +343,7 @@ class recursion_des(Scene):
 
     def attrs2(self, text1_en, vg_anim):
         text2_cn = Text('2. 解决方法与问题规模无关').scale(0.5).next_to(text1_en, 3 * DOWN)
-        text2_en = Text('enumeration scope').scale(0.4).next_to(text2_cn, DOWN)
+        text2_en = Text('The solution method is independent of the problem size.',color=MAROON).scale(0.4).next_to(text2_cn, DOWN)
 
         self.play(FadeOut(vg_anim[0]), FadeOut(vg_anim[-1]))
         vg_text = vg_anim[1]
@@ -372,7 +372,7 @@ class recursion_des(Scene):
 
     def attrs3(self, text2_en):
         text3_cn = Text('3. 包含终止条件，终止条件即初始状态').scale(0.5).next_to(text2_en, 3 * DOWN)
-        text3_en = Text('enumeration scope').scale(0.4).next_to(text3_cn, DOWN)
+        text3_en = Text('It includes a termination condition，i.e., the initial state',color=MAROON).scale(0.4).next_to(text3_cn, DOWN)
 
         s = VGroup()
         v_stack = RoundedRectangle(corner_radius=0.5, height=1.2, color=BLUE).scale(0.35).to_edge(6 * LEFT + 2 * DOWN)
