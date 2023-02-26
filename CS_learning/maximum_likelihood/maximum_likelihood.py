@@ -58,7 +58,7 @@ class NormalDistribution(Scene):
         return coef * np.power(np.e, expon)
 
 
-class Regression(Scene):
+class Regression(MovingCameraScene):
     def construct(self):
         self.plot_scatter()
 
@@ -69,14 +69,40 @@ class Regression(Scene):
 
         x = np.linspace(-7.5, 7.5, 200)
         gaussian_noise = np.random.normal(size=(200,))
-        y = np.array(x)
-        y_noise = y+gaussian_noise
+        y = np.power(0.25 * x, 3)
+        y_noise = y + gaussian_noise
         coords = list(zip(x, y_noise))
 
-        #coords = np.random.uniform(-8, 8, size=(10, 2))
+        # coords = np.random.uniform(-8, 8, size=(10, 2))
 
-        dots = VGroup(*[Dot(ax.c2p(coord[0], coord[1]), radius=0.5*DEFAULT_DOT_RADIUS, color=BLUE) for coord in coords])
+        dots = VGroup(
+            *[Dot(ax.c2p(coord[0], coord[1]), radius=0.5 * DEFAULT_DOT_RADIUS, color=BLUE) for coord in coords])
         self.play(FadeIn(dots))
 
+        self.camera.frame.save_state()
+        self.play(self.camera.frame.animate.scale(0.3).move_to(dots[140]))
+
+        self.play(dots[140].animate.set(color=RED))
+
+        iid_axes = Axes(x_range=[-3, 3], y_range=[0, 0.6], x_length=5, y_length=1,
+                        axis_config=dict(include_tip=False,
+                                         include_numbers=False,
+                                         rotation=0 * DEGREES,
+                                         stroke_width=1.0),).scale(0.3).rotate(270*DEGREES).next_to(dots[140], 0.05*RIGHT)
+        self.play(Create(iid_axes))
+
+        #self.play(iid_axes.animate.rotate(270*DEGREES))
+        graph = iid_axes.plot(lambda x: self.normal_dis(x, mu=0, sigma=1),
+                              x_range=[-3, 3],
+                              use_smoothing=True,
+                              color=MAROON)
+        self.play(Create(graph))
+
+        self.wait(3)
+        self.play(Restore(self.camera.frame))
 
 
+    def normal_dis(self, x, sigma, mu):
+        coef = 1 / (sigma * np.sqrt(2 * np.pi))
+        expon = -1 / 2 * ((x - mu) / sigma) ** 2
+        return coef * np.power(np.e, expon)

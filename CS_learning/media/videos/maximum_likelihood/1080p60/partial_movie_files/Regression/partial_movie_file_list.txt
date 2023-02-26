@@ -1,3 +1,9 @@
 # This file is used internally by FFMPEG.
-file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/Regression/2902699114_1497470386_223132457.mp4'
-file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/Regression/3931933789_423313677_3278145617.mp4'
+file 'file:/Users/tfifthezhang/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/Regression/1357623261_956867543_223132457.mp4'
+file 'file:/Users/tfifthezhang/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/Regression/1969693602_735614444_167890609.mp4'
+file 'file:/Users/tfifthezhang/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/Regression/386585915_3401502443_2162748161.mp4'
+file 'file:/Users/tfifthezhang/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/Regression/3447408810_1045423470_2162748161.mp4'
+file 'file:/Users/tfifthezhang/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/Regression/3447408810_228293297_3916998778.mp4'
+file 'file:/Users/tfifthezhang/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/Regression/3447408810_2979624579_3934878035.mp4'
+file 'file:/Users/tfifthezhang/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/Regression/3447408810_2569718023_3150248531.mp4'
+file 'file:/Users/tfifthezhang/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/Regression/3447408810_2243974563_1882860107.mp4'
