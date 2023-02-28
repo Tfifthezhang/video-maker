@@ -1,1 +1,1 @@
-manim -qh maximum_likelihood/maximum_likelihood.py Regression
+manim -qh maximum_likelihood/maximum_likelihood.py NormalDistribution

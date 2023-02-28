@@ -72,8 +72,8 @@ class CommonFunc:
         return pointer, tracker, label
 
     @classmethod
-    def variable_tracker(cls, label=Text('x'), start=0, color=RED):
-        var = Variable(start, label, var_type=Integer)
+    def variable_tracker(cls, label=Text('x'), start=0, color=RED, var_type=Integer):
+        var = Variable(start, label, var_type=var_type)
         var.set_color(color)
         return var
 
