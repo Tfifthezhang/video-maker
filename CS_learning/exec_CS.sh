@@ -1,1 +1,1 @@
-manim -qh maximum_likelihood/maximum_likelihood.py NormalDistribution
+manim -qh maximum_likelihood/maximum_likelihood.py MaxProbability

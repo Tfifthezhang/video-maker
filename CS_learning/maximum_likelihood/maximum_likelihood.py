@@ -67,14 +67,16 @@ class NormalDistribution(Scene):
 
         self.play(Create(mu), Create(sigma))
 
-        for i in np.linspace(-4, 4, 10).tolist():
+        for i in np.linspace(-4, 4, 15).tolist():
             self.play(mu.tracker.animate.set_value(i))
             self.play(sigma.tracker.animate.set_value(self.sigma))
             graph_other = ax.plot(lambda x: self.normal_dis(x, mu=i, sigma=self.sigma), x_range=[i - 3, i + 3],
                                   use_smoothing=True, color=MAROON)
             self.play(Transform(graph, graph_other))
 
-        for j in np.linspace(0.5, 2.5, 10).tolist():
+        self.wait(2)
+
+        for j in np.linspace(0.5, 2.5, 15).tolist():
             self.play(mu.tracker.animate.set_value(self.mu))
             self.play(sigma.tracker.animate.set_value(j))
             graph_other = ax.plot(lambda x: self.normal_dis(x, mu=self.mu, sigma=j), x_range=[-6, 6],
@@ -121,10 +123,44 @@ class NormalDistribution(Scene):
 
 class MaxProbability(Scene):
     def construct(self):
-        pass
+        self.mle_normal()
 
-    def max_probability(self):
-        pass
+    def mle_sample(self):
+        sampler = np.random.normal(loc=1, scale=0.5, size=10)
+
+        vg_sample = VGroup(*[DecimalNumber(n) for n in sampler])
+        vg_sample.arrange_submobjects(DOWN, buff=0.25).scale(0.8).to_edge(2 * LEFT)
+
+        self.play(Create(vg_sample))
+
+    def mle_normal(self):
+        vg_graph = VGroup()
+        l_mu = np.random.uniform(-3, 3, 8)
+        l_sigma = np.random.uniform(0.5, 3, 8)
+        for i, j in list(zip(l_mu, l_sigma)):
+            ax = CommonFunc.add_axes(x_range=[-6, 6], y_range=[0, 0.7], x_length=8, y_length=6,
+                                 axis_config={"include_tip": True, "include_numbers": False}).scale(0.6)
+            graph = ax.plot(lambda x: self.normal_dis(x, mu=i, sigma=j), x_range=[i - 3, i + 3],
+                        use_smoothing=True)
+            graph_label = ax.get_graph_label(graph=graph,
+                                             label=MathTex('\mu={:.2f},\sigma^2={:.2f}'.format(i, j)),
+                                             direction=DL).scale(0.8)
+
+            ax_vg = VGroup(ax, graph, graph_label)
+            vg_graph.add(ax_vg)
+
+        vg_graph.arrange_in_grid(2, 4, buff=0.2).scale(0.6)
+
+        self.play(FadeIn(vg_graph))
+
+
+
+    def normal_dis(self, x, sigma, mu):
+        coef = 1 / (sigma * np.sqrt(2 * np.pi))
+        expon = -1 / 2 * ((x - mu) / sigma) ** 2
+        return coef * np.power(np.e, expon)
+
+
 
 
 class Regression(MovingCameraScene):
