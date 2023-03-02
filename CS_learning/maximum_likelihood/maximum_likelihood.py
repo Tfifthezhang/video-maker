@@ -16,6 +16,7 @@ sys.path.append('..')
 
 from CS_learning.common_func import CommonFunc
 
+np.random.seed(0)
 
 class NormalDistribution(Scene):
     def construct(self):
@@ -120,27 +121,50 @@ class NormalDistribution(Scene):
             copy_label = label.copy()
             self.play(FadeTransform(copy_label, vg_sample[i], stretch=True))
 
+        self.play(Uncreate(pointer), Uncreate(label))
 
-class MaxProbability(Scene):
+    def key_question(self):
+        self.play(Uncreate(self.axes),
+                  Uncreate(self.graph),
+                  Uncreate(self.var_tracker))
+
+        self.play(self.formula.animate.move_to(LEFT))
+        self.play(self.sampler.animate.move_to(RIGHT))
+
+
+class MaxProbability(ThreeDScene):
     def construct(self):
+        self.sample_array = None
+        self.vg_sample = None
+        self.vg_graph = None
+        self.vg_formula = None
+
+        self.mle_sample()
         self.mle_normal()
+        self.mle_explain()
+        #self.mle_3D()
 
     def mle_sample(self):
         sampler = np.random.normal(loc=1, scale=0.5, size=10)
 
+        self.sample_array = sampler
         vg_sample = VGroup(*[DecimalNumber(n) for n in sampler])
-        vg_sample.arrange_submobjects(DOWN, buff=0.25).scale(0.8).to_edge(2 * LEFT)
+        vg_sample.arrange_submobjects(DOWN, buff=0.3).scale(0.8).to_edge(2 * LEFT)
+
+        self.vg_sample = vg_sample
 
         self.play(Create(vg_sample))
+
+        self.wait(1)
 
     def mle_normal(self):
         vg_graph = VGroup()
         l_mu = np.random.uniform(-3, 3, 8)
         l_sigma = np.random.uniform(0.5, 3, 8)
         for i, j in list(zip(l_mu, l_sigma)):
-            ax = CommonFunc.add_axes(x_range=[-6, 6], y_range=[0, 0.7], x_length=8, y_length=6,
+            ax = CommonFunc.add_axes(x_range=[-10, 10], y_range=[0, 0.7], x_length=8, y_length=6,
                                  axis_config={"include_tip": True, "include_numbers": False}).scale(0.6)
-            graph = ax.plot(lambda x: self.normal_dis(x, mu=i, sigma=j), x_range=[i - 3, i + 3],
+            graph = ax.plot(lambda x: self.normal_dis(x, mu=i, sigma=j), x_range=[i - 10, i + 10],
                         use_smoothing=True)
             graph_label = ax.get_graph_label(graph=graph,
                                              label=MathTex('\mu={:.2f},\sigma^2={:.2f}'.format(i, j)),
@@ -149,9 +173,67 @@ class MaxProbability(Scene):
             ax_vg = VGroup(ax, graph, graph_label)
             vg_graph.add(ax_vg)
 
-        vg_graph.arrange_in_grid(2, 4, buff=0.2).scale(0.6)
+        vg_graph.arrange_in_grid(2, 4, buff=0.15).scale(0.5).next_to(self.vg_sample, 2*RIGHT)
 
-        self.play(FadeIn(vg_graph))
+        self.vg_graph = vg_graph
+
+        self.play(Write(vg_graph))
+
+        self.wait(3)
+
+        self.play(Unwrite(self.vg_graph))
+
+    def mle_explain(self):
+
+        vg_formula = VGroup(*[MathTex("\mathcal{N}", "(", "{:.2f}".format(i),"|", "\mu", ",", "\sigma", ")").scale(0.7) for i in self.sample_array])
+
+        vg_formula.arrange_submobjects(DOWN, buff=0.3).next_to(self.vg_sample, 3*RIGHT)
+
+        for i in range(len(self.vg_sample)):
+            copy_sample = self.vg_sample[i].copy()
+            self.play(FadeTransform(copy_sample, vg_formula[i], stretch=True))
+
+        self.wait(3)
+
+
+        #self.play(vg_formula.animate.arrange_submobjects(RIGHT, buff=SMALL_BUFF).next_to(self.vg_sample, RIGHT))
+
+
+
+    def mle_3D(self):
+
+        def bowl(u, v):
+            z = 1 / 2 * (np.power(u, 2) + np.power(v, 2)/5)
+            return z
+
+        axes = ThreeDAxes(x_range=(-4, 4), y_range=(-2, 2), z_range=(0, 8))
+        surface_plane = Surface(lambda u, v: axes.c2p(u, v, bowl(u, v)),
+                                u_range=[-2, 2],
+                                v_range=[-2, 2],
+                                resolution=(30, 30),
+                                should_make_jagged=True,
+                                stroke_width=0.2)
+
+        surface_plane.set_style(fill_opacity=0.5, stroke_color=RED)
+
+        surface_plane.set_fill_by_value(axes=axes, colors=[(RED, 0.0), (YELLOW, 0.2), (BLUE, 4)], axis=2)
+
+        self.add(axes)
+        self.play(Create(surface_plane))
+
+        self.move_camera(phi=75 * DEGREES)
+
+        # self.set_camera_orientation(phi=75 * DEGREES, theta=0)
+
+        # for i in range(0, 120, 30):
+        #     self.move_camera(theta=i * DEGREES)
+
+
+
+
+
+
+
 
 
 
