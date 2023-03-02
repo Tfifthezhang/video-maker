@@ -85,9 +85,12 @@ class NormalDistribution(Scene):
 
         self.wait(1)
 
-        self.play(FadeIn(self.graph))
         self.play(mu.tracker.animate.set_value(self.mu))
         self.play(sigma.tracker.animate.set_value(self.sigma))
+        graph = ax.plot(lambda x: self.normal_dis(x, mu=self.mu, sigma=self.sigma), x_range=[self.mu - 3, self.mu + 3],
+                        use_smoothing=True)
+        self.graph = graph
+        self.play(FadeIn(self.graph))
 
     def normal_dis(self, x, sigma, mu):
         coef = 1 / (sigma * np.sqrt(2 * np.pi))
@@ -98,8 +101,8 @@ class NormalDistribution(Scene):
         sampler = np.random.normal(loc=0, scale=1, size=10)
 
         vg_sample = VGroup(*[DecimalNumber(n) for n in sampler])
-        vg_sample.arrange_submobjects(DOWN, buff=SMALL_BUFF).scale(0.8).to_edge(2 * RIGHT)
 
+        vg_sample.arrange_submobjects(DOWN, buff=0.25).scale(0.8).to_edge(2 * RIGHT)
         self.sampler = vg_sample
 
         tracker = ValueTracker(0)
