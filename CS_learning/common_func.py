@@ -101,8 +101,8 @@ class CommonFunc:
         return listing
 
     @classmethod
-    def add_line(cls, start_object, end_object, buff=0):
-        line = Line(start_object, end_object, buff=buff)
+    def add_line(cls, start_object, end_object, color=WHITE, buff=0):
+        line = Line(start_object, end_object, color=color, buff=buff)
         return line
 
     @classmethod

@@ -1,0 +1,7 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/MLE_3D/3522960179_1511741580_3666443441.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/MLE_3D/3251066967_2495936282_378568837.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/MLE_3D/3579797492_3793792333_440281445.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/MLE_3D/296343144_194246909_440281445.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/MLE_3D/4071416741_1114911828_440281445.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/maximum_likelihood/1080p60/partial_movie_files/MLE_3D/570119817_2829906127_440281445.mp4'
