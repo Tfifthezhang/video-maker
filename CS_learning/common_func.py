@@ -160,13 +160,6 @@ class CommonFunc:
         axes.add(x_labels)
         axes.x_labels = x_labels
 
-        # y_labels = VGroup()
-        # for y in range(25, 100, 25):
-        #     label = Integer(y)
-        #     label.next_to(axes.y_axis.n2p(y), LEFT, MED_SMALL_BUFF)
-        #     y_labels.add(label)
-        # axes.add(y_labels)
-
         x_axis_label = Text('数字').scale(0.6)
         x_axis_label.next_to(axes.x_axis.get_end(), RIGHT, buff=MED_LARGE_BUFF)
         axes.add(x_axis_label)

@@ -15,8 +15,35 @@ import sys
 sys.path.append('..')
 
 from CS_learning.common_func import CommonFunc
+import scipy.stats as stats
 
 np.random.seed(0)
+
+
+class Title(Scene):
+    def construct(self):
+        svg_object = SVGMobject('svg_icon/video.svg', fill_color=BLUE)
+        svg_group = VGroup(*[svg_object.copy() for _ in range(10)]).scale(0.4)
+        svg_group.arrange_submobjects(RIGHT, buff=0.2).shift(1 * UP)
+
+        brace = Brace(svg_group, direction=UP, color=MAROON)
+
+        section_text = Text('基础算法优化').scale(0.9).next_to(brace, UP)
+
+        self.play(Create(svg_group))
+        self.wait(5)
+
+        self.play(FadeIn(brace), Create(section_text))
+
+        self.play(Indicate(svg_group[0], run_time=2))
+
+        text = Text('枚举算法    Enumeration Algorithm ').scale(0.7).next_to(svg_group, DOWN * 3)
+
+        self.play(GrowFromPoint(text, svg_group[0].get_center(), run_time=2))
+        self.wait(3)
+
+        subtext = Text('-- 列举出问题所有可能的解').scale(0.5).next_to(text, 1.5 * DOWN)
+        self.play(Write(subtext))
 
 
 class NormalDistribution(Scene):
@@ -122,6 +149,13 @@ class NormalDistribution(Scene):
             copy_label = label.copy()
             self.play(FadeTransform(copy_label, vg_sample[i], stretch=True))
 
+        self.play(Circumscribe(vg_sample, shape=Rectangle))
+
+        text_en = Text('Independent Identically Distribution,iid', color=PURE_RED).scale(0.3).to_edge(2 * UP + RIGHT)
+        text_cn = Text('独立同分布', color=PURE_RED).scale(0.6).next_to(text_en, UP)
+
+        self.play(FadeIn(text_cn), FadeIn(text_en))
+
         self.play(Uncreate(pointer), Uncreate(label))
 
     def key_question(self):
@@ -140,10 +174,12 @@ class MaxProbability(ThreeDScene):
         self.vg_graph = None
         self.vg_formula = None
         self.prod_formula = None
+        self.title = None
 
         self.mle_sample()
         self.mle_normal()
         self.mle_explain()
+        self.mle_likelihood()
         self.mle_prod()
         # self.mle_3D()
 
@@ -159,6 +195,13 @@ class MaxProbability(ThreeDScene):
         self.play(Create(vg_sample))
 
         self.wait(1)
+
+        text_en = Text('Independent Identically Distribution,iid', color=PURE_RED).scale(0.3).to_edge(2 * UP + LEFT)
+        text_cn = Text('独立同分布', color=PURE_RED).scale(0.6).next_to(text_en, UP)
+
+        self.play(FadeIn(text_cn), FadeIn(text_en))
+        self.wait(2)
+        self.play(FadeOut(text_cn), FadeOut(text_en))
 
     def mle_normal(self):
         vg_graph = VGroup()
@@ -184,12 +227,15 @@ class MaxProbability(ThreeDScene):
 
         self.wait(3)
 
+        for graph in vg_graph:
+            self.play(FadeTransform(graph.copy(), self.vg_sample))
+
         self.play(Unwrite(self.vg_graph))
 
     def mle_explain(self):
 
         vg_formula = VGroup(
-            *[MathTex("\mathcal{N}", "(", "{:.2f}".format(i), "|", "\mu", ",", "\sigma", ")").scale(0.7) for i in
+            *[MathTex("\mathcal{N}", "(", "{:.2f}".format(i), "|", "\mu", ",", "\sigma^2", ")").scale(0.7) for i in
               self.sample_array])
 
         vg_formula.arrange_submobjects(DOWN, buff=0.3).next_to(self.vg_sample, 3 * RIGHT)
@@ -220,7 +266,44 @@ class MaxProbability(ThreeDScene):
 
         self.wait(2)
 
+        title_cn = Text('极大似然估计').scale(0.6).to_edge(UP)
+        title_en = Text('Maximum likelihood estimation', color=MAROON).scale(0.3).next_to(title_cn, DOWN)
+        self.play(FadeIn(title_cn), FadeIn(title_en))
+
         self.prod_formula = mle_formula
+        self.title = VGroup(title_cn, title_en)
+
+    def mle_likelihood(self):
+        ax = CommonFunc.add_axes(x_range=[-10, 10], y_range=[0, 0.7], x_length=8, y_length=6,
+                                 axis_config={"include_tip": True, "include_numbers": False}).scale(0.3).to_edge(
+            2 * UP + 3.5 * RIGHT)
+        graph = ax.plot(lambda x: self.normal_dis(x, mu=0, sigma=1), x_range=[0 - 10, 0 + 10], use_smoothing=True)
+
+        sampler = np.random.normal(loc=0, scale=1, size=8)
+        sample = VGroup(*[DecimalNumber(n).scale(0.4) for n in sampler])
+        sample.arrange_submobjects(DOWN, buff=SMALL_BUFF).next_to(ax, 8 * DOWN)
+
+        self.play(FadeIn(ax), FadeIn(graph), FadeIn(sample))
+
+        arrow_sample = CommonFunc.add_arrow(ax.get_corner(LEFT + DOWN), sample, color=RED)
+        sample_text = Text('概率 Probability', color=RED).scale(0.3).next_to(arrow_sample.get_center(),
+                                                                           0.01 * RIGHT).shift(0.5 * UP)
+
+        arrow_estimate = CommonFunc.add_arrow(sample, ax.get_corner(RIGHT + DOWN), color=BLUE)
+        estimate = Text('似然 Likelihood', color=BLUE).scale(0.3).next_to(arrow_estimate.get_center(),
+                                                                        0.01 * RIGHT).shift(0.5 * DOWN)
+
+        self.play(Write(arrow_sample, run_time=1))
+
+        self.play(Write(arrow_estimate, run_time=1))
+
+        self.play(Create(sample_text))
+        self.wait(2)
+        self.play(Create(estimate))
+
+        self.wait(1)
+
+        self.play(FadeOut(VGroup(ax, graph, sample, arrow_sample, arrow_estimate, sample_text, estimate)))
 
     def mle_prod(self):
         # 由于多个小的概率连乘会造成下溢,所以我们想把乘法干掉
@@ -440,11 +523,11 @@ class MLE_Regression(MovingCameraScene):
         self.dot_linspace = None
         self.dots = None
         self.ax = None
-        self.model_formula = None
-        self.linear_graph = None
+        self.mle_loss = None
 
         self.plot_scatter()
         self.single_dot_dis()
+        self.formula_deduce()
 
     def plot_scatter(self):
         ax = CommonFunc.add_axes(x_range=[-8, 8], y_range=[-8, 8], x_length=8, y_length=6,
@@ -489,10 +572,17 @@ class MLE_Regression(MovingCameraScene):
 
         self.play(Create(graph))
 
-        graph_tex = MathTex("\mathcal{N}", "(", "y_i", "|", "\omega x_i", ",", "\sigma^2", ")").scale(0.3).next_to(
+        graph_noise = MathTex("y_i = wx_i + \epsilon_i").scale(0.3).next_to(graph, RIGHT)
+
+        graph_noise_dis = MathTex("\epsilon_i", "\\thicksim", "\mathcal{N}(0,\sigma^2)", color=PURE_RED).scale(
+            0.3).next_to(graph_noise, DOWN)
+        self.play(Write(graph_noise), Write(graph_noise_dis))
+        self.wait(2)
+
+        graph_tex = MathTex("\mathcal{N}", "(", "y_i", "|", "\omega x_i", ",", "\sigma^2", ")").scale(0.4).next_to(
             graph, RIGHT)
 
-        self.play(Write(graph_tex, run_time=2))
+        self.play(FadeTransform(VGroup(graph_noise, graph_noise_dis), graph_tex))
 
         self.wait(3)
         self.play(Restore(self.camera.frame))
@@ -502,23 +592,169 @@ class MLE_Regression(MovingCameraScene):
         for i in range(0, len(self.dots), 5):
             dot = self.dots[i]
             dis_iid_axes = Axes(x_range=[-3, 3], y_range=[0, 0.6], x_length=5, y_length=1,
-                            axis_config=dict(include_tip=False,
-                                             include_numbers=False,
-                                             rotation=0 * DEGREES,
-                                             stroke_width=1.0), ).scale(0.3).rotate(270 * DEGREES).next_to(dot,
-                                                                                                           0.05 * RIGHT)
+                                axis_config=dict(include_tip=False,
+                                                 include_numbers=False,
+                                                 rotation=0 * DEGREES,
+                                                 stroke_width=1.0), ).scale(0.3).rotate(270 * DEGREES).next_to(dot,
+                                                                                                               0.05 * RIGHT)
             dis_graph = dis_iid_axes.plot(lambda x: self.normal_dis(x, mu=0, sigma=1),
-                                  x_range=[-3, 3],
-                                  use_smoothing=True,
-                                  color=RED)
+                                          x_range=[-3, 3],
+                                          use_smoothing=True,
+                                          color=RED)
             vg_dis.add(VGroup(dis_iid_axes, dis_graph))
         self.play(Create(vg_dis, lag_ratio=0.5, run_time=5))
 
         self.wait(3)
 
+        mle_loss = MathTex("\sum_i^n", "\ln", "\mathcal{N}", "(", "y_i", "|", "\omega x_i", ",", "\sigma^2",
+                           ")").to_edge(UP + LEFT)
+        self.play(FadeTransform(vg_dis, mle_loss))
 
+        self.wait(2)
+        self.play(self.ax.animate.shift(2 * RIGHT),
+                  self.dots.animate.shift(2 * RIGHT),
+                  iid_axes.animate.shift(2 * RIGHT),
+                  graph.animate.shift(2 * RIGHT),
+                  graph_tex.animate.shift(2 * RIGHT))
+
+        self.mle_loss = mle_loss
+
+    def formula_deduce(self):
+        normal_dis = MathTex(
+            'f(x)=\\frac{1}{\sigma \sqrt{2 \pi}} e^{-\\frac{1}{2}\left(\\frac{x-\mu}{\sigma}\\right)^2}',
+            color=BLUE).scale(
+            0.7).to_edge(4 * UP + LEFT)
+
+        self.play(FadeIn(normal_dis))
+
+        self.wait(2)
+
+        mle_loss_sum = MathTex("\sum_i^n", "\ln",
+                               "[", "\\frac{1}{\sigma \sqrt{2 \pi}}",
+                               "e^{-\\frac{1}{2}\left(\\frac{y_i -\omega x_i}{\sigma}\\right)^2",
+                               "]").scale(0.8).to_edge(4 * UP + LEFT)
+
+        self.play(FadeTransform(normal_dis, mle_loss_sum))
+
+        self.wait(2)
+
+        self.play(Indicate(mle_loss_sum[1]), Indicate(mle_loss_sum[4]))
+
+        self.wait(2)
+        # 利用对数运算可以化简
+        mle_loss_part = MathTex("\sum_i^n", "\ln",
+                                "[", "\\frac{1}{\sigma \sqrt{2 \pi}}", "]", "+",
+                                "\sum_i^n", "-", "[", "\\frac{1}{2\sigma^2}", "(y_i -\omega x_i)^2",
+                                "]").scale(0.8).to_edge(4 * UP + LEFT)
+        self.play(FadeTransform(mle_loss_sum, mle_loss_part))
+
+        self.wait(2)
+
+        self.play(Indicate(mle_loss_part[3]), Indicate(mle_loss_part[8]))
+
+        self.wait(2)
+
+        # sigma与模型无关
+        self.play(FadeOut(mle_loss_part[:6]),
+                  FadeOut(mle_loss_part[8:10]),
+                  FadeOut(mle_loss_part[-1]))
+
+        mle_loss_final = MathTex("\sum_i^n", "-", "(y_i -\omega x_i)^2").scale(0.8).to_edge(4 * UP + LEFT)
+
+        self.play(FadeTransform(VGroup(mle_loss_part[6:8], mle_loss_part[10:]), mle_loss_final))
+
+        # 最大化对数似然等于最小化均方误差
+
+        self.play(self.mle_loss.animate.shift(RIGHT))
+        max_tex = MathTex('\max_\omega').next_to(self.mle_loss, LEFT)
+        self.play(Write(max_tex))
+
+        self.play(mle_loss_final.animate.shift(RIGHT))
+        max_tex2 = MathTex('\max_\omega').scale(0.8).next_to(mle_loss_final, LEFT)
+        self.play(Write(max_tex2))
+
+        self.wait(2)
+
+        min_tex = MathTex('\min_\omega').scale(0.8).next_to(mle_loss_final, LEFT)
+
+        self.play(Indicate(max_tex2), Indicate(mle_loss_final[1]))
+        self.wait(2)
+        self.play(FadeTransform(VGroup(max_tex2, mle_loss_final[1]), min_tex))
+
+        self.play(Circumscribe(VGroup(max_tex2, mle_loss_final)))
 
     def normal_dis(self, x, sigma, mu):
         coef = 1 / (sigma * np.sqrt(2 * np.pi))
         expon = -1 / 2 * ((x - mu) / sigma) ** 2
         return coef * np.power(np.e, expon)
+
+class Other_Regression(MovingCameraScene):
+    def construct(self):
+        title = Text("下一期预告").to_edge(UP)
+        self.play(Write(title))
+        self.bonuli()
+        self.binomial()
+
+    def bonuli(self):
+        inital_chart = BarChart(
+                values=[0.5,0.5],
+                bar_names=["0", "1"],
+                y_range=[0, 1, 10],
+                y_length=6,
+                x_length=8,
+                x_axis_config={"font_size": 36},
+            ).scale(0.7).to_edge(LEFT)
+        c_bar_lbls = inital_chart.get_bar_labels(font_size=32)
+        self.play(Create(inital_chart), Create(c_bar_lbls))
+
+        self.play(FadeIn(Text('伯努利分布 Bernoulli distribution').scale(0.5).next_to(inital_chart, UP)))
+
+        l_p = np.random.random(10)
+        for p in l_p:
+            dist = stats.bernoulli(p)
+            value = [dist.pmf(0), dist.pmf(1)]
+            chart = BarChart(
+                values=list(map(lambda x: round(x,2), value)),
+                bar_names=["0", "1"],
+                y_range=[0, 1, 10],
+                y_length=6,
+                x_length=8,
+                x_axis_config={"font_size": 36},
+            ).scale(0.7).to_edge(LEFT)
+            bar_lbls = chart.get_bar_labels(font_size=32)
+
+            self.play(Transform(inital_chart, chart), Transform(c_bar_lbls, bar_lbls))
+
+    def binomial(self):
+        x = list(range(10))
+        inital_chart = BarChart(
+                values=[0.1]*10,
+                bar_names=list(map(str, x)),
+                y_range=[0, 1, 10],
+                y_length=6,
+                x_length=8,
+                x_axis_config={"font_size": 36},
+            ).scale(0.7).to_edge(RIGHT)
+        c_bar_lbls = inital_chart.get_bar_labels(font_size=32)
+        self.play(Create(inital_chart), Create(c_bar_lbls))
+
+        self.play(FadeIn(Text('二项分布 Binomial distribution').scale(0.5).next_to(inital_chart, UP)))
+
+        from scipy.stats import binom
+        l_p = np.random.random(20)
+        n = 10
+        for p in l_p:
+            dist = stats.binom(n, p)
+            value = dist.pmf(x)
+            chart = BarChart(
+                values=list(map(lambda x: round(x, 2), value)),
+                bar_names=list(map(str, x)),
+                y_range=[0, 1, 10],
+                y_length=6,
+                x_length=8,
+                x_axis_config={"font_size": 36},
+            ).scale(0.7).to_edge(RIGHT)
+            bar_lbls = chart.get_bar_labels(font_size=32)
+
+            self.play(Transform(inital_chart, chart), Transform(c_bar_lbls, bar_lbls))
+
