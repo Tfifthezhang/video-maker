@@ -1,1 +1,1 @@
-manim -qh maximum_likelihood/maximum_likelihood.py Other_Regression
+manim -qh logistic_regression/logistic_regression.py Other_01Function
