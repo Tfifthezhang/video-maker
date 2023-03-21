@@ -442,14 +442,12 @@ class Other_01Function(Scene):
     def construct(self):
         self.sigmoid_ax = VGroup()
         self.formula = VGroup()
-        self.generalized_formula = VGroup()
-        self.exponential_group = None
 
         self.Formula_trans()
         self.sigmoid_function()
         self.other_function()
-        self.generalized_text()
-        self.exponential_family()
+        # self.exponential_family()
+        # self.general_form()
 
     def Formula_trans(self):
         weight_formula = MathTex('\eta = \omega x + b').to_edge(UP + LEFT)
@@ -530,9 +528,61 @@ class Other_01Function(Scene):
 
         self.wait(2)
 
-        self.play(FadeOut(vg_graph), FadeOut(self.sigmoid_ax))
+        # self.play(FadeOut(vg_graph), FadeOut(self.sigmoid_ax), FadeOut(self.formula[-1]))
 
         self.wait(1)
+
+    def arctan(self, x):
+        return np.arctan(x)
+
+    def daishu(self, x):
+        return x / np.sqrt(1 + x ** 2)
+
+    def tanh(self, x):
+        return np.tanh(x)
+
+    def goodman(self, x):
+        return 2 * np.arctan(np.tanh(x / 2))
+
+    def sigmoid(self, x):
+        s = np.power(np.e, -x)
+        return 1 / (1 + s)
+
+    def H(self, x):
+        if x == 0:
+            return 0.5
+        if x > 0:
+            return 1
+        else:
+            return 0
+
+
+class GLM_theory(Scene):
+    def construct(self):
+        self.formula = VGroup()
+        self.generalized_formula = VGroup()
+        self.exponential_group = None
+        self.normal_link_function = None
+
+        self.Formula_trans()
+        self.generalized_text()
+        self.general_explain()
+        self.GLM_intro()
+        self.exponential_family()
+        self.general_form()
+
+        # self.general_form()
+
+    def Formula_trans(self):
+        weight_formula = MathTex('\eta = \omega x + b').to_edge(UP + LEFT)
+
+        self.add(weight_formula)
+        self.formula.add(weight_formula)
+
+        g_formula = MathTex("y", "=", "g^{-1}", "(\eta)").next_to(weight_formula, DOWN)
+
+        self.add(g_formula)
+        self.formula.add(g_formula)
 
     def generalized_text(self):
         cn_title = Text('广义线性模型').scale(0.7).to_edge(UP)
@@ -540,18 +590,116 @@ class Other_01Function(Scene):
         self.generalized_formula.add(cn_title)
         self.generalized_formula.add(en_title)
 
-        self.play(Write(cn_title), Write(en_title))
+        # self.play(Write(cn_title), Write(en_title))
 
         assume_1_padding = Text('指数族分布 Exponential family ').scale(0.5).to_edge(3 * UP + RIGHT)
         assume_1_tex = MathTex("1.", "P(y|\eta)", "\sim").scale(0.6).next_to(assume_1_padding, LEFT)
         self.generalized_formula.add(VGroup(assume_1_tex, assume_1_padding))
 
-        assume_2 = MathTex('2.').scale(0.6).next_to(assume_1_tex, DOWN).align_to(assume_1_tex[0], LEFT)
+        # self.play(Circumscribe(self.generalized_formula[2][1]))
 
-        assume_3 = MathTex('3.').scale(0.6).next_to(assume_2, DOWN).align_to(assume_2, LEFT)
+        assume_2 = MathTex('2. \eta = \omega x + b').scale(0.65).next_to(assume_1_tex, DOWN).align_to(assume_1_tex[0],
+                                                                                                      LEFT)
 
-        self.generalized_formula.add(assume_2)
+        assume_3 = MathTex('3. \mu = \mathbb{E}(y) = g^{-1}(\eta) ').scale(0.6).next_to(assume_2, DOWN).align_to(
+            assume_2, LEFT)
+
+        self.generalized_formula.add(VGroup(assume_2))
         self.generalized_formula.add(assume_3)
+
+    def general_explain(self):
+        model_ax = CommonFunc.add_axes(x_range=[-8, 8], y_range=[-8, 8], x_length=8, y_length=6,
+                                       axis_config={"include_tip": False, "include_numbers": False}).scale(0.7)
+        model_plot = model_ax.plot(lambda x: 0.8 * x + 0.7, x_range=[-6, 6], use_smoothing=True, color=BLUE)
+        model_label = model_ax.get_graph_label(graph=model_plot, label=MathTex('\{\omega, b\,....\}'),
+                                               direction=DOWN).scale(0.8)
+
+        model_text = Text('线性模型 Model').scale(0.7).next_to(model_ax, DOWN)
+
+        vg_model = VGroup(model_ax, model_plot, model_label, model_text).scale(0.6).shift(3 * LEFT + DOWN)
+
+        dis_ax = CommonFunc.add_axes(x_range=[-6, 6], y_range=[0, 1], x_length=8, y_length=6,
+                                     axis_config={"include_tip": True, "include_numbers": False}).scale(0.7)
+        dis_plot = dis_ax.plot(lambda x: self.normal_dis(x, mu=1, sigma=0.8), x_range=[1 - 3, 1 + 3],
+                               use_smoothing=True, color=RED)
+        dis_label = dis_ax.get_graph_label(graph=dis_plot, label=MathTex('\{\mu,\sigma^2\,....\}'), direction=UP).scale(
+            0.8)
+
+        dis_text = Text('假设分布 Distribution').scale(0.7).next_to(dis_ax, DOWN)
+
+        vg_dis = VGroup(dis_ax, dis_plot, dis_label, dis_text).scale(0.6).shift(3 * RIGHT + DOWN)
+
+        space_vg = VGroup(vg_model, vg_dis).arrange_submobjects(RIGHT, buff=3.5).shift(DOWN)
+
+        arrow_1 = CommonFunc.add_arrow(vg_model.get_right(), vg_dis.get_left(), color=WHITE)
+        arrow_2 = CommonFunc.add_arrow(vg_dis.get_left(), vg_model.get_right(), color=WHITE).next_to(arrow_1, DOWN)
+
+        vg_arrow = VGroup(arrow_1, arrow_2)
+
+        self.play(FadeTransform(VGroup(self.formula[0],self.formula[1][3]), vg_model))
+        self.wait(1)
+
+        self.play(FadeTransform(self.formula[1][:2], vg_dis))
+        self.wait(1)
+
+        self.play(FadeTransform(self.formula[1][2], vg_arrow))
+        self.wait(1)
+
+        g_1 = MathTex('g^{-1}').scale(0.6).next_to(arrow_1, 0.5 * UP)
+        g_2 = MathTex('g').scale(0.6).next_to(arrow_2, 0.5 * DOWN)
+        self.play(Write(g_1), Write(g_2))
+
+        vg_arrow.add(g_1)
+        vg_arrow.add(g_2)
+
+        self.wait(2)
+
+        # 这三个条件分别对应着广义线性模型的三个假设
+        ## 假设分布
+        self.play(FadeTransform(vg_dis, self.generalized_formula[2]))
+        self.wait(3)
+        ## 线性组合
+        self.play(FadeTransform(vg_model, self.generalized_formula[3]))
+        self.wait(3)
+        ## 链接函数,分布的均值等于链接函数的反函数
+        self.play(FadeTransform(vg_arrow, self.generalized_formula[4]))
+        self.wait(3)
+
+    def GLM_intro(self):
+        self.play(FadeIn(self.generalized_formula[0]),
+                  FadeIn(self.generalized_formula[1]))
+
+        self.wait(1)
+        previous_example = ImageMobject('logistic_regression/MLE_Regression.png').scale(0.3).to_edge(0.3 * LEFT).shift(
+            2 * UP)
+        self.add(previous_example)
+        self.wait(3)
+
+        example_assume_1 = MathTex("P(y|\eta)", "\sim", "\mathcal{N}(\mu, \sigma^2)").scale(0.65).next_to(
+            previous_example, DOWN)
+
+        example_assume_2 = MathTex('\eta = \omega x').scale(0.65).next_to(example_assume_1, DOWN).align_to(
+            example_assume_1[0], LEFT)
+
+        example_assume_3 = MathTex('\mu = g^{-1}(\eta) = \eta = \omega x').scale(0.65).next_to(example_assume_2,
+                                                                                               DOWN).align_to(
+            example_assume_2, LEFT)
+
+        self.play(FadeTransform(self.generalized_formula[2].copy(), example_assume_1))
+        self.wait(1)
+        self.play(FadeTransform(self.generalized_formula[3].copy(), example_assume_2))
+        self.wait(1)
+        self.play(FadeTransform(self.generalized_formula[4].copy(), example_assume_3))
+        self.wait(3)
+
+        g_tex = MathTex('g = \operatorname{Id}', color=MAROON).scale(0.8).next_to(previous_example, RIGHT)
+        self.play(ReplacementTransform(example_assume_3, g_tex))
+
+        self.play(FadeOut(VGroup(example_assume_1, example_assume_2)))
+        self.wait(2)
+
+        self.normal_graph = previous_example
+        self.normal_link_function = g_tex
 
     def exponential_family(self):
 
@@ -574,8 +722,6 @@ class Other_01Function(Scene):
                 return 0
             exponential = 0.5 * np.exp(-0.5 * x)
             return exponential
-
-        self.play(Write(self.generalized_formula[2]))
 
         self.play(Circumscribe(self.generalized_formula[2][1]))
 
@@ -604,13 +750,14 @@ class Other_01Function(Scene):
             y_length=4,
             x_length=6,
             x_axis_config={"font_size": 36},
-        ).scale(0.65)
+            bar_colors=[WHITE, WHITE],
+        ).scale(0.7)
 
-        bernoulli_label = MathTex('\mathcal{B}(x)').next_to(bernoulli_chart, 0.1 * (UP))
+        bernoulli_label = MathTex('\mathcal{B}(x)').next_to(bernoulli_chart, 0.001 * UP)
 
         vg_graph.add(VGroup(bernoulli_chart, bernoulli_label))
 
-        vg_graph.arrange_in_grid(1, 5, buff=0.5 * SMALL_BUFF).scale(0.55).to_edge(2 * DOWN)
+        vg_graph.arrange_submobjects(RIGHT, buff=0.5 * SMALL_BUFF).scale(0.55).shift(DOWN)
 
         for graph in vg_graph:
             self.play(FadeTransform(self.generalized_formula[2][1].copy(), graph))
@@ -620,34 +767,128 @@ class Other_01Function(Scene):
         self.wait(3)
 
     def general_form(self):
-        pass
+
+        tex_form = MathTex("P(y \mid \eta)", "=", "h(y)", "\exp", "(", "\eta^T", "T(y)", "-", "A(\eta)", ")").scale(0.8)
+
+        self.play(FadeTransform(self.exponential_group, tex_form))
+
+        self.wait(2)
+
+        # 自然参数：
+        self.play(tex_form[5].animate.set_color(GREEN))
+        self.wait(3)
+        # 充分统计量
+        self.play(tex_form[6].animate.set_color(BLUE))
+        self.wait(3)
+        # 配分函数
+        self.play(tex_form[8].animate.set_color(YELLOW))
+        self.wait(3)
+
+        normal_form = MathTex('P(y \mid \mu,\sigma)='
+                              '\\frac{1}{\sigma \sqrt{2 \pi}} '
+                              '\exp (-\\frac{1}{2 \sigma^2}(y-\mu)^2)').scale(0.8).next_to(tex_form, DOWN).align_to(
+            tex_form, LEFT)
+
+        self.play(FadeIn(normal_form))
+        self.wait(2)
+
+        normal_form_dis = MathTex('P(y \mid \mu)='
+                                  '\\frac{1}{\sqrt{2 \pi}} '
+                                  '\exp (-\\frac{1}{2}(y-\mu)^2)').scale(0.8).next_to(tex_form, DOWN).align_to(
+            tex_form, LEFT)
+
+        self.play(ReplacementTransform(normal_form, normal_form_dis))
+        self.wait(2)
+
+        normal_form_exp = MathTex("P(y \mid \mu)=",
+                                  "\\frac{1}{\sqrt{2 \pi}}",
+                                  "\exp (-\\frac{y^2}{2})",
+                                  "\exp", "(",
+                                  "\mu",
+                                  "y",
+                                  "-",
+                                  "\\frac{\mu^2}{2}",
+                                  ")").scale(0.8).next_to(tex_form, DOWN).align_to(tex_form, LEFT)
+
+        self.play(ReplacementTransform(normal_form_dis, normal_form_exp))
+        self.play(normal_form_exp[5].animate.set_color(GREEN))
+        self.play(normal_form_exp[6].animate.set_color(BLUE))
+        self.play(normal_form_exp[8].animate.set_color(YELLOW))
+        self.wait(2)
+
+        # 证明高斯分布的均值就是eta
+        normal_link = MathTex('\eta = \mu').scale(0.9).next_to(self.normal_link_function, DOWN).align_to(self.normal_link_function, LEFT)
+
+        self.play(FadeTransform(VGroup(normal_form_exp[5].copy(), tex_form[5].copy()), normal_link))
+
+        self.wait(2)
+
+        # 引入伯努利分布
+        bernoulli_chart = BarChart(
+            values=[0.75, 0.25],
+            bar_names=["0", "1"],
+            y_range=[0, 1, 10],
+            y_length=4,
+            x_length=5,
+            x_axis_config={"font_size": 36},
+            bar_colors=[WHITE, WHITE],
+        ).scale(0.6).move_to(self.normal_graph).shift(DOWN)
+
+        bernoulli_label = MathTex('\mathcal{B}(x)').next_to(bernoulli_chart, 0.001 * UP)
+
+        self.play(FadeOut(self.normal_graph),
+                  FadeOut(self.normal_link_function),
+                  FadeOut(normal_link))
+
+        self.play(FadeIn(VGroup(bernoulli_label, bernoulli_chart)))
+        self.wait(1)
+
+        bernoulli_form = MathTex('P(y \mid p)=p^y(1-p)^y').scale(0.8).next_to(tex_form, DOWN).align_to(tex_form, LEFT)
+
+        #self.play(FadeOut(VGroup(normal_form_exp, normal_form, normal_form_dis)))
+        self.play(FadeOut(normal_form_exp))
+
+        self.play(Write(bernoulli_form))
+        self.wait(2)
+
+        bernoulli_exp = MathTex("P(y \mid p)=\exp(",
+                                "\ln\\frac{p}{(1-p)}",
+                                "y", "+", "\ln(1-p)\}").scale(0.8).next_to(tex_form, DOWN).align_to(tex_form, LEFT)
+        self.play(Transform(bernoulli_form, bernoulli_exp))
+        self.play(bernoulli_exp[1].animate.set_color(GREEN))
+        self.play(bernoulli_exp[2].animate.set_color(BLUE))
+        self.play(bernoulli_exp[4].animate.set_color(YELLOW))
+        self.wait(3)
+
+        bernoulli_link = MathTex('\eta =g(p)=\ln\\frac{p}{(1-p)}', color=MAROON).scale(0.9).next_to(self.generalized_formula[3], LEFT)
+
+        self.play(FadeTransform(VGroup(bernoulli_exp[1].copy(), tex_form[5].copy()), bernoulli_link))
+
+        self.wait(2)
+
+        sigmoid_link = MathTex('p =g^{-1}(\eta) = \\frac{e^{\eta}}{1+e^\eta}',color=MAROON).scale(0.9).next_to(self.generalized_formula[3], LEFT)
+
+        self.play(FadeTransform(bernoulli_link, sigmoid_link))
+        self.wait(2)
 
 
 
 
-    def arctan(self, x):
-        return np.arctan(x)
 
-    def daishu(self, x):
-        return x / np.sqrt(1 + x ** 2)
 
-    def tanh(self, x):
-        return np.tanh(x)
 
-    def goodman(self, x):
-        return 2 * np.arctan(np.tanh(x / 2))
 
-    def sigmoid(self, x):
-        s = np.power(np.e, -x)
-        return 1 / (1 + s)
 
-    def H(self, x):
-        if x == 0:
-            return 0.5
-        if x > 0:
-            return 1
-        else:
-            return 0
+
+
+
+
+
+
+    def normal_dis(self, x, sigma, mu):
+        coef = 1 / (sigma * np.sqrt(2 * np.pi))
+        expon = -1 / 2 * ((x - mu) / sigma) ** 2
+        return coef * np.power(np.e, expon)
 
 
 class Classification_3D(ThreeDScene):
