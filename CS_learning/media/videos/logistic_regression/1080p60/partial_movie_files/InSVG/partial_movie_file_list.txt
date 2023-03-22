@@ -1,0 +1,8 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/logistic_regression/1080p60/partial_movie_files/InSVG/2902699114_909784925_223132457.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/logistic_regression/1080p60/partial_movie_files/InSVG/3931933789_1797556478_1419747729.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/logistic_regression/1080p60/partial_movie_files/InSVG/3931933789_1605896349_1419747729.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/logistic_regression/1080p60/partial_movie_files/InSVG/3931933789_3023232709_1419747729.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/logistic_regression/1080p60/partial_movie_files/InSVG/3931933789_790434910_1419747729.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/logistic_regression/1080p60/partial_movie_files/InSVG/3931933789_729728930_1419747729.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/logistic_regression/1080p60/partial_movie_files/InSVG/3931933789_1814017559_1419747729.mp4'

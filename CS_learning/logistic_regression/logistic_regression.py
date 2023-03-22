@@ -282,11 +282,11 @@ class logistic_3D(ThreeDScene):
     def construct(self):
         self.class_ax = VGroup()
 
-        self.set_camera_orientation(zoom=1, frame_center=ORIGIN)
-        self.Write_formula()
-        self.make_01_classification()
-        self.sigmoid_3D()
-        self.sigmoid_bernoulli()
+        # self.set_camera_orientation(zoom=1, frame_center=ORIGIN)
+        # self.Write_formula()
+        # self.make_01_classification()
+        # self.sigmoid_3D()
+        # self.sigmoid_bernoulli()
 
     def Write_formula(self):
         formula = MathTex('P(y=1|\eta) =\\frac{1}{1+e^{-\eta}}').scale(0.8).to_edge(UP + LEFT)
@@ -436,6 +436,17 @@ class logistic_3D(ThreeDScene):
     def func_sigmoid(self, x_1, x_2):
         s = np.power(np.e, -(x_1 - x_2))
         return 1 / (1 + s)
+
+
+class InSVG(Scene):
+    def construct(self):
+        self.insert_coutour()
+
+    def insert_coutour(self):
+        svg_coutour = SVGMobject('logistic_regression/4.svg', height=7, width=7)
+        self.play(Create(svg_coutour))
+        for i in range(6):
+            self.play(Rotate(svg_coutour, angle=60 * DEGREES, axis=OUT))
 
 
 class Other_01Function(Scene):
@@ -601,7 +612,7 @@ class GLM_theory(Scene):
         assume_2 = MathTex('2. \eta = \omega x + b').scale(0.65).next_to(assume_1_tex, DOWN).align_to(assume_1_tex[0],
                                                                                                       LEFT)
 
-        assume_3 = MathTex('3. \mu = \mathbb{E}(y) = g^{-1}(\eta) ').scale(0.6).next_to(assume_2, DOWN).align_to(
+        assume_3 = MathTex("3.", "\mu = \mathbb{E}(y)", "= g^{-1}(\eta)").scale(0.6).next_to(assume_2, DOWN).align_to(
             assume_2, LEFT)
 
         self.generalized_formula.add(VGroup(assume_2))
@@ -636,7 +647,7 @@ class GLM_theory(Scene):
 
         vg_arrow = VGroup(arrow_1, arrow_2)
 
-        self.play(FadeTransform(VGroup(self.formula[0],self.formula[1][3]), vg_model))
+        self.play(FadeTransform(VGroup(self.formula[0], self.formula[1][3]), vg_model))
         self.wait(1)
 
         self.play(FadeTransform(self.formula[1][:2], vg_dis))
@@ -656,20 +667,29 @@ class GLM_theory(Scene):
 
         # 这三个条件分别对应着广义线性模型的三个假设
         ## 假设分布
-        self.play(FadeTransform(vg_dis, self.generalized_formula[2]))
+        self.play(FadeTransform(vg_dis.copy(), self.generalized_formula[2]))
         self.wait(3)
         ## 线性组合
-        self.play(FadeTransform(vg_model, self.generalized_formula[3]))
+        self.play(FadeTransform(vg_model.copy(), self.generalized_formula[3]))
         self.wait(3)
         ## 链接函数,分布的均值等于链接函数的反函数
-        self.play(FadeTransform(vg_arrow, self.generalized_formula[4]))
+        self.play(FadeTransform(vg_arrow.copy(), self.generalized_formula[4]))
         self.wait(3)
 
-    def GLM_intro(self):
         self.play(FadeIn(self.generalized_formula[0]),
                   FadeIn(self.generalized_formula[1]))
 
         self.wait(1)
+
+        self.play(Wiggle(self.generalized_formula[4][1], run_time=1))
+
+        self.wait(3)
+
+        self.play(FadeOut(VGroup(vg_dis, vg_model, vg_arrow)))
+
+    def GLM_intro(self):
+
+        # 让线性回归作为一个例子
         previous_example = ImageMobject('logistic_regression/MLE_Regression.png').scale(0.3).to_edge(0.3 * LEFT).shift(
             2 * UP)
         self.add(previous_example)
@@ -817,7 +837,8 @@ class GLM_theory(Scene):
         self.wait(2)
 
         # 证明高斯分布的均值就是eta
-        normal_link = MathTex('\eta = \mu').scale(0.9).next_to(self.normal_link_function, DOWN).align_to(self.normal_link_function, LEFT)
+        normal_link = MathTex('\eta = \mu').scale(0.9).next_to(self.normal_link_function, DOWN).align_to(
+            self.normal_link_function, LEFT)
 
         self.play(FadeTransform(VGroup(normal_form_exp[5].copy(), tex_form[5].copy()), normal_link))
 
@@ -845,7 +866,7 @@ class GLM_theory(Scene):
 
         bernoulli_form = MathTex('P(y \mid p)=p^y(1-p)^y').scale(0.8).next_to(tex_form, DOWN).align_to(tex_form, LEFT)
 
-        #self.play(FadeOut(VGroup(normal_form_exp, normal_form, normal_form_dis)))
+        # self.play(FadeOut(VGroup(normal_form_exp, normal_form, normal_form_dis)))
         self.play(FadeOut(normal_form_exp))
 
         self.play(Write(bernoulli_form))
@@ -860,30 +881,18 @@ class GLM_theory(Scene):
         self.play(bernoulli_exp[4].animate.set_color(YELLOW))
         self.wait(3)
 
-        bernoulli_link = MathTex('\eta =g(p)=\ln\\frac{p}{(1-p)}', color=MAROON).scale(0.9).next_to(self.generalized_formula[3], LEFT)
+        bernoulli_link = MathTex('\eta =g(p)=\ln\\frac{p}{(1-p)}', color=MAROON).scale(0.9).next_to(
+            self.generalized_formula[3], LEFT)
 
         self.play(FadeTransform(VGroup(bernoulli_exp[1].copy(), tex_form[5].copy()), bernoulli_link))
 
         self.wait(2)
 
-        sigmoid_link = MathTex('p =g^{-1}(\eta) = \\frac{e^{\eta}}{1+e^\eta}',color=MAROON).scale(0.9).next_to(self.generalized_formula[3], LEFT)
+        sigmoid_link = MathTex('p =g^{-1}(\eta) = \\frac{e^{\eta}}{1+e^\eta}', color=MAROON).scale(0.9).next_to(
+            self.generalized_formula[3], LEFT)
 
-        self.play(FadeTransform(bernoulli_link, sigmoid_link))
+        self.play(ReplacementTransform(bernoulli_link, sigmoid_link))
         self.wait(2)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     def normal_dis(self, x, sigma, mu):
         coef = 1 / (sigma * np.sqrt(2 * np.pi))
@@ -896,8 +905,8 @@ class Classification_3D(ThreeDScene):
         self.axes = None
         # self.sampler = np.random.normal(loc=1, scale=0.5, size=10)
 
-        # self.sigmoid_3D()
-        self.softmax_3D()
+        self.sigmoid_3D()
+        # self.softmax_3D()
 
     def func_sigmoid(self, x_1, x_2):
         s = np.power(np.e, -(x_1 - x_2))
@@ -946,7 +955,7 @@ class Classification_3D(ThreeDScene):
         #     self.move_camera(theta=i * DEGREES)
 
     def sigmoid_3D(self):
-        axes = ThreeDAxes(x_range=(-6, 6), y_range=(-6, 6), z_range=(-0.15, 1.15), x_length=7, y_length=7, z_length=4)
+        axes = ThreeDAxes(x_range=(-6, 6), y_range=(-6, 6), z_range=(-0.15, 1.15), x_length=6, y_length=6, z_length=4)
         z_label = axes.get_z_axis_label(MathTex('S(x_1,x_2)'))
         self.play(Create(axes), Create(z_label))
 
@@ -960,32 +969,34 @@ class Classification_3D(ThreeDScene):
                             stroke_width=0.2,
                             )
 
-        surface_1.set_style(fill_opacity=0.5, stroke_color=RED)
+        # surface_1.set_style(fill_opacity=0.5, stroke_color=RED)
 
-        surface_1.set_fill_by_value(axes=axes, colors=[(RED, 0.25), (YELLOW, 0.75), (RED, 1)], axis=2)
+        # surface_1.set_fill_by_value(axes=axes, colors=[(RED, 0.25), (YELLOW, 0.75), (RED, 1)], axis=2)
 
-        surface_2 = Surface(lambda u, v: axes.c2p(u, v, self.func_sigmoid(-u, -v)),
-                            u_range=[-5, 5],
-                            v_range=[-5, 5],
-                            resolution=(30, 30),
-                            should_make_jagged=True,
-                            stroke_width=0.2,
-                            )
+        # surface_1.set_fill_by_checkerboard([BLUE, YELLOW, RED])
 
-        surface_2.set_style(fill_opacity=0.5, stroke_color=RED)
+        # surface_2 = Surface(lambda u, v: axes.c2p(u, v, self.func_sigmoid(-u, -v)),
+        #                     u_range=[-5, 5],
+        #                     v_range=[-5, 5],
+        #                     resolution=(30, 30),
+        #                     should_make_jagged=True,
+        #                     stroke_width=0.2,
+        #                     )
+        #
+        # surface_2.set_style(fill_opacity=0.5, stroke_color=RED)
+        #
+        # surface_2.set_fill_by_value(axes=axes, colors=[(BLUE, 0.25), (YELLOW, 0.75), (BLUE, 1)], axis=2)
 
-        surface_2.set_fill_by_value(axes=axes, colors=[(BLUE, 0.25), (YELLOW, 0.75), (BLUE, 1)], axis=2)
-
-        self.play(Create(surface_1), Create(surface_2))
+        self.play(Create(surface_1))  # , Create(surface_2))
 
         self.wait(3)
 
         self.move_camera(phi=75 * DEGREES)
 
         # self.set_camera_orientation(phi=75 * DEGREES, theta=0)
-        #
-        for i in range(0, 360, 30):
-            self.move_camera(theta=i * DEGREES)
+        # #
+        # for i in range(0, 360, 30):
+        #     self.move_camera(theta=i * DEGREES)
 
 
 class Other_Regression(MovingCameraScene):

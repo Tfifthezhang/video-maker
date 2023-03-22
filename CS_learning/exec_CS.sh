@@ -1,1 +1,1 @@
-manim -qh logistic_regression/logistic_regression.py GLM_theory
+manim -qh logistic_regression/logistic_regression.py InSVG
