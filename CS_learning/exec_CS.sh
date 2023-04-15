@@ -1,1 +1,1 @@
-manim -qh logistic_regression/logistic_regression.py InSVG
+manim -qh logistic_regression/logistic_regression.py thanks_end

@@ -140,7 +140,7 @@ class Classification(MovingCameraScene):
 
         self.play(Transform(self.formula, weight_formula))
 
-        g_formula = MathTex("y", "=", "g(\eta)").next_to(weight_formula, DOWN)
+        g_formula = MathTex("y", "=", "g^{-1}(\eta)").next_to(weight_formula, DOWN)
 
         self.play(Write(g_formula))
         self.formula.add(g_formula)
@@ -150,7 +150,11 @@ class Classification(MovingCameraScene):
         self.play(FadeTransform(g_formula[-1].copy(), function_formula))
         self.formula.add(function_formula)
 
-        self.wait(3)
+        self.wait(1)
+
+        self.play(Indicate(g_formula[-1], run_time=1))
+
+        self.wait(2)
 
     def sigmoid_plot(self):
         self.play(self.class_ax.animate.scale(0.75).to_edge(RIGHT))
@@ -277,26 +281,111 @@ class Classification(MovingCameraScene):
             self.play(blue_vg.animate.set_color(BLUE, family=True))
             self.play(red_vg.animate.set_color(RED, family=True))
 
+class sigmoid_explain(Scene):
+    def construct(self):
+        pass
+    def sigmoid_plot(self):
+        ax = CommonFunc.add_axes(x_range=[-8, 8], y_range=[0, 1], x_length=7, y_length=4,
+                                 axis_config={"include_tip": False, "include_numbers": True}).shift(RIGHT)
+
+        self.sigmoid_ax.add(ax)
+
+        sigmoid_plot = ax.plot(lambda x: self.sigmoid(x), x_range=[-7, 7], use_smoothing=True, color=RED)
+        sigmoid_label = ax.get_graph_label(graph=sigmoid_plot, label=MathTex('\\frac{1}{1+e^{-\eta}}').scale(0.8),
+                                           direction=DOWN)
+
+        self.sigmoid_ax.add(sigmoid_plot)
+        self.sigmoid_ax.add(sigmoid_label)
+
+    def Write_formula(self):
+        formula_1 = MathTex("P(y=1|\eta)=", "\\frac{1}{", "1", "+e^{-\eta}}").scale(0.8).to_edge(UP + LEFT)
+        formula_0 = MathTex("P(y=0|\eta)=\\frac{e^{-\eta}}{", "1", "+e^{-\eta}}").scale(0.8).next_to(formula_1, DOWN)
+
+        self.play(Write(formula_1))
+
+        self.play(Create(self.sigmoid_ax))
+
+        self.play(Write(formula_0))
+
+        sigmoid_minus_plot = self.sigmoid_ax[0].plot(lambda x: self.sigmoid(-x), x_range=[-7, 7], use_smoothing=True,
+                                                     color=BLUE)
+        sigmoid_minus_label = self.sigmoid_ax[0].get_graph_label(graph=sigmoid_minus_plot,
+                                                                 label=MathTex('\\frac{e^{-\eta}}{1+e^{-\eta}}').scale(
+                                                                     0.8),
+                                                                 direction=UP)
+
+        self.sigmoid_ax.add(sigmoid_minus_label)
+        self.sigmoid_ax.add(sigmoid_minus_plot)
+
+        self.play(Create(sigmoid_minus_plot), Create(sigmoid_minus_label))
+
+        self.play(Indicate(formula_1[-2], run_time=1), Indicate(formula_0[-2], run_time=1))
+        self.wait(1)
+
+        # 指数归一化的形式
+
+        formula_1_exp = MathTex('P(y=1|\eta) =\\frac{e^0}{e^0+e^{-\eta}}').scale(0.8).to_edge(UP + LEFT)
+        formula_0_exp = MathTex('P(y=0|\eta)=\\frac{e^{-\eta}}{e^0+e^{-\eta}}').scale(0.8).next_to(formula_1_exp, DOWN)
+
+        self.play(ReplacementTransform(formula_1, formula_1_exp),
+                  ReplacementTransform(formula_0, formula_0_exp))
+
+        self.wait(2)
+
+        # 可以写成eta为正的形式
+
+        formula_relation = MathTex('S(\eta)+S(-\eta)=1').scale(0.9).to_edge(LEFT)
+
+        self.sigmoid_ax.add(formula_relation)
+
+        self.play(Write(formula_relation))
+        self.wait(1)
+
+        formula_1_plus = MathTex('P(y=1|\eta) =\\frac{e^{\eta}}{1+e^{\eta}}').scale(0.8).to_edge(UP + LEFT)
+        formula_0_plus = MathTex('P(y=0|\eta)=\\frac{1}{1+e^{\eta}}').scale(0.8).next_to(formula_1_plus, DOWN).align_to(
+            formula_1_plus, LEFT)
+
+        self.play(ReplacementTransform(formula_1_exp, formula_1_plus),
+                  ReplacementTransform(formula_0_exp, formula_0_plus))
+
+        self.sigmoid_ax.add(formula_1_plus)
+        self.sigmoid_ax.add(formula_0_plus)
+
+        self.wait(2)
+
+        sigmoid_plus_0_label = self.sigmoid_ax[0].get_graph_label(graph=sigmoid_minus_plot,
+                                                                  label=MathTex('\\frac{1}{1+e^{\eta}}').scale(0.8),
+                                                                  direction=UP)
+
+        sigmoid_plus_1_label = self.sigmoid_ax[0].get_graph_label(graph=self.sigmoid_ax[1],
+                                                                  label=MathTex('\\frac{e^{\eta}}{1+e^{\eta}}').scale(
+                                                                      0.8),
+                                                                  direction=DOWN)
+
+        self.play(Transform(self.sigmoid_ax[2], sigmoid_plus_1_label),
+                  Transform(sigmoid_minus_label, sigmoid_plus_0_label))
+
+        self.wait(2)
 
 class logistic_3D(ThreeDScene):
     def construct(self):
+        self.sigmoid_ax = VGroup()
         self.class_ax = VGroup()
+        self.bernoulli_graph = None
 
         # self.set_camera_orientation(zoom=1, frame_center=ORIGIN)
-        # self.Write_formula()
-        # self.make_01_classification()
-        # self.sigmoid_3D()
-        # self.sigmoid_bernoulli()
+        self.make_01_classification()
+        self.sigmoid_3D()
+        self.sigmoid_bernoulli()
+        self.mle_logistic()
+        self.sigmoid_plot()
+        self.Write_formula()
+        # self.mle_logistic()
 
-    def Write_formula(self):
-        formula = MathTex('P(y=1|\eta) =\\frac{1}{1+e^{-\eta}}').scale(0.8).to_edge(UP + LEFT)
-        self.play(Write(formula))
 
     def make_01_classification(self):
-        axes = ThreeDAxes(x_range=(-6, 6), y_range=(-6, 6), z_range=(-0.15, 1.15), x_length=7, y_length=7, z_length=4)
-        # z_label = axes.get_z_axis_label(MathTex('S(x_1,x_2)'))
-
-        # axes_labels = axes.get_axis_labels(x_label=MathTex('x_1'), y_label=MathTex('x_2'))
+        axes = ThreeDAxes(x_range=(-6, 6), y_range=(-6, 6), z_range=(-0.15, 1.15), x_length=7, y_length=7,
+                          z_length=4).to_edge(2.5 * LEFT)
 
         self.class_ax.add(axes)
 
@@ -308,26 +397,17 @@ class logistic_3D(ThreeDScene):
         coords = list(zip(X, y))
 
         dots = VGroup(
-            *[Dot3D(axes.c2p(coord[0][0], coord[0][1], 0), radius=0.5 * DEFAULT_DOT_RADIUS, color=BLUE) if coord[
-                                                                                                               1] == 0 else
+            *[Dot3D(axes.c2p(coord[0][0], coord[0][1], 0), radius=0.5 * DEFAULT_DOT_RADIUS, color=BLUE) if coord[1] == 0 else
               Dot3D(axes.c2p(coord[0][0], coord[0][1], 1), radius=0.5 * DEFAULT_DOT_RADIUS, color=RED) for coord in
               coords])
 
         self.class_ax.add(dots)
 
-        self.play(Create(self.class_ax))
-        # self.move_camera(phi=75 * DEGREES)
+        self.play(Write(self.class_ax))
         self.wait(3)
 
-        self.play(Rotate(self.class_ax, angle=-90 * DEGREES, axis=RIGHT))
-
-        # for i in range(6):
-        #     self.play(Rotate(self.class_ax, angle=60 * DEGREES, axis=UP))
-
-        self.wait(3)
 
     def sigmoid_3D(self):
-
         surface_1 = Surface(lambda u, v: self.class_ax[0].c2p(u, v, self.func_sigmoid(u, v)),
                             u_range=[-5, 5],
                             v_range=[-5, 5],
@@ -336,40 +416,39 @@ class logistic_3D(ThreeDScene):
                             stroke_width=0.2,
                             )
 
-        surface_1.set_style(fill_opacity=0.3, stroke_color=RED)
+        surface_1.set_style(fill_opacity=0.3)
 
-        surface_1.set_fill_by_value(axes=self.class_ax[0], colors=[(BLUE, 0.5), (RED, 1)], axis=2)
-        #
-        # surface_2 = Surface(lambda u, v: self.class_ax[0].c2p(u, v, self.func_sigmoid(-u, -v)),
-        #                     u_range=[-5, 5],
-        #                     v_range=[-5, 5],
-        #                     resolution=(40, 40),
-        #                     should_make_jagged=True,
-        #                     stroke_width=0.2,
-        #                     )
-        #
-        # surface_2.set_style(fill_opacity=0.5, stroke_color=RED)
-        #
-        # surface_2.set_fill_by_value(axes=self.class_ax[0], colors=[(BLUE, 0.25), (YELLOW, 0.75), (RED, 1)], axis=2)
+        blues = [interpolate_color(BLUE, WHITE, i) for i in np.linspace(0, 1, 10)]
+        reds = [interpolate_color(WHITE, RED, i) for i in np.linspace(0, 1, 10)]
+
+        surface_1.set_fill_by_value(axes=self.class_ax[0], colorscale=blues + reds, axis=2)
 
         self.class_ax.add(surface_1)
-        # self.class_ax.add(surface_2)
 
         self.play(Create(surface_1))
 
-        self.wait(3)
+        self.wait(2)
+
+        svg_coutour = SVGMobject('logistic_regression/5.svg', height=6, width=6).scale(0.65).to_edge(2.5 * RIGHT)
+        self.play(FadeTransform(self.class_ax[0], svg_coutour))
+        self.wait(2)
+
+        self.play(Rotate(self.class_ax, angle=-90 * DEGREES, axis=RIGHT))
+        self.wait(1)
 
         for i in range(6):
-            self.play(Rotate(self.class_ax, angle=60 * DEGREES, axis=UP))
+            self.play(Rotate(self.class_ax, angle=60 * DEGREES, axis=UP),
+                      Rotate(svg_coutour, angle=60 * DEGREES, axis=OUT))
 
-        # self.play(Rotate(self.class_ax, angle=90 * DEGREES, axis=RIGHT))
+        self.wait(2)
+
+        self.play(FadeOut(svg_coutour))
 
     def sigmoid_bernoulli(self):
+
         dot = self.class_ax[1][0]
-        # self.camera.save_state()
 
         self.move_camera(frame_center=dot, zoom=2)
-        # self.play(self.camera.frame.animate.scale(0.5).move_to(dot))
 
         inital_chart = BarChart(
             values=[0.5, 0.5],
@@ -378,11 +457,12 @@ class logistic_3D(ThreeDScene):
             y_length=4,
             x_length=2,
             x_axis_config={"font_size": 36},
+            bar_colors=[WHITE, WHITE]
         ).scale(0.3).next_to(dot, 0.1 * UP)
 
         self.play(Create(inital_chart))  # Create(c_bar_lbls))
 
-        bernoulli_formula = MathTex('\mathcal{B}(P)').scale(0.4).next_to(inital_chart, RIGHT)
+        bernoulli_formula = MathTex('\mathcal{B}(p)').scale(0.4).next_to(inital_chart, RIGHT)
         self.play(FadeIn(bernoulli_formula))
         self.wait(3)
 
@@ -397,20 +477,20 @@ class logistic_3D(ThreeDScene):
                 y_length=4,
                 x_length=2,
                 x_axis_config={"font_size": 36},
+                bar_colors=[WHITE, WHITE]
             ).scale(0.4).next_to(dot, 0.1 * UP)
 
             self.play(Transform(inital_chart, chart))
 
         self.wait(2)
 
-        bernoulli_p = MathTex('P(y=1|\eta) =\\frac{1}{1+e^{-\eta}}', color=MAROON).scale(0.4).next_to(bernoulli_formula,
-                                                                                                      RIGHT)
+        bernoulli_p = MathTex('p(y=1|\eta) =\\frac{1}{1+e^{-\eta}}', color=MAROON).scale(0.4).next_to(bernoulli_formula, RIGHT)
 
         self.play(Write(bernoulli_p))
 
         self.wait(1)
 
-        bernoulli_final = MathTex('\mathcal{B}(\\frac{1}{1+e^{-\eta})').scale(0.4).next_to(inital_chart, RIGHT)
+        bernoulli_final = MathTex('\mathcal{B}(\\frac{1}{1+e^{-\eta}})').scale(0.4).next_to(inital_chart, RIGHT)
 
         self.play(FadeTransform(VGroup(bernoulli_formula, bernoulli_p), bernoulli_final))
 
@@ -418,23 +498,111 @@ class logistic_3D(ThreeDScene):
 
         self.move_camera(frame_center=ORIGIN, zoom=1)
 
-        other_dot = self.class_ax[1][-1]
-        dist = stats.bernoulli(np.random.rand())
-        value = [dist.pmf(0), dist.pmf(1)]
-        chart = BarChart(
-            values=list(map(lambda x: round(x, 2), value)),
-            bar_names=["0", "1"],
-            y_range=[0, 1, 10],
-            y_length=4,
-            x_length=2,
-            x_axis_config={"font_size": 36},
-        ).scale(0.4).next_to(other_dot, 0.1 * UP)
-        self.play(FadeIn(chart))
+        self.bernoulli_graph = VGroup(bernoulli_final, inital_chart)
 
-        self.play(Rotate(self.class_ax, angle=90 * DEGREES, axis=RIGHT))
+    def mle_logistic(self):
+        mle_text = MathTex("\max","\sum_i^n", "\ln", "\mathcal{B}", "(", "y_i", "|", "\eta", ")").scale(0.8).to_edge(UP + RIGHT)
+
+        self.play(FadeTransform(self.bernoulli_graph.copy(), mle_text))
+        self.wait(2)
+
+        bernoulli_dis = MathTex('\mathcal{B}(y_i,p)= p^y_i(1-p)^{y_i}', color=BLUE).scale(0.7).next_to(mle_text, DOWN).align_to(mle_text, LEFT)
+        self.play(FadeIn(bernoulli_dis))
+        self.wait(2)
+
+        mle_text_2 = MathTex("\max", "\sum_i^n[y_i \ln (p)+(1-y_i) \ln (1-p)]").scale(0.8).to_edge(UP+RIGHT)
+
+        self.play(FadeTransform(VGroup(mle_text, bernoulli_dis), mle_text_2))
+        self.wait(2)
+
+        p_des = MathTex('p(y=1|\eta) =\\frac{1}{1+e^{-\eta}}', color=MAROON).scale(0.7).next_to(mle_text_2, DOWN).align_to(mle_text_2, LEFT)
+        self.play(FadeIn(p_des))
+        self.wait(2)
+
+        mle_text_3 = MathTex("\max", "\sum_i^n[y_i \eta -\ln (1+{e}^\eta)]").scale(0.8).to_edge(UP+RIGHT)
+
+        self.play(FadeTransform(VGroup(mle_text_2, p_des), mle_text_3))
+        self.wait(2)
+
+        mle_min = MathTex("\min", "\sum_i^n[-y_i \eta +\ln (1+{e}^\eta)]").scale(0.8).to_edge(UP+RIGHT)
+
+        self.play(FadeTransform(mle_text_3, mle_min))
+        self.wait(2)
+        self.play(Indicate(mle_min))
+
+    def sigmoid_plot(self):
+        ax = CommonFunc.add_axes(x_range=[-8, 8], y_range=[0, 1], x_length=7, y_length=4,
+                                 axis_config={"include_tip": False, "include_numbers": False}).scale(0.6).next_to(self.class_ax, RIGHT)
+
+        self.sigmoid_ax.add(ax)
+
+        sigmoid_plot = ax.plot(lambda x: self.sigmoid(x), x_range=[-7, 7], use_smoothing=True, color=RED)
+        sigmoid_label = ax.get_graph_label(graph=sigmoid_plot, label=MathTex('\\frac{1}{1+e^{-\eta}}').scale(0.8),
+                                           direction=DOWN)
+
+        self.sigmoid_ax.add(sigmoid_plot)
+        self.sigmoid_ax.add(sigmoid_label)
+
+        self.play(Create(self.sigmoid_ax))
+        self.wait(2)
+
+    def Write_formula(self):
+        sigmoid_minus_plot = self.sigmoid_ax[0].plot(lambda x: self.sigmoid(-x), x_range=[-7, 7], use_smoothing=True,
+                                                     color=BLUE)
+        sigmoid_minus_label = self.sigmoid_ax[0].get_graph_label(graph=sigmoid_minus_plot,
+                                                                 label=MathTex('\\frac{e^{-\eta}}{1+e^{-\eta}}').scale(
+                                                                     0.8),
+                                                                 direction=UP)
+
+        self.sigmoid_ax.add(sigmoid_minus_label)
+        self.sigmoid_ax.add(sigmoid_minus_plot)
+
+        self.play(Create(sigmoid_minus_plot), Create(sigmoid_minus_label))
+        self.wait(2)
+
+        # 指数归一化的形式
+        #
+        # formula_1_exp = MathTex('P(y=1|\eta) =\\frac{e^0}{e^0+e^{-\eta}}').scale(0.8).to_edge(UP + LEFT)
+        # formula_0_exp = MathTex('P(y=0|\eta)=\\frac{e^{-\eta}}{e^0+e^{-\eta}}').scale(0.8).next_to(formula_1_exp, DOWN)
+        #
+        # self.play(ReplacementTransform(formula_1, formula_1_exp),
+        #           ReplacementTransform(formula_0, formula_0_exp))
+        #
+        # self.wait(2)
+
+        # 可以写成eta为正的形式
+
+        formula_relation = MathTex('f(\eta)+f(-\eta)=1').scale(0.65).next_to(self.sigmoid_ax, DOWN)
+
+        self.sigmoid_ax.add(formula_relation)
+
+        self.play(Write(formula_relation))
+        self.wait(2)
+
+        impor_tex = MathTex("\\frac{1}{1+e^{-\eta}}", "=", "\\frac{e^{\eta}}{1+e^{\eta}}").scale(0.6).next_to(formula_relation, DOWN)
+        self.play(FadeIn(impor_tex))
+        self.wait(1)
+
+        sigmoid_plus_0_label = self.sigmoid_ax[0].get_graph_label(graph=sigmoid_minus_plot,
+                                                                  label=MathTex('\\frac{1}{1+e^{\eta}}').scale(0.8),
+                                                                  direction=UP)
+
+        sigmoid_plus_1_label = self.sigmoid_ax[0].get_graph_label(graph=self.sigmoid_ax[1],
+                                                                  label=MathTex('\\frac{e^{\eta}}{1+e^{\eta}}').scale(
+                                                                      0.8),
+                                                                  direction=DOWN)
+
+        self.play(Transform(self.sigmoid_ax[2], sigmoid_plus_1_label),
+                  Transform(sigmoid_minus_label, sigmoid_plus_0_label))
+
+        self.wait(2)
 
     def func_sigmoid(self, x_1, x_2):
         s = np.power(np.e, -(x_1 - x_2))
+        return 1 / (1 + s)
+
+    def sigmoid(self, x):
+        s = np.power(np.e, -x)
         return 1 / (1 + s)
 
 
@@ -443,10 +611,11 @@ class InSVG(Scene):
         self.insert_coutour()
 
     def insert_coutour(self):
-        svg_coutour = SVGMobject('logistic_regression/4.svg', height=7, width=7)
+        svg_coutour = SVGMobject('logistic_regression/5.svg', height=7, width=7)
         self.play(Create(svg_coutour))
-        for i in range(6):
-            self.play(Rotate(svg_coutour, angle=60 * DEGREES, axis=OUT))
+        self.wait(6)
+        # for i in range(6):
+        #     self.play(Rotate(svg_coutour, angle=60 * DEGREES, axis=OUT))
 
 
 class Other_01Function(Scene):
@@ -579,6 +748,7 @@ class GLM_theory(Scene):
         self.generalized_text()
         self.general_explain()
         self.GLM_intro()
+        self.GLM_emerge()
         self.exponential_family()
         self.general_form()
 
@@ -603,8 +773,9 @@ class GLM_theory(Scene):
 
         # self.play(Write(cn_title), Write(en_title))
 
-        assume_1_padding = Text('指数族分布 Exponential family ').scale(0.5).to_edge(3 * UP + RIGHT)
-        assume_1_tex = MathTex("1.", "P(y|\eta)", "\sim").scale(0.6).next_to(assume_1_padding, LEFT)
+        # assume_1_padding = Text('指数族分布 Exponential family ').scale(0.5).to_edge(3 * UP + RIGHT)
+        assume_1_tex = MathTex("1.", "P(y|\eta)", "\sim").scale(0.6).to_edge(3*UP).shift(1.5*RIGHT)
+        assume_1_padding = Text('某个分布 ').scale(0.5).next_to(assume_1_tex, RIGHT)
         self.generalized_formula.add(VGroup(assume_1_tex, assume_1_padding))
 
         # self.play(Circumscribe(self.generalized_formula[2][1]))
@@ -612,11 +783,12 @@ class GLM_theory(Scene):
         assume_2 = MathTex('2. \eta = \omega x + b').scale(0.65).next_to(assume_1_tex, DOWN).align_to(assume_1_tex[0],
                                                                                                       LEFT)
 
-        assume_3 = MathTex("3.", "\mu = \mathbb{E}(y)", "= g^{-1}(\eta)").scale(0.6).next_to(assume_2, DOWN).align_to(
-            assume_2, LEFT)
+        # assume_3 = MathTex("3.\mu = \mathbb{E}(y)", "= g^{-1}(\eta)").scale(0.6).next_to(assume_2, DOWN).align_to(assume_2, LEFT)
+        assume_3_padding = Text('3. 某个参数 ').scale(0.5).next_to(assume_2, DOWN).align_to(assume_2, LEFT)
+        assume_3 = MathTex( "= g^{-1}(\eta)").scale(0.6).next_to(assume_3_padding, RIGHT)
 
-        self.generalized_formula.add(VGroup(assume_2))
-        self.generalized_formula.add(assume_3)
+        self.generalized_formula.add(assume_2)
+        self.generalized_formula.add(VGroup(assume_3, assume_3_padding))
 
     def general_explain(self):
         model_ax = CommonFunc.add_axes(x_range=[-8, 8], y_range=[-8, 8], x_length=8, y_length=6,
@@ -676,13 +848,6 @@ class GLM_theory(Scene):
         self.play(FadeTransform(vg_arrow.copy(), self.generalized_formula[4]))
         self.wait(3)
 
-        self.play(FadeIn(self.generalized_formula[0]),
-                  FadeIn(self.generalized_formula[1]))
-
-        self.wait(1)
-
-        self.play(Wiggle(self.generalized_formula[4][1], run_time=1))
-
         self.wait(3)
 
         self.play(FadeOut(VGroup(vg_dis, vg_model, vg_arrow)))
@@ -721,6 +886,22 @@ class GLM_theory(Scene):
         self.normal_graph = previous_example
         self.normal_link_function = g_tex
 
+    def GLM_emerge(self):
+        self.play(FadeIn(self.generalized_formula[0]),
+                  FadeIn(self.generalized_formula[1]))
+
+        assume_1_GLM = Text('指数族分布 Exponential family ', color=MAROON).scale(0.5).next_to(self.generalized_formula[2][0], 0.1*RIGHT)
+
+        self.play(Transform(self.generalized_formula[2][-1], assume_1_GLM))
+
+        assume_3_GLM = MathTex("3.\mu = \mathbb{E}(y)", color=MAROON).scale(0.7).next_to(self.generalized_formula[3],DOWN).align_to(self.generalized_formula[3], LEFT)
+
+        self.play(Transform(self.generalized_formula[4][-1], assume_3_GLM))
+
+        self.wait(2)
+
+        self.play(Circumscribe(self.generalized_formula[4][-1]))
+
     def exponential_family(self):
 
         def normal(x):
@@ -743,7 +924,7 @@ class GLM_theory(Scene):
             exponential = 0.5 * np.exp(-0.5 * x)
             return exponential
 
-        self.play(Circumscribe(self.generalized_formula[2][1]))
+        self.play(Circumscribe(self.generalized_formula[2][-1]))
 
         vg_graph = VGroup()
         l_graph_label = [MathTex('\mathcal{N}(x)'),
@@ -822,10 +1003,10 @@ class GLM_theory(Scene):
 
         normal_form_exp = MathTex("P(y \mid \mu)=",
                                   "\\frac{1}{\sqrt{2 \pi}}",
-                                  "\exp (-\\frac{y^2}{2})",
+                                  " ",
                                   "\exp", "(",
-                                  "\mu",
-                                  "y",
+                                  "(\mu,-\\frac{1}{2})",
+                                  "(y,y^2)",
                                   "-",
                                   "\\frac{\mu^2}{2}",
                                   ")").scale(0.8).next_to(tex_form, DOWN).align_to(tex_form, LEFT)
@@ -855,7 +1036,7 @@ class GLM_theory(Scene):
             bar_colors=[WHITE, WHITE],
         ).scale(0.6).move_to(self.normal_graph).shift(DOWN)
 
-        bernoulli_label = MathTex('\mathcal{B}(x)').next_to(bernoulli_chart, 0.001 * UP)
+        bernoulli_label = MathTex('\mathcal{B}(p)').next_to(bernoulli_chart, 0.001 * UP)
 
         self.play(FadeOut(self.normal_graph),
                   FadeOut(self.normal_link_function),
@@ -874,7 +1055,7 @@ class GLM_theory(Scene):
 
         bernoulli_exp = MathTex("P(y \mid p)=\exp(",
                                 "\ln\\frac{p}{(1-p)}",
-                                "y", "+", "\ln(1-p)\}").scale(0.8).next_to(tex_form, DOWN).align_to(tex_form, LEFT)
+                                "y", "+", "\ln(1-p)", ")").scale(0.8).next_to(tex_form, DOWN).align_to(tex_form, LEFT)
         self.play(Transform(bernoulli_form, bernoulli_exp))
         self.play(bernoulli_exp[1].animate.set_color(GREEN))
         self.play(bernoulli_exp[2].animate.set_color(BLUE))
@@ -892,6 +1073,10 @@ class GLM_theory(Scene):
             self.generalized_formula[3], LEFT)
 
         self.play(ReplacementTransform(bernoulli_link, sigmoid_link))
+        self.wait(2)
+
+        self.play(Circumscribe(sigmoid_link, color=GREEN))
+
         self.wait(2)
 
     def normal_dis(self, x, sigma, mu):
@@ -954,52 +1139,75 @@ class Classification_3D(ThreeDScene):
         # for i in range(0, 360, 90):
         #     self.move_camera(theta=i * DEGREES)
 
-    def sigmoid_3D(self):
-        axes = ThreeDAxes(x_range=(-6, 6), y_range=(-6, 6), z_range=(-0.15, 1.15), x_length=6, y_length=6, z_length=4)
-        z_label = axes.get_z_axis_label(MathTex('S(x_1,x_2)'))
-        self.play(Create(axes), Create(z_label))
-
-        self.axes = VGroup(axes, z_label)
-
-        surface_1 = Surface(lambda u, v: axes.c2p(u, v, self.func_sigmoid(u, v)),
-                            u_range=[-5, 5],
-                            v_range=[-5, 5],
-                            resolution=(30, 30),
-                            should_make_jagged=True,
-                            stroke_width=0.2,
-                            )
-
-        # surface_1.set_style(fill_opacity=0.5, stroke_color=RED)
-
-        # surface_1.set_fill_by_value(axes=axes, colors=[(RED, 0.25), (YELLOW, 0.75), (RED, 1)], axis=2)
-
-        # surface_1.set_fill_by_checkerboard([BLUE, YELLOW, RED])
-
-        # surface_2 = Surface(lambda u, v: axes.c2p(u, v, self.func_sigmoid(-u, -v)),
-        #                     u_range=[-5, 5],
-        #                     v_range=[-5, 5],
-        #                     resolution=(30, 30),
-        #                     should_make_jagged=True,
-        #                     stroke_width=0.2,
-        #                     )
-        #
-        # surface_2.set_style(fill_opacity=0.5, stroke_color=RED)
-        #
-        # surface_2.set_fill_by_value(axes=axes, colors=[(BLUE, 0.25), (YELLOW, 0.75), (BLUE, 1)], axis=2)
-
-        self.play(Create(surface_1))  # , Create(surface_2))
-
-        self.wait(3)
-
-        self.move_camera(phi=75 * DEGREES)
-
-        # self.set_camera_orientation(phi=75 * DEGREES, theta=0)
-        # #
-        # for i in range(0, 360, 30):
-        #     self.move_camera(theta=i * DEGREES)
-
 
 class Other_Regression(MovingCameraScene):
     def construct(self):
         title = Text("下一期预告").to_edge(UP)
-        pass
+        self.play(Write(title))
+
+        self.softmax_3D()
+
+    def func_softmax(self, x_1, x_2, index):
+        w_1 = np.sqrt(3 / 2)
+        w_2 = np.sqrt(3 / 2) * (np.sqrt(3) * x_1 - x_2) / 2
+        w_3 = np.sqrt(3 / 2) * (-np.sqrt(3) * x_1 - x_2) / 2
+
+        a, b, c = [np.power(np.e, w_1),
+                   np.power(np.e, w_2),
+                   np.power(np.e, w_3)]
+
+        sum_max = np.sum(a + b + c)
+        result = [a / sum_max, b / sum_max, c / sum_max]
+        return result[index]
+
+    def softmax_3D(self):
+
+        vg_ax = VGroup()
+
+        axes = ThreeDAxes(x_range=(-6, 6), y_range=(-6, 6), z_range=(-0.15, 1.15), x_length=7, y_length=7, z_length=4).shift(0.7*DOWN)
+        vg_ax.add(axes)
+        vg_surface = VGroup()
+        for i, color in zip(range(3), [RED, BLUE, GREEN]):
+            surface = Surface(lambda u, v: axes.c2p(u, v, self.func_softmax(u, v, i)),
+                              u_range=[-6, 6],
+                              v_range=[-6, 6],
+                              resolution=(30, 30),
+                              should_make_jagged=True,
+                              stroke_width=0.2,
+                              )
+            surface.set_style(fill_opacity=0.5, stroke_color=RED)
+            surface.set_fill_by_value(axes=axes, colors=[(color, 0.5), (color, 1)], axis=2)
+            vg_surface.add(surface)
+
+
+        vg_ax.add(vg_surface)
+
+        self.play(FadeIn(vg_ax))
+
+        self.play(Rotate(vg_ax, angle=-90 * DEGREES, axis=RIGHT))
+        self.wait(1)
+
+        for i in range(12):
+            self.play(Rotate(vg_ax, angle=60 * DEGREES, axis=UP))
+
+class thanks_end(Scene):
+    def construct(self):
+        svg_image = SVGMobject('svg_icon/bird.svg', fill_color=MAROON).scale(1.5).shift(2 * UP)
+
+        text = Text('感谢充电', font='SIL-Hei-Med-Jian').next_to(svg_image, 4 * DOWN)
+
+        self.play(SpinInFromNothing(svg_image))
+
+        self.play(Create(text))
+
+        image1 = ImageMobject('svg_icon/charge/芽芽威武.jpg').scale(0.4).next_to(text, 4*DOWN+LEFT)
+        self.play(FadeIn(image1))
+        name1 = Text('芽芽威武').scale(0.6).next_to(image1, RIGHT)
+        self.play(FadeIn(name1))
+
+        image2 = ImageMobject('svg_icon/charge/FuuLuu999.jpg').scale(0.29).next_to(name1, RIGHT)
+        self.play(FadeIn(image2))
+        name2 = Text('FuuLuu999').scale(0.6).next_to(image2, RIGHT)
+        self.play(FadeIn(name2))
+
+        self.wait(3)
