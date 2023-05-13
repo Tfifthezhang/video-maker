@@ -1,1 +1,1 @@
-manim -qh logistic_regression/logistic_regression.py thanks_end
+manim -qh entropy/entropy.py InfoEntropy
