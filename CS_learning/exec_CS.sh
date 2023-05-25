@@ -1,1 +1,1 @@
-manim -qh entropy/entropy.py InfoEntropy
+manim -qh optimize_algorithms/optimize_algorithm.py Taylor_Expan
