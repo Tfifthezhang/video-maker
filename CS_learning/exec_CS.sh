@@ -1,1 +1,1 @@
-manim -qh optimize_algorithms/optimize_algorithm.py Taylor_Expan
+manim -qh optimize_algorithms/optimize_algorithm.py Opt_GD

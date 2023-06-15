@@ -1,0 +1,13 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/optimize_algorithm/1080p60/partial_movie_files/Next_Epsiode/3522960179_992147392_223132457.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/optimize_algorithm/1080p60/partial_movie_files/Next_Epsiode/996697702_2972114969_929973189.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/optimize_algorithm/1080p60/partial_movie_files/Next_Epsiode/996697702_1650453727_2653377929.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/optimize_algorithm/1080p60/partial_movie_files/Next_Epsiode/996697702_957343386_1211744592.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/optimize_algorithm/1080p60/partial_movie_files/Next_Epsiode/996697702_2127067935_915477620.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/optimize_algorithm/1080p60/partial_movie_files/Next_Epsiode/996697702_2385498179_915477620.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/optimize_algorithm/1080p60/partial_movie_files/Next_Epsiode/996697702_4231601433_915477620.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/optimize_algorithm/1080p60/partial_movie_files/Next_Epsiode/996697702_272786262_915477620.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/optimize_algorithm/1080p60/partial_movie_files/Next_Epsiode/996697702_3462655152_915477620.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/optimize_algorithm/1080p60/partial_movie_files/Next_Epsiode/996697702_2570940926_915477620.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/optimize_algorithm/1080p60/partial_movie_files/Next_Epsiode/996697702_2942834559_915477620.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/optimize_algorithm/1080p60/partial_movie_files/Next_Epsiode/996697702_2535189800_915477620.mp4'
