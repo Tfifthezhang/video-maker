@@ -1,1 +1,1 @@
-manim -qh optimize_algorithms/optimize_algorithm.py Opt_GD
+manim -qh LLM/self_supervised_learning.py supervised_learning
