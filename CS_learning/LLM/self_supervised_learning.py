@@ -18,16 +18,45 @@ sys.path.append('..')
 from CS_learning.common_func import CommonFunc
 
 from sklearn.datasets import make_moons, make_blobs, make_classification
+from sklearn import cluster, datasets
 
 
 class supervised_learning(Scene):
     def construct(self):
+        self.basic_formula = None
+        self.basic_formula_item = {}
+
         self.write_formula()
 
     def write_formula(self):
-        formula = MathTex("f", "(", "X", ")", "=", "Y")
+        formula = MathTex("f", "(", "X", ")", "=", "Y").scale(2.5)
+        f, x, y = formula[0], formula[2], formula[-1]
         self.play(Write(formula))
+        self.play(x.animate.set_color(BLUE))
+        self.wait(1)
+        self.play(y.animate.set_color(RED))
+        self.wait(1)
+        self.play(f.animate.set_color(YELLOW))
         self.wait(2)
+
+        self.basic_formula = formula
+        self.basic_formula_item = {'x': x, 'f': f, 'y': y}
+
+        self.play(self.basic_formula.animate.to_edge(UP))
+        self.wait(1)
+
+    def unsupervise_example(self):
+        n_samples = 500
+        seed = 30
+        blobs = datasets.make_blobs(n_samples=n_samples, cluster_std=[1.0, 2.5, 0.5], random_state=seed)
+
+        self.play(Indicate(self.basic_formula_item['x']))
+
+
+    def supervise_example(self):
+        self.play(Indicate(self.basic_formula_item['x']),
+                  Indicate(self.basic_formula_item['y']))
+        self.wait(1)
 
 
 class thanks_end(Scene):
