@@ -27,6 +27,7 @@ class supervised_learning(Scene):
         self.basic_formula_item = {}
 
         self.write_formula()
+        self.unsupervise_example1()
 
     def write_formula(self):
         formula = MathTex("f", "(", "X", ")", "=", "Y").scale(2.5)
@@ -45,12 +46,39 @@ class supervised_learning(Scene):
         self.play(self.basic_formula.animate.to_edge(UP))
         self.wait(1)
 
-    def unsupervise_example(self):
-        n_samples = 500
+    def unsupervise_example1(self):
+        n_samples = 150
         seed = 30
-        blobs = datasets.make_blobs(n_samples=n_samples, cluster_std=[1.0, 2.5, 0.5], random_state=seed)
+        X, y = datasets.make_blobs(n_samples=n_samples, cluster_std=[1.0, 2.5, 0.5], random_state=0)
+        kmeans = cluster.KMeans(n_clusters=3, random_state=0, n_init="auto").fit(X)
 
         self.play(Indicate(self.basic_formula_item['x']))
+
+        ax = CommonFunc.add_axes(x_range=[-10, 10], y_range=[-10, 10], x_length=8, y_length=6,
+                                 axis_config={"include_tip": False, "include_numbers": False}).scale(0.85).to_edge(DOWN)
+        self.play(Create(ax))
+
+        axes_labels = ax.get_axis_labels(x_label=MathTex('x_1'), y_label=MathTex('x_2'))
+        self.play(Create(axes_labels))
+
+        kmeans_dots_blue = VGroup(
+            *[Dot(ax.c2p(coord[0], coord[1]), radius=0.5 * DEFAULT_DOT_RADIUS, color=WHITE)
+             for coord in list(zip(X[:, 0], X[:, 1], kmeans.labels_)) if coord[-1]==2 ])
+        kmeans_dots_orange = VGroup(
+            *[Dot(ax.c2p(coord[0], coord[1]), radius=0.5 * DEFAULT_DOT_RADIUS, color=WHITE)
+             for coord in list(zip(X[:, 0], X[:, 1], kmeans.labels_)) if coord[-1]==0])
+        kmeans_dots_green = VGroup(
+            *[Dot(ax.c2p(coord[0], coord[1]), radius=0.5 * DEFAULT_DOT_RADIUS, color=WHITE)
+             for coord in list(zip(X[:, 0], X[:, 1], kmeans.labels_)) if coord[-1]==1])
+        kmeans_dot = VGroup(kmeans_dots_green, kmeans_dots_orange, kmeans_dots_blue)
+
+        self.play(FadeIn(kmeans_dot))
+        self.wait(1)
+
+        self.play(kmeans_dots_blue.animate.set_color(BLUE, family=True))
+        self.play(kmeans_dots_green.animate.set_color(GREEN, family=True))
+        self.play(kmeans_dots_orange.animate.set_color(ORANGE, family=True))
+        self.wait(2)
 
 
     def supervise_example(self):
