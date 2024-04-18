@@ -17,8 +17,64 @@ sys.path.append('..')
 
 from CS_learning.common_func import CommonFunc
 
-from sklearn.datasets import make_moons, make_blobs, make_classification
+from sklearn.datasets import make_moons, make_circles, make_classification
+from sklearn.decomposition import KernelPCA
 from sklearn import cluster, datasets
+
+class represent_learning(Scene):
+    def construct(self):
+        self.PCA_example = VGroup()
+        #self.intro()
+        self.example_PCA2()
+    def intro(self): # 机器学习的任务是什么，机器学习效果依赖于好的特征
+        svg_image = SVGMobject('../images/NN.svg', fill_color=WHITE).scale(1.2)
+        self.play(Create(svg_image))
+        self.wait(2)
+    def example_PCA(self):
+        ax = CommonFunc.add_axes(x_range=[-1, 1], y_range=[-1, 1], x_length=8, y_length=6,
+                                axis_config={"include_tip": False, "include_numbers": False})
+        self.play(Create(ax))
+        self.PCA_example.add(ax)
+
+        axes_labels = ax.get_axis_labels(x_label=MathTex('a'), y_label=MathTex('b'))
+        self.play(Create(axes_labels))
+        self.PCA_example.add(axes_labels)
+
+        X, y = make_circles(n_samples=500, factor=0.3, noise=0.05, random_state=0)
+        coords = list(zip(X[:, 0], X[:, 1], y))
+        colors = [BLUE, RED]
+
+        dots = VGroup(
+            *[Dot(ax.c2p(coord[0], coord[1]), radius=0.5 * DEFAULT_DOT_RADIUS, color=colors[coord[2]]) for coord in coords])
+        self.PCA_example.add(dots)
+        self.play(FadeIn(dots))
+
+        self.wait(2)
+
+    def example_PCA2(self):
+        from sklearn.decomposition import KernelPCA
+        ax = CommonFunc.add_axes(x_range=[-1, 1], y_range=[-1, 1], x_length=8, y_length=6,
+                                axis_config={"include_tip": False, "include_numbers": False})
+        self.play(Create(ax))
+        self.PCA_example.add(ax)
+
+        axes_labels = ax.get_axis_labels(x_label=MathTex('a'), y_label=MathTex('b'))
+        self.play(Create(axes_labels))
+        self.PCA_example.add(axes_labels)
+
+        X, y = make_circles(n_samples=200, factor=0.3, noise=0.05, random_state=0)
+        kernel_pca = KernelPCA(n_components=2, kernel="rbf", gamma=10, fit_inverse_transform=False, alpha=0.1)
+        X = kernel_pca.fit(X).transform(X)
+        coords = list(zip(X[:, 0], X[:, 1], y))
+        colors = [BLUE, RED]
+
+        dots = VGroup(
+            *[Dot(ax.c2p(coord[0], coord[1]), radius=0.5 * DEFAULT_DOT_RADIUS, color=colors[coord[2]]) for coord in coords])
+        self.PCA_example.add(dots)
+        self.play(FadeIn(dots))
+
+        self.wait(2)
+
 
 
 class supervised_learning(Scene):
