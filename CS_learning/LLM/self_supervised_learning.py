@@ -59,6 +59,10 @@ class represent_learning(Scene):
         self.play(Create(svg_image))
         self.wait(2)
 
+        formula_x = MathTex("X").scale(2.5).next_to(svg_image,LEFT)
+        formula_y = MathTex("f(X)").scale(2.5).next_to(svg_image,RIGHT)
+        
+
         ## 新的坐标架
         kernel_pca = KernelPCA(n_components=2, kernel="rbf", gamma=10, fit_inverse_transform=False, alpha=0.1)
         X = kernel_pca.fit(X).transform(X)
