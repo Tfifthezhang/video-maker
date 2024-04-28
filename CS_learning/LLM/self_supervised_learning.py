@@ -51,17 +51,37 @@ class represent_learning(Scene):
 
         self.wait(2)
 
+        ## 不是线性可分的
+        graph = ax.plot(lambda x: x, x_range=[-2, 2], use_smoothing=True, color=YELLOW)
+        self.play(Create(graph))
+        self.play(Rotate(graph, angle=2*PI,
+                         about_point=ax.c2p(0.5, 0.5),
+                         rate_func=linear, run_time=2))
+        self.PCA_example.add(graph)
+
         ## 引入模型
         self.play(self.PCA_example.animate.scale(0.75).to_edge(UP))
         self.wait(1)
+        self.play(FadeOut(graph))
 
-        svg_image = SVGMobject('../images/NN.svg', fill_color=WHITE).scale(0.8).to_edge(1.5*DOWN)
+        svg_image = SVGMobject('../images/NN.svg', fill_color=WHITE).scale(0.8).to_edge(2*DOWN)
         self.play(Create(svg_image))
         self.wait(2)
 
-        formula_x = MathTex("X").scale(2.5).next_to(svg_image,LEFT)
-        formula_y = MathTex("f(X)").scale(2.5).next_to(svg_image,RIGHT)
-        
+        formula_x = MathTex("X").scale(2).next_to(svg_image, 2*LEFT)
+
+        self.play(FadeTransform(axes_labels, formula_x))
+        self.wait(1)
+
+        ## X进入模型变为f（x）
+
+        self.play(FadeOut(formula_x.copy(), target_position=svg_image, run_time=1))
+
+        formula_y = MathTex("f(X)").scale(2).next_to(svg_image, 2*RIGHT)
+
+        self.play(FadeIn(formula_y, target_position=svg_image, run_time=1))
+
+        self.wait(2)
 
         ## 新的坐标架
         kernel_pca = KernelPCA(n_components=2, kernel="rbf", gamma=10, fit_inverse_transform=False, alpha=0.1)
@@ -71,11 +91,19 @@ class represent_learning(Scene):
             *[Dot(ax.c2p(coord[0], coord[1]), radius=0.5 * DEFAULT_DOT_RADIUS, color=colors[coord[2]]) for coord in new_coords])
         new_axes_labels = ax.get_axis_labels(x_label=MathTex('f(x_1)'), y_label=MathTex('f(x_2)'))
 
-        ## 旧坐标变换为新坐标
-        self.play(Transform(axes_labels, new_axes_labels))
+        ## 坐标架更换
+        self.play(FadeTransform(formula_y.copy(), new_axes_labels))
         self.wait(2)
+        ## 旧坐标变换为新坐标
         self.play(Transform(dots, new_dots))
         self.wait(2)
+
+        ## 线性可分
+        graph = ax.plot(lambda x: -0.5*x-0.2, x_range=[-1, 1], use_smoothing=True, color=YELLOW)
+        self.play(SpinInFromNothing(graph))
+
+        self.wait(2)
+
 
 class supervised_learning(Scene):
     def construct(self):
