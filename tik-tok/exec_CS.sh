@@ -1,1 +1,1 @@
-manim -qh test.py BubbleSort_TT
+manim -qh test_tt.py BubbleSort_TT
