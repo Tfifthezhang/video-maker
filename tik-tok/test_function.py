@@ -6,7 +6,7 @@ from CS_learning.common_func import CommonFunc
 
 class test(Scene):
     def construct(self):
-        s = VGroup(*[RoundedRectangle(corner_radius=0.5, height=1.5) for i in range(9)])
-        s.arrange_submobjects(UP, buff=0.2).scale(0.35)
-        self.play(Create(s))
-        self.play(Indicate(s[-1]))
+        tc_text = Text('Time Complexity').scale(0.8)
+        tc_tex = Tex('$\\frac{n(n-1)}{2}\sim n^2$').next_to(tc_text, DOWN)
+
+        self.play(Write(tc_text))
