@@ -70,8 +70,11 @@ class BubbleSort_TT(Scene):
         self.play(FadeTransform(self.before.copy(), self.target))
 
     def bubble_sort(self):
-        #title = Tex('冒泡排序（Bubble Sort）').scale(0.8).move_to(np.array([-5, 3.5, 0]))
-        #self.add(title)
+        title = Text('冒泡排序Bubble Sort').scale(1.5).to_edge(2.5*UP)
+        self.play(Create(title))
+        self.wait(1)
+
+        self.play(FadeOut(title))
 
         n_circles = 10
         circles = self.before[0]
@@ -135,8 +138,13 @@ class BubbleSort_TT(Scene):
         self.play(FadeTransform(self.history.copy(), tc_text))
         self.wait(2)
         self.play(FadeTransform(VGroup(text_out, text_in), tc_tex))
-        self.wait()
-        # self.play(Write(Tex('if $m=n$: Worst case Time Complexity:$n^2$').scale(0.6).move_to(np.array([0, -2.7, 0]))))
-        # self.wait()
-        # self.play(Write(Tex('if $m=1$: Best case Time Complexity:$n$').scale(0.6).move_to(np.array([0, -3.4, 0]))))
+        self.wait(1)
+
+class thanks_end(Scene):
+    def construct(self):
+        svg_image = SVGMobject('svg_icon/bird.svg', fill_color=MAROON).scale(2.5)
+
+        text = Text('迷路的小画家', font='SIL-Hei-Med-Jian').scale(1.5).next_to(svg_image, 2.5 * DOWN)
+
+        self.play(SpinInFromNothing(VGroup(svg_image, text)))
 

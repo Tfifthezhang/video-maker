@@ -1,0 +1,2 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/tfifthezhang/video-maker/tik-tok/media/videos/test_tt/1920p60/partial_movie_files/thanks_end/4222611999_3628687875_223132457.mp4'
