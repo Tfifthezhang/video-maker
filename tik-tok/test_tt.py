@@ -70,7 +70,7 @@ class BubbleSort_TT(Scene):
         self.play(FadeTransform(self.before.copy(), self.target))
 
     def bubble_sort(self):
-        title = Text('冒泡排序Bubble Sort').scale(1.5).to_edge(2.5*UP)
+        title = Text('冒泡排序Bubble Sort').scale(1.5).to_edge(1.5*UP)
         self.play(Create(title))
         self.wait(1)
 
@@ -103,6 +103,9 @@ class BubbleSort_TT(Scene):
             self.play(move_circles_texs.animate.scale(0.3).move_to(self.before.get_corner(RIGHT)).shift(0.8*(item+1)*RIGHT))
             #self.play(Rotate(move_circles_texs, angle=PI, about_point=self.before.center()))
 
+        self.play(FadeTransform(sort_history[-1].copy(), self.target))
+        self.wait(1)
+
         self.history = sort_history
 
     def time_complexity(self):
@@ -132,12 +135,17 @@ class BubbleSort_TT(Scene):
                          brace_in,
                          text_in).animate.shift(4*UP))
         self.wait(1)
-        tc_text = Text('时间复杂度Time Complexity').scale(1.5).to_edge(2.6*DOWN)
-        tc_tex = Tex('$\\frac{n(n-1)}{2}\sim n^2$').scale(3).next_to(tc_text, DOWN)
+        tc_text = Text('时间复杂度Time Complexity').scale(1.5).to_edge(3*DOWN)
+        tc_tex = Tex('$\\frac{n(n-1)}{2}$').scale(3).next_to(tc_text, DOWN).shift(1.5*LEFT)
+
+        self.play(FadeTransform(VGroup(text_out, text_in), tc_tex))
+        self.wait(1)
 
         self.play(FadeTransform(self.history.copy(), tc_text))
         self.wait(2)
-        self.play(FadeTransform(VGroup(text_out, text_in), tc_tex))
+
+        tc_jianjin = Tex('$\sim O(n ^ 2)$').scale(2.5).next_to(tc_tex, RIGHT)
+        self.play(FadeIn(tc_jianjin))
         self.wait(1)
 
 class thanks_end(Scene):
