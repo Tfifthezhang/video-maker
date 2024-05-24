@@ -4,4 +4,7 @@ file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/self_supervi
 file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/self_supervised_learning/1080p60/partial_movie_files/supervised_example/1790293035_3494816192_1819332135.mp4'
 file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/self_supervised_learning/1080p60/partial_movie_files/supervised_example/1790293035_2341897986_3363992723.mp4'
 file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/self_supervised_learning/1080p60/partial_movie_files/supervised_example/1790293035_2767477945_4096007561.mp4'
-file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/self_supervised_learning/1080p60/partial_movie_files/supervised_example/1790293035_3494816192_1426946993.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/self_supervised_learning/1080p60/partial_movie_files/supervised_example/1790293035_2362818954_840417570.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/self_supervised_learning/1080p60/partial_movie_files/supervised_example/1790293035_1635202150_2329107646.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/self_supervised_learning/1080p60/partial_movie_files/supervised_example/1790293035_3792686739_643488555.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/self_supervised_learning/1080p60/partial_movie_files/supervised_example/1790293035_3494816192_3136458984.mp4'

@@ -20,7 +20,9 @@ from CS_learning.common_func import CommonFunc
 from sklearn.datasets import make_blobs, make_circles
 from sklearn.decomposition import KernelPCA
 from sklearn.linear_model import LogisticRegression
+from sklearn.multiclass import OneVsRestClassifier
 from sklearn import cluster, datasets
+
 
 class represent_learning(Scene):
     def construct(self):
@@ -132,21 +134,20 @@ class represent_learning(Scene):
 
 class unsupervised_example(Scene):
     def construct(self):
-        self.dots = None
-        self.centroids = None
         self.data_image = None
+        self.example_ax = VGroup()
 
         self.unsupervised_intro()
         self.data_prepare()
         self.kmeans_run()
 
     def unsupervised_intro(self):
-        unsup_cn = Text('无监督学习').to_edge(LEFT+2*UP)
+        unsup_cn = Text('无监督学习').to_edge(LEFT + 2 * UP)
         unsup_en = Text('Unsupervised Learning').scale(0.5).next_to(unsup_cn, DOWN)
 
         self.play(FadeIn(unsup_cn), FadeIn(unsup_en))
 
-        svg_image = SVGMobject('svg_icon/文档.svg', fill_color=WHITE).scale(0.9).next_to(unsup_en, 2*DOWN)
+        svg_image = SVGMobject('svg_icon/文档.svg', fill_color=WHITE).scale(0.9).next_to(unsup_en, 2 * DOWN)
         text_intro = Text('数据无标注', color=GRAY).scale(0.7).next_to(svg_image, DOWN)
 
         image_text_intro = VGroup(svg_image, text_intro)
@@ -156,66 +157,61 @@ class unsupervised_example(Scene):
 
         self.data_image = image_text_intro
 
-    @staticmethod
-    def get_positions(_x_y_pos):
-        return np.array([[float(line[0]), float(line[1]), 0] for line in _x_y_pos])
+    def data_prepare(self):
+        centers = [[-2, -2], [0, 3], [3, 0]]
+        X, y = make_blobs(n_samples=18, centers=centers, cluster_std=1, random_state=0)
+        clf = LogisticRegression(random_state=0,
+                                 multi_class='ovr',
+                                 solver='newton-cg')
+        clf.fit(X, y)
+
+        ax = NumberPlane(x_range=[-6, 6], y_range=[-4, 4], x_length=8, y_length=6,
+                         axis_config={"include_tip": False, "include_numbers": False}).to_edge(RIGHT)
+        self.example_ax.add(ax)
+
+        coords = list(zip(X[:, 0], X[:, 1], y))
+        colors = [BLUE, RED, GREEN]
+
+        dots = VGroup(
+            *[Dot(ax.c2p(coord[0], coord[1]),
+                  radius=1 * DEFAULT_DOT_RADIUS,
+                  stroke_width=8,
+                  fill_opacity=.7,
+                  color=WHITE) for coord in coords])
+        self.example_ax.add(dots)
+
+        init_centers = [[-3, -3], [-2, 2], [3, -2]]
+        centroids = VGroup(*[Dot(ax.c2p(center[0], center[1]),
+                                 color=colors[i],
+                                 radius=3 * DEFAULT_DOT_RADIUS,
+                                 stroke_width=1,
+                                 fill_opacity=.9) for i, center in enumerate(init_centers)])
+
+        self.play(FadeTransform(self.data_image[1].copy(), self.example_ax))
+        self.wait(2)
+
+        self.play(Create(centroids), run_time=2)
+        self.wait(2)
+        self.example_ax.add(centroids)
 
     @staticmethod
     def stuff_sorted_by_distance(x, stuff):
         x_np = np.array(x.get_center())
         return sorted(stuff, key=lambda i: np.linalg.norm(x_np - np.array(i.get_center())))
 
-    def data_prepare(self):
-        LABEL_COLORS = [BLUE, RED, GREEN]
-        k_means_positions = [[3.37, 1.29],
-                             [-0.6, 3.12],
-                             [0.5, -2.54],
-                             [1.86, -3.19],
-                             [2.7, -3.4],
-                             [-0.17, 3.01],
-                             [-0.13, 2.54],
-                             [2.0, -2.77],
-                             [4.779, 2.28],
-                             [0.6, -2.03],
-                             [1.3, -2.68],
-                             [0.5, 1.49],
-                             [1.7, -2.91],
-                             [3.58, 1.51],
-                             [1.5, 2.49],
-                             [4.0, 2.7],
-                             [4.9, 2.5]]
-        centroid_starting_positions = [-2, -2, 0], [0, 3, 0], [3, 0, 0]
-
-        dots = VGroup(*[
-            Circle(color=WHITE, radius=1 * DEFAULT_DOT_RADIUS, stroke_width=8, fill_opacity=.7).move_to(
-                self.get_positions(k_means_positions)[i])
-            for i in range(len(self.get_positions(k_means_positions)))])
-
-        centroids = VGroup(*[
-            Circle(color=LABEL_COLORS[i], radius=2 * DEFAULT_DOT_RADIUS, stroke_width=8, fill_opacity=.4).move_to(pos)
-            for i, pos in enumerate(centroid_starting_positions)])
-
-        self.play(FadeTransform(self.data_image[1].copy(), dots))
-        self.wait(2)
-
-        self.play(Create(centroids), run_time=2)
-        self.wait(1)
-
-        self.dots = dots
-        self.centroids = centroids
-
-    def distance_to_closest_centroid(self, dot):
-        closest_centroid = np.array(self.stuff_sorted_by_distance(dot, self.centroids)[0].get_center())
+    def distance_to_closest_centroid(self, dot, centroids):
+        closest_centroid = np.array(self.stuff_sorted_by_distance(dot, centroids)[0].get_center())
         return np.linalg.norm(np.array(dot.get_center()) - closest_centroid)
 
     def kmeans_run(self):
+        ax, dots, centroids = self.example_ax
         n_runs = 3
+
         for run_idx in range(n_runs):
             self.wait(1.6)
-
             # === Get closest centroid for each datapoint ===
-            for dot in self.dots:
-                closest_centroid = self.stuff_sorted_by_distance(dot, self.centroids)[0]
+            for dot in dots:
+                closest_centroid = self.stuff_sorted_by_distance(dot, centroids)[0]
                 my_color = closest_centroid.get_color()
 
                 radius_tracker = ValueTracker(0)
@@ -225,7 +221,7 @@ class unsupervised_example(Scene):
                 self.add(growing_circle)
 
                 self.play(
-                    radius_tracker.animate.set_value(self.distance_to_closest_centroid(dot)),
+                    radius_tracker.animate.set_value(self.distance_to_closest_centroid(dot, centroids)),
                     FadeIn(Line(closest_centroid.get_center(), dot.get_center(), color=my_color, buff=.2),
                            rate_func=there_and_back),
                     dot.animate.set_color(my_color),
@@ -233,8 +229,8 @@ class unsupervised_example(Scene):
                 self.remove(growing_circle)
 
             # === Move each centroid to mean ===
-            for centroid in self.centroids:
-                relevant_dots = list(filter(lambda d: d.get_color() == centroid.get_color(), self.dots))
+            for centroid in centroids:
+                relevant_dots = list(filter(lambda d: d.get_color() == centroid.get_color(), dots))
                 new_pos = np.array([d.get_center() for d in relevant_dots]).mean(axis=0)
                 self.play(centroid.animate.move_to(new_pos), run_time=1.3)
         self.wait(2)
@@ -245,7 +241,7 @@ class supervised_example(ThreeDScene):
         self.example_ax = VGroup()
         self.data_image = None
         # self.text = None
-        # self.ax = VGroup()
+        self.ax_3D = VGroup()
         # self.m = 10
         # self.loss_track = None
         # self.loss_graph = None
@@ -260,16 +256,17 @@ class supervised_example(ThreeDScene):
         # self.get_dot()
 
     def supervised_intro(self):
-        unsup_cn = Text('有监督学习').to_edge(LEFT+2*UP)
+        unsup_cn = Text('有监督学习').to_edge(LEFT + 2 * UP)
         unsup_en = Text('supervised Learning').scale(0.5).next_to(unsup_cn, DOWN)
 
         self.play(FadeIn(unsup_cn), FadeIn(unsup_en))
 
-        svg_image = SVGMobject('svg_icon/文档.svg', fill_color=WHITE).scale(0.9).next_to(unsup_en, 2*DOWN)
+        svg_image = SVGMobject('svg_icon/文档.svg', fill_color=WHITE).scale(0.9).next_to(unsup_en, 2 * DOWN)
         text_intro = Text('数据有标注', color=GRAY).scale(0.7).next_to(svg_image, DOWN)
 
-        l_label_svg = VGroup(*[SVGMobject('svg_icon/文档_split.svg', fill_color=i).scale(0.6) for i in [BLUE, RED, GREEN]])
-        l_label_svg.arrange_submobjects(RIGHT).scale(0.8).next_to(text_intro ,DOWN)
+        l_label_svg = VGroup(
+            *[SVGMobject('svg_icon/文档_split.svg', fill_color=i).scale(0.6) for i in [BLUE, RED, GREEN]])
+        l_label_svg.arrange_submobjects(RIGHT).scale(0.8).next_to(text_intro, DOWN)
 
         image_text_intro = VGroup(svg_image, text_intro)
 
@@ -284,18 +281,16 @@ class supervised_example(ThreeDScene):
         centers = [[-2, -2], [0, 3], [3, 0]]
         X, y = make_blobs(n_samples=18, centers=centers, cluster_std=1, random_state=0)
         clf = LogisticRegression(random_state=0,
-                                 multi_class='multinomial',
+                                 multi_class='ovr',
                                  solver='newton-cg')
         clf.fit(X, y)
 
-        # ax = CommonFunc.add_axes(x_range=[-6, 6], y_range=[-4, 4], x_length=8, y_length=6,
-        #                          axis_config={"include_tip": False, "include_numbers": False}).to_edge(RIGHT)
         ax = NumberPlane(x_range=[-6, 6], y_range=[-4, 4], x_length=8, y_length=6,
-                                 axis_config={"include_tip": False, "include_numbers": False}).to_edge(RIGHT)
+                         axis_config={"include_tip": False, "include_numbers": False}).to_edge(RIGHT)
         self.example_ax.add(ax)
 
         coords = list(zip(X[:, 0], X[:, 1], y))
-        colors = [BLUE, RED, YELLOW]
+        colors = [BLUE, RED, GREEN]
 
         dots = VGroup(
             *[Dot(ax.c2p(coord[0], coord[1]),
@@ -305,9 +300,18 @@ class supervised_example(ThreeDScene):
         self.example_ax.add(dots)
 
         self.play(FadeIn(self.example_ax))
-
         self.wait(2)
 
+        l_graph = VGroup()
+        for coefs, intercept in zip(clf.coef_, clf.intercept_):
+            a1, a2 = coefs
+            b = intercept
+            graph = ax.plot(lambda x: -(a1 / a2) * x - b / a2, x_range=[-6, 6], use_smoothing=True, color=YELLOW)
+            l_graph.add(graph)
+
+        self.example_ax.add(l_graph)
+        self.play(FadeIn(l_graph))
+        self.wait(2)
 
     def write_text_before_animate(self):
         text_gradient = MathTex("\mathbf{\omega}_{m+1} =",
@@ -329,7 +333,7 @@ class supervised_example(ThreeDScene):
 
         axes = ThreeDAxes(x_range=(-4, 4), y_range=(-4, 4), z_range=(0, 7), x_length=8, y_length=8, z_length=4).shift(
             2 * LEFT)
-        self.ax.add(axes)
+        self.ax_3D.add(axes)
         surface_plane = Surface(lambda u, v: axes.c2p(u, v, bowl(u, v)),
                                 u_range=[-2, 2],
                                 v_range=[-2, 2],
@@ -341,11 +345,11 @@ class supervised_example(ThreeDScene):
 
         surface_plane.set_fill_by_value(axes=axes, colors=[(RED, 0.0), (YELLOW, 0.2), (BLUE, 4)], axis=2)
 
-        self.ax.add(surface_plane)
+        self.ax_3D.add(surface_plane)
 
-        self.play(Create(self.ax))
+        self.play(Create(self.ax_3D))
 
-        self.play(Rotate(self.ax, angle=-90 * DEGREES, axis=RIGHT))
+        self.play(Rotate(self.ax_3D, angle=-90 * DEGREES, axis=RIGHT))
         self.wait(2)
 
         # self.move_camera(phi=75 * DEGREES)
@@ -353,10 +357,10 @@ class supervised_example(ThreeDScene):
         # self.set_camera_orientation(phi=75 * DEGREES, theta=0)
 
         for i in range(6):
-            self.play(Rotate(self.ax, angle=60 * DEGREES, axis=UP))
+            self.play(Rotate(self.ax_3D, angle=60 * DEGREES, axis=UP))
 
-        self.play(Rotate(self.ax, angle=15 * DEGREES, axis=UP))
-        self.play(Rotate(self.ax, angle=45 * DEGREES, axis=RIGHT))
+        self.play(Rotate(self.ax_3D, angle=15 * DEGREES, axis=UP))
+        self.play(Rotate(self.ax_3D, angle=45 * DEGREES, axis=RIGHT))
 
     @staticmethod
     def f(x, y):
