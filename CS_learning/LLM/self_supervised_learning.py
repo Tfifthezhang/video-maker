@@ -238,22 +238,22 @@ class unsupervised_example(Scene):
 
 class supervised_example(ThreeDScene):
     def construct(self):
+        self.clf = None
         self.example_ax = VGroup()
         self.data_image = None
-        # self.text = None
+        self.text = VGroup()
         self.ax_3D = VGroup()
-        # self.m = 10
-        # self.loss_track = None
-        # self.loss_graph = None
-        # self.iterations = None
-        # self.learning_rate = [0.3]
+        self.m = 10
+        self.loss_track = None
+        self.loss_graph = None
+        self.iterations = None
+        self.learning_rate = [0.4]
 
         self.supervised_intro()
         self.data_prepare()
-        # self.kmeans_run()
-        # self.write_text_before_animate()
-        # self.get_surfaceplot()
-        # self.get_dot()
+        self.write_text_before_animate()
+        self.get_surfaceplot()
+        self.get_dot()
 
     def supervised_intro(self):
         unsup_cn = Text('有监督学习').to_edge(LEFT + 2 * UP)
@@ -269,13 +269,14 @@ class supervised_example(ThreeDScene):
         l_label_svg.arrange_submobjects(RIGHT).scale(0.8).next_to(text_intro, DOWN)
 
         image_text_intro = VGroup(svg_image, text_intro)
+        self.data_image = image_text_intro
 
         self.play(Create(image_text_intro))
         self.wait(2)
 
         self.play(FadeTransform(text_intro.copy(), l_label_svg))
 
-        self.data_image = image_text_intro
+        self.data_image.add(l_label_svg)
 
     def data_prepare(self):
         centers = [[-2, -2], [0, 3], [3, 0]]
@@ -284,6 +285,8 @@ class supervised_example(ThreeDScene):
                                  multi_class='ovr',
                                  solver='newton-cg')
         clf.fit(X, y)
+
+        self.clf = clf
 
         ax = NumberPlane(x_range=[-6, 6], y_range=[-4, 4], x_length=8, y_length=6,
                          axis_config={"include_tip": False, "include_numbers": False}).to_edge(RIGHT)
@@ -306,7 +309,7 @@ class supervised_example(ThreeDScene):
         for coefs, intercept in zip(clf.coef_, clf.intercept_):
             a1, a2 = coefs
             b = intercept
-            graph = ax.plot(lambda x: -(a1 / a2) * x - b / a2, x_range=[-6, 6], use_smoothing=True, color=YELLOW)
+            graph = ax.plot(lambda x: -(a1 / a2) * x - b / a2, x_range=[-6, 6], use_smoothing=True, color=YELLOW_C)
             l_graph.add(graph)
 
         self.example_ax.add(l_graph)
@@ -314,25 +317,62 @@ class supervised_example(ThreeDScene):
         self.wait(2)
 
     def write_text_before_animate(self):
+        self.play(FadeOut(self.data_image[0]),
+                  FadeOut(self.data_image[-1]),
+                  FadeOut(self.example_ax[-1]),
+                  self.data_image[1].animate.shift(2.5*UP))
+        self.wait(1)
+
+        formula_x = MathTex("X").scale(1).next_to(self.data_image[1], 2.5*DOWN)
+        self.text.add(formula_x)
+        self.play(Create(formula_x))
+        self.wait(1)
+
+        svg_image = SVGMobject('../images/NN.svg', fill_color=WHITE).scale(0.6).next_to(formula_x, 2*RIGHT)
+        self.text.add(svg_image)
+        self.play(FadeIn(svg_image))
+        self.wait(2)
+
+        self.play(FadeOut(formula_x.copy(), target_position=svg_image, run_time=1))
+        formula_y = MathTex("Y_{pred}").scale(1).next_to(svg_image, 2 * RIGHT)
+
+        self.play(FadeIn(formula_y, target_position=svg_image, run_time=1))
+
+        self.wait(2)
+
+        self.play(Indicate(self.data_image[1]))
+        self.wait(1)
+        y_ture = MathTex("Y_{true}").scale(1).next_to(formula_y, DOWN)
+        self.play(FadeTransform(self.data_image[1].copy(), y_ture))
+        self.wait(2)
+
+        text_loss = MathTex(" \mathcal{L}(Y_{true},Y_{pred})").next_to(formula_x, 3*DOWN)
+        self.text.add(text_loss)
+
+        self.play(FadeTransform(VGroup(y_ture, formula_y), text_loss))
+
+        self.wait(2)
+
+        g_text = MathTex('\mathbf{g} = \\nabla \mathcal{L}').scale(0.8).next_to(text_loss, DOWN)
+
+        self.text.add(g_text)
+
         text_gradient = MathTex("\mathbf{\omega}_{m+1} =",
                                 "\mathbf{\omega}_m - ",
-                                "\epsilon", "\mathbf{g}(\omega_m)").to_edge(LEFT + UP)
-        text_gradient[2].set_color(MAROON)
-
-        g_text = MathTex('\mathbf{g} = \\nabla \mathcal{L}').scale(0.6).next_to(text_gradient, DOWN)
+                                "\epsilon", "\mathbf{g}(\omega_m)").scale(0.6).next_to(g_text,DOWN)
+        self.text.add(text_gradient)
 
         self.play(Write(text_gradient), Write(g_text))
         self.wait(2)
 
-        self.text = text_gradient
-
     def get_surfaceplot(self):
+        #self.play(self.example_ax.animate.scale().to_edge(RIGHT))
+        self.play(FadeOut(self.text))
+
         def bowl(u, v):
             z = 1 / 2 * (np.power(u, 2) + np.power(v, 2))
             return z
-
-        axes = ThreeDAxes(x_range=(-4, 4), y_range=(-4, 4), z_range=(0, 7), x_length=8, y_length=8, z_length=4).shift(
-            2 * LEFT)
+        axes = ThreeDAxes(x_range=(-4, 4), y_range=(-4, 4), z_range=(0, 7), x_length=8, y_length=8, z_length=4).scale(0.85).to_edge(0.5*LEFT)
         self.ax_3D.add(axes)
         surface_plane = Surface(lambda u, v: axes.c2p(u, v, bowl(u, v)),
                                 u_range=[-2, 2],
@@ -356,8 +396,8 @@ class supervised_example(ThreeDScene):
 
         # self.set_camera_orientation(phi=75 * DEGREES, theta=0)
 
-        for i in range(6):
-            self.play(Rotate(self.ax_3D, angle=60 * DEGREES, axis=UP))
+        # for i in range(6):
+        #      self.play(Rotate(self.ax_3D, angle=60 * DEGREES, axis=UP))
 
         self.play(Rotate(self.ax_3D, angle=15 * DEGREES, axis=UP))
         self.play(Rotate(self.ax_3D, angle=45 * DEGREES, axis=RIGHT))
@@ -387,47 +427,66 @@ class supervised_example(ThreeDScene):
         return GD_x, GD_y, GD_z
 
     def get_dot(self):
+        ax = self.example_ax[0]
+        iter_graphs = VGroup()
+        for extra_bias in np.linspace(10, 1, 10):
+            l_graph = VGroup()
+            for coefs, intercept in zip(self.clf.coef_, self.clf.intercept_):
+                a1, a2 = coefs
+                a2 = a2*extra_bias
+                b = intercept
+                graph = ax.plot(lambda x: -(a1 / a2) * x - b / a2, x_range=[-6, 6], use_smoothing=True, color=YELLOW_C)
+                l_graph.add(graph)
+            iter_graphs.add(l_graph)
+
         for lr in range(len(self.learning_rate)):
             l_x, l_y, l_z = self.GD(self.learning_rate[lr], start=[2, 2])
 
-            axes = self.ax[0]
+            axes = self.ax_3D[0]
 
             point = Dot3D(axes.c2p(l_x[0], l_y[0], l_z[0]), radius=0.1, color=MAROON)
-            self.play(Create(point))
+            graph = iter_graphs[0]
+            self.play(Create(point),
+                      FadeIn(graph))
             self.wait(2)
 
             arrow_vg = VGroup()
             for i in range(1, len(l_x)):
                 arrow = Arrow(start=axes.c2p(l_x[i - 1], l_y[i - 1], l_z[i - 1]),
-                              end=axes.c2p(l_x[i], l_y[i], l_z[i]), color=GRAY, stroke_width=5)
+                              end=axes.c2p(l_x[i], l_y[i], l_z[i]), buff=0, color=YELLOW_A, stroke_width=8)
                 self.play(Write(arrow))
-                self.play(point.animate.move_to(axes.c2p(l_x[i], l_y[i], l_z[i])))
-
+                self.play(point.animate.move_to(axes.c2p(l_x[i], l_y[i], l_z[i])),
+                          Transform(graph, iter_graphs[i]))
                 arrow_vg.add(arrow)
 
-            self.wait(2)
+            self.wait(1)
 
-            self.iterations = VGroup(point, arrow_vg)
-            self.loss_track = [l_x, l_y, l_z]
-            ax = CommonFunc.add_axes(x_range=[0, self.m], y_range=[0, 8], x_length=8, y_length=3,
-                                     axis_config={"include_tip": False, "include_numbers": False}).scale(0.5).to_edge(
-                RIGHT)
-
-            labels = ax.get_axis_labels(Text("m").scale(0.5), MathTex("\mathcal{L}").scale(0.45))
-
-            gd_plot = ax.plot_line_graph(x_values=list(range(self.m)), y_values=self.loss_track[-1],
-                                         line_color=GOLD_E,
-                                         vertex_dot_style=dict(stroke_width=1, fill_color=PURPLE),
-                                         stroke_width=3)
-            # gd_label = ax.get_graph_label(graph=gd_plot, label=MathTex('\\text{lr}=2').scale(0.7), direction=UP)
-
-            self.loss_graph = VGroup(ax, labels, gd_plot)
-
-            self.play(Create(self.loss_graph))
+            self.play(Indicate(point),
+                      ApplyWave(graph))
 
             self.wait(2)
 
-            self.play(FadeOut(self.iterations))
+            # self.iterations = VGroup(point, arrow_vg)
+            # self.loss_track = [l_x, l_y, l_z]
+            # ax = CommonFunc.add_axes(x_range=[0, self.m], y_range=[0, 8], x_length=8, y_length=3,
+            #                          axis_config={"include_tip": False, "include_numbers": False}).scale(0.5).to_edge(
+            #     RIGHT)
+            #
+            # labels = ax.get_axis_labels(Text("m").scale(0.5), MathTex("\mathcal{L}").scale(0.45))
+            #
+            # gd_plot = ax.plot_line_graph(x_values=list(range(self.m)), y_values=self.loss_track[-1],
+            #                              line_color=GOLD_E,
+            #                              vertex_dot_style=dict(stroke_width=1, fill_color=PURPLE),
+            #                              stroke_width=3)
+            # # gd_label = ax.get_graph_label(graph=gd_plot, label=MathTex('\\text{lr}=2').scale(0.7), direction=UP)
+            #
+            # self.loss_graph = VGroup(ax, labels, gd_plot)
+            #
+            # self.play(Create(self.loss_graph))
+            #
+            # self.wait(2)
+            #
+            # self.play(FadeOut(self.iterations))
 
 
 class llm_train(Scene):
