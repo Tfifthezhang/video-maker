@@ -127,9 +127,11 @@ class represent_learning(Scene):
 
         self.PCA_example.add(graph)
 
-    def represent_nn(self):
         self.play(FadeOut(self.PCA_example))
         self.wait(2)
+
+    def represent_nn(self):
+        pass
 
 
 class unsupervised_example(Scene):
