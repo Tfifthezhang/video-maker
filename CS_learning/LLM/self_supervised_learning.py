@@ -17,7 +17,7 @@ sys.path.append('..')
 
 from CS_learning.common_func import CommonFunc
 
-from sklearn.datasets import make_blobs, make_circles
+from sklearn.datasets import make_blobs, make_circles,make_moons
 from sklearn.decomposition import KernelPCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.multiclass import OneVsRestClassifier
@@ -28,10 +28,15 @@ class represent_learning(Scene):
     def construct(self):
         self.PCA_example = VGroup()
         self.NN_func = VGroup()
+        self.NN_node = None
+        self.NN_weight = None
+        self.cat_dog_example = VGroup()
 
         self.linear_cant()
         self.feature_trans()
         self.nn()
+        self.nn_example1()
+        self.represent_clf()
 
     def intro(self):  # 机器学习的任务是什么，机器学习效果依赖于好的特征
         svg_image = SVGMobject('../images/NN.svg', fill_color=WHITE).scale(1.2)
@@ -140,17 +145,19 @@ class represent_learning(Scene):
                                     ) for _ in range(n)])
             nodes.arrange(DOWN, buff=0.2)
             return nodes
-        node1 = get_nodes(4)
+        node1 = get_nodes(6)
         node2 = get_nodes(6)
-        node3 = get_nodes(8)
+        node3 = get_nodes(6)
 
         vg_nodes = VGroup(node1, node2, node3)
 
-        vg_nodes.arrange(RIGHT, buff=1).next_to(self.NN_func, UP)
+        vg_nodes.arrange(RIGHT, buff=1).next_to(self.NN_func[0], UP)
 
-        self.play(Create(vg_nodes))
+        self.play(FadeIn(vg_nodes, target_position=self.NN_func[0]))
 
         self.wait(2)
+
+        self.NN_node = vg_nodes
 
         def create_connections(left_layer_nodes, right_layer_nodes):
             # Create VGroup to hold created connections
@@ -171,11 +178,92 @@ class represent_learning(Scene):
                     connection_group.add(line)
             return connection_group
 
-        weight_12 = create_connections(vg_nodes[0],vg_nodes[1])
+        weight_12 = create_connections(vg_nodes[0], vg_nodes[1])
         weight_23 = create_connections(vg_nodes[1], vg_nodes[2])
 
-        self.play(Create(weight_12),Create(weight_23))
+        self.play(Create(weight_12), Create(weight_23))
         self.wait(2)
+
+        self.NN_weight = VGroup(weight_12, weight_23)
+
+    def nn_example1(self):
+        # self.NN_func
+        cat = SVGMobject('svg_icon/cat.svg').scale(0.6).to_edge(LEFT+UP)
+        dog = SVGMobject('svg_icon/dog.svg').scale(0.6).next_to(cat, RIGHT)
+
+        self.play(SpinInFromNothing(cat),
+                  SpinInFromNothing(dog))
+
+        self.wait(2)
+
+        self.cat_dog_example.add(VGroup(cat, dog))
+
+        ax = CommonFunc.add_axes(x_range=[-6, 7], y_range=[-7, 6], x_length=6, y_length=6,
+                         axis_config={"include_tip": False, "include_numbers": False}).scale(0.6).next_to(self.NN_node[0],3*LEFT).shift(DOWN)
+
+        # axes_labels = ax.get_axis_labels(x_label=MathTex('x_1'), y_label=MathTex('x_2'))
+        # self.cat_dog_example.add(axes_labels)
+
+        X, y = make_moons(n_samples=30, noise=2.5, random_state=0)
+        coords = list(zip(X[:, 0], X[:, 1], y))
+
+        dots = VGroup(
+            *[cat.copy().scale(0.4).move_to(ax.c2p(coord[0], coord[1])) if coord[-1] == 1
+             else dog.copy().scale(0.4).move_to(ax.c2p(coord[0], coord[1]))
+             for coord in coords])
+        self.cat_dog_example.add(VGroup(ax, dots))
+        self.play(FadeIn(self.cat_dog_example[1:], target_position=self.cat_dog_example[0]))
+
+        self.wait(2)
+
+        self.play(FadeOut(self.cat_dog_example[1:], target_position=self.NN_node[0]))
+
+        ## 不是线性可分的
+        #graph = ax.plot(lambda x: x + 0.5, x_range=[-0.8, 0.5], use_smoothing=True, color=YELLOW)
+
+
+        self.play(Indicate(self.NN_node[0]))
+        #self.play(ShowPassingFlash(self.NN_weight[0].copy().set_color(YELLOW)))
+        self.play(self.NN_weight[0].animate.set_color(YELLOW))
+        self.play(Indicate(self.NN_node[1]))
+        #self.play(ShowPassingFlash(self.NN_weight[1].copy().set_color(YELLOW)))
+        self.play(self.NN_weight[1].animate.set_color(YELLOW))
+        self.play(Indicate(self.NN_node[2]))
+        
+        bx = CommonFunc.add_axes(x_range=[-1, 2], y_range=[-1, 1], x_length=6, y_length=6,
+                         axis_config={"include_tip": False, "include_numbers": False}).scale(0.6).next_to(
+            self.NN_node[2], 3 * RIGHT).shift(DOWN)
+
+        X, y = make_moons(n_samples=30, noise=0.05, random_state=0)
+        coords = list(zip(X[:, 0], X[:, 1], y))
+
+        dots = VGroup(
+            *[cat.copy().scale(0.4).move_to(bx.c2p(coord[0], coord[1])) if coord[-1] == 1
+              else dog.copy().scale(0.4).move_to(bx.c2p(coord[0], coord[1]))
+              for coord in coords])
+        self.play(FadeIn(VGroup(bx, dots), target_position=self.NN_node[-1]))
+
+        self.wait(2)
+
+        self.cat_dog_example.add(VGroup(bx, dots))
+
+    def represent_clf(self):
+        self.play(FadeOut(self.cat_dog_example[0]),
+                  self.NN_func.animate.to_edge(LEFT),
+                  VGroup(self.NN_node, self.NN_weight).animate.to_edge(LEFT),
+                  self.cat_dog_example[-1].animate.to_edge(RIGHT).shift(UP))
+
+        self.wait(2)
+
+        clf = self.NN_node[-1].copy().next_to( self.NN_node[-1], 2*RIGHT)
+
+        svg_clf = SVGMobject('svg_icon/logistic.svg').scale(0.6).next_to(self.NN_func[-1], RIGHT)
+
+
+
+
+
+
 
 
 class unsupervised_example(Scene):
