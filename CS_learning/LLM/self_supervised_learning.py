@@ -216,7 +216,7 @@ class represent_learning(Scene):
 
         self.wait(2)
 
-        self.play(FadeOut(self.cat_dog_example[1:], target_position=self.NN_node[0]))
+        self.play(FadeOut(self.cat_dog_example[1:].copy(), target_position=self.NN_node[0]))
 
         ## 不是线性可分的
         #graph = ax.plot(lambda x: x + 0.5, x_range=[-0.8, 0.5], use_smoothing=True, color=YELLOW)
@@ -248,16 +248,89 @@ class represent_learning(Scene):
         self.cat_dog_example.add(VGroup(bx, dots))
 
     def represent_clf(self):
+        def get_nodes(n):
+            nodes = VGroup(*[Circle(radius=0.4
+                                    , stroke_color=RED
+                                    , stroke_width=2
+                                    , fill_color=GRAY
+                                    , fill_opacity=0
+                                    ) for _ in range(n)])
+            nodes.arrange(DOWN, buff=0.2)
+            return nodes
+        def create_connections(left_layer_nodes, right_layer_nodes):
+            # Create VGroup to hold created connections
+            connection_group = VGroup()
+            # Iterate through right layer nodes
+            for l in range(len(right_layer_nodes)):
+                # Iterate through left layer nodes
+                for r in range(len(left_layer_nodes)):
+                    # Create connection line
+                    line = Line(start=right_layer_nodes[l].get_edge_center(LEFT)
+                                , end=left_layer_nodes[r].get_edge_center(RIGHT)
+                                , color=WHITE,
+                                stroke_width=1)
+                    connection_group.add(line)
+            return connection_group
+
+        def sigmoid(x):
+            s = np.power(np.e, -x)
+            return 1 / (1 + s)
+
         self.play(FadeOut(self.cat_dog_example[0]),
+                  FadeOut(self.cat_dog_example[1]),
                   self.NN_func.animate.to_edge(LEFT),
                   VGroup(self.NN_node, self.NN_weight).animate.to_edge(LEFT),
                   self.cat_dog_example[-1].animate.to_edge(RIGHT).shift(UP))
 
         self.wait(2)
 
-        clf = self.NN_node[-1].copy().next_to( self.NN_node[-1], 2*RIGHT)
+        # 输出y
+        svg_clf = SVGMobject('svg_icon/logistic.svg', fill_color=WHITE).scale(0.6).next_to(self.NN_func[-1], RIGHT)
 
-        svg_clf = SVGMobject('svg_icon/logistic.svg').scale(0.6).next_to(self.NN_func[-1], RIGHT)
+        self.play(FadeIn(svg_clf))
+        self.play(FadeOut(self.NN_func[-1].copy(), target_position=svg_clf))
+
+        Y_tex = MathTex('Y').scale(2).next_to(svg_clf, 2*RIGHT)
+
+        self.play(FadeIn(Y_tex, target_position=svg_clf))
+        self.wait(1)
+
+        clf = get_nodes(1)
+        clf.shift(0.8*UP)
+
+        self.play(FadeIn(clf, target_position=svg_clf))
+
+        weight_output = create_connections(self.NN_node[-1], clf)
+
+        self.play(Create(weight_output))
+
+        clf_brace = Brace(clf, DOWN)
+        clf_text = Text('输出层', color=MAROON).scale(0.8).next_to(clf_brace, DOWN)
+
+        self.play(Write(clf_brace))
+        self.play(Write(clf_text))
+
+        ## 输出层可以为sigmoid
+
+        ax = CommonFunc.add_axes(x_range=[-8, 8], y_range=[0, 1], x_length=7, y_length=4,
+                                 axis_config={"include_tip": False, "include_numbers": True})
+
+        sigmoid_plot = ax.plot(lambda x: sigmoid(x), x_range=[-7, 7], use_smoothing=True, color=MAROON)
+        vg_sigmoid = VGroup(ax, sigmoid_plot).scale(0.35).next_to(clf, UP)
+
+        self.play(FadeTransform(clf.copy(), vg_sigmoid))
+        self.wait(2)
+
+        # from sklearn.preprocessing import PolynomialFeatures
+        #poly = PolynomialFeatures(2)
+        # poly.fit_transform(X)
+
+
+
+
+
+
+
 
 
 
