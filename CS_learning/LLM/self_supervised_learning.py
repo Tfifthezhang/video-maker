@@ -230,11 +230,11 @@ class represent_learning(Scene):
         self.play(self.NN_weight[1].animate.set_color(YELLOW))
         self.play(Indicate(self.NN_node[2]))
         
-        bx = CommonFunc.add_axes(x_range=[-1, 2], y_range=[-1, 1], x_length=6, y_length=6,
+        bx = CommonFunc.add_axes(x_range=[-2, 3.5], y_range=[-1, 6], x_length=6, y_length=6,
                          axis_config={"include_tip": False, "include_numbers": False}).scale(0.6).next_to(
             self.NN_node[2], 3 * RIGHT).shift(DOWN)
 
-        X, y = make_moons(n_samples=30, noise=0.05, random_state=0)
+        X, y = make_blobs(n_samples=30, centers=2, n_features=2, cluster_std=0.8, random_state=0)
         coords = list(zip(X[:, 0], X[:, 1], y))
 
         dots = VGroup(
@@ -290,11 +290,6 @@ class represent_learning(Scene):
         self.play(FadeIn(svg_clf))
         self.play(FadeOut(self.NN_func[-1].copy(), target_position=svg_clf))
 
-        Y_tex = MathTex('Y').scale(2).next_to(svg_clf, 2*RIGHT)
-
-        self.play(FadeIn(Y_tex, target_position=svg_clf))
-        self.wait(1)
-
         clf = get_nodes(1)
         clf.shift(0.8*UP)
 
@@ -321,22 +316,25 @@ class represent_learning(Scene):
         self.play(FadeTransform(clf.copy(), vg_sigmoid))
         self.wait(2)
 
-        # from sklearn.preprocessing import PolynomialFeatures
-        #poly = PolynomialFeatures(2)
-        # poly.fit_transform(X)
+        # 决策边界
+        # from sklearn.linear_model import LogisticRegression
+        X, y = make_blobs(n_samples=30, centers=2, n_features=2, cluster_std=0.8, random_state=0)
+        log_clf = LogisticRegression(random_state=0)
+        log_clf.fit(X, y)
+        a1, a2 = log_clf.coef_[0]
+        b = log_clf.intercept_[0]
+        graph = self.cat_dog_example[-1][0].plot(lambda x: -(a1 / a2) * x - b / a2, x_range=[-2.5, 3.5], use_smoothing=True, color=MAROON)
 
 
+        Y_tex = MathTex('Y', color=MAROON).scale(2).next_to(svg_clf, 2*RIGHT)
 
+        self.play(FadeIn(Y_tex, target_position=svg_clf),
+                  FadeTransform(clf.copy(), graph))
+        self.wait(2)
 
-
-
-
-
-
-
-
-
-
+        self.play(Indicate(Y_tex),
+                  Indicate(graph))
+        self.wait(2)
 
 
 class unsupervised_example(Scene):
