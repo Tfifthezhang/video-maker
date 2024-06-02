@@ -35,6 +35,7 @@ class represent_learning(Scene):
         self.linear_cant()
         self.feature_trans()
         self.nn()
+        self.nn_structure()
         self.nn_example1()
         self.represent_clf()
 
@@ -185,6 +186,41 @@ class represent_learning(Scene):
         self.wait(2)
 
         self.NN_weight = VGroup(weight_12, weight_23)
+
+    def nn_structure(self):
+        vg_nn = VGroup(self.NN_node, self.NN_weight)
+
+        cnn = SVGMobject('svg_icon/cnn.svg',
+                         opacity=None,
+                         stroke_color=BLUE,
+                         stroke_opacity=1,
+                         stroke_width=1).scale(0.8).to_edge(RIGHT).shift(1.5*UP)
+
+        self.play(FadeTransform(vg_nn.copy(), cnn))
+        self.wait(1)
+
+        rnn = SVGMobject('svg_icon/rnn.svg',
+                         opacity=None,
+                         stroke_color=BLUE,
+                         stroke_opacity=1,
+                         stroke_width=1).scale(1).next_to(cnn, 2*DOWN)
+
+        self.play(FadeTransform(vg_nn.copy(), rnn))
+        self.wait(1)
+
+        transformer = SVGMobject('svg_icon/attention.svg',
+                                 opacity=None,
+                                 stroke_color=BLUE,
+                                 stroke_opacity=0.9,
+                                 stroke_width=0.8).scale(1.3).to_edge(0.5*LEFT)
+
+        self.play(FadeTransform(vg_nn.copy(), transformer))
+        self.wait(1)
+
+        self.play(FadeOut(cnn, target_mobject=vg_nn),
+                  FadeOut(rnn, target_mobject=vg_nn),
+                  FadeOut(transformer, target_mobject=vg_nn))
+        self.wait(1)
 
     def nn_example1(self):
         # self.NN_func
@@ -698,34 +734,141 @@ class supervised_example(ThreeDScene):
 
 class llm_train(Scene):
     def construct(self):
-        self.example_texts = None
+        self.text = None
+        self.token =None
+        self.NN_node = None
+        self.NN_weight= None
+        self.bert_data = VGroup()
 
         self.sentence_example()
+        self.nn()
+        self.BERT_train()
 
     def sentence_example(self):
-        l_array = list('迷路的小画家是个英俊少年')
-        n_circles = len(l_array)
+        svg_image = SVGMobject('svg_icon/文档.svg', fill_color=WHITE).scale(0.9).to_edge(LEFT+2*UP)
 
-        circles = VGroup(*[Circle(radius=0.4, color=LOGO_WHITE).scale(1)
-                           for _ in range(n_circles)])
-        circles.arrange_submobjects(RIGHT, buff=0.15)
-
-        texts = VGroup()
-        for i in range(n_circles):
-            integ = Text(l_array[i], color=LOGO_WHITE).scale(0.8)
-            integ.move_to(circles[i].get_center())
-            texts.add(integ)
-
-        circle_texts = VGroup(circles, texts)
-
-        self.play(Create(circle_texts))
-
+        self.play(FadeIn(svg_image))
         self.wait(2)
 
-        self.example_texts = circle_texts
+        s_text = '我给你瘦落的街道，绝望的落日，荒郊的月亮。' \
+                 '我给你一个久久地望着孤月的人的悲哀。' \
+                 '我给你我已死去的祖辈后人们用大理石祭奠的先魂。' \
+                 '我父亲的父亲阵亡于布宜诺斯艾利斯的边境,两颗子弹射穿了他的胸膛。' \
+                 '死的时候蓄着胡子，尸体被士兵们用牛皮裹起。' \
+                 '我母亲的祖父那年才二十四岁，在秘鲁率领三百人冲锋，如今都成了消失的马背上的亡魂。' \
+                 '我给你我的书中所能蕴含的一切悟力，以及我生活中所能有的男子气概和幽默。' \
+                 '我给你一个从未有过信仰的人的忠诚。' \
+                 '我给你我设法保全的我自己的核心。' \
+                 '不营字造句，不和梦交易，不被时间、欢乐和逆境触动的核心。' \
+                 '我给你早在你出生前多年的一个傍晚看到的一朵黄玫瑰的记忆。' \
+                 '我给你关于你生命的诠释，关于你自己的理论，你的真实而惊人的存在。' \
+                 '我给你我的寂寞，我的黑暗，我心的饥渴。' \
+                 '我试图用困惑、危险、失败来打动你。'
+
+        l_text = s_text.split('。')
+
+        text = VGroup(*[Text(i).scale(0.4) for i in l_text])
+        text.arrange_submobjects(DOWN, buff=0.2)
+
+        self.play(Write(text),
+                  FadeOut(svg_image))
+        self.wait(2)
+
+        self.text = text
+
+        s_token = '我 给 你 瘦落 的 街道 ， 绝望 的 落日 ， 荒郊 的 月亮 。 我 给 你 一个 久久地 望着 孤月 的 人 的 悲哀 。 我 给 你 我 已 死去 的 祖辈 后人们 用 大理石 祭奠 的 先 魂 。 我 父亲 的 父亲 阵亡 于 布宜诺斯艾利斯 的 边境 ， 两 颗 子弹 射 穿 了 他 的 胸膛 。 死 的 时候 蓄 着 胡子 ， 尸体 被 士兵们 用 牛皮 裹 起 。 我 母亲 的 祖父 那年 才 二十四岁 ， 在 秘鲁 率领 三百人 冲锋 ， 如今 都 成 了 消失 的 马 背上 的 亡魂 。 我 给 你 我 的 书 中 所 能 蕴含 的 一切 悟力 ， 以及 我 生活 中 所 能 有 的 男子气概 和 幽默 。 我 给 你 一个 从未 有 过 信仰 的 人 的 忠诚 。 我 给 你 我 设法 保全 的 我 自己 的 核心 。 不 营 字 造句 ， 不 和 梦 交易 ， 不 被 时间 、 欢乐 和 逆境 触动 的 核心 。 我 给 你 早 在 你 出生 前 多年 的 一个 傍晚 看到 的 一朵 黄 玫瑰 的 记忆 。 我 给 你 关于 你 生命 的 诠释 ， 关于 你 自己 的 理论 ， 你 的 真实 而 惊人 的 存在 。 我 给 你 我 的 寂寞 ， 我 的 黑暗 ， 我 心 的 饥渴 。 我 试图 用 困惑 、 危险 、 失败 来 打动 你 。'
+        self.token = s_token
+
+    def nn(self):
+        def get_nodes(n):
+            nodes = VGroup(*[Circle(radius=0.3
+                                    , stroke_color=BLUE
+                                    , stroke_width=2
+                                    , fill_color=GRAY
+                                    , fill_opacity=0
+                                    ) for _ in range(n)])
+            nodes.arrange(RIGHT, buff=0.5)
+            return nodes
+        node1 = get_nodes(8)
+        node2 = get_nodes(8)
+        node3 = get_nodes(8)
+
+        vg_nodes = VGroup(node1, node2, node3)
+
+        vg_nodes.arrange(DOWN, buff=0.8)
+
+        self.NN_node = vg_nodes
+
+        def create_connections(left_layer_nodes, right_layer_nodes):
+            # Create VGroup to hold created connections
+            connection_group = VGroup()
+            # Iterate through right layer nodes
+            for l in range(len(right_layer_nodes)):
+                # Iterate through left layer nodes
+                for r in range(len(left_layer_nodes)):
+                    # Create connection line
+                    line = DashedLine(start=right_layer_nodes[l].get_edge_center(UP)
+                                , end=left_layer_nodes[r].get_edge_center(DOWN)
+                                , color=WHITE,
+                                stroke_width=0.8,
+                                # , stroke_opacity=0.4
+                                )
+
+                    # Add to connection group
+                    connection_group.add(line)
+            return connection_group
+
+        weight_12 = create_connections(vg_nodes[0], vg_nodes[1])
+        weight_23 = create_connections(vg_nodes[1], vg_nodes[2])
+
+        self.NN_weight = VGroup(weight_12, weight_23)
 
     def BERT_train(self):
-        pass
+        text = self.text
+        tokens = self.token
+
+        l_tokens = tokens.split(' ')
+        l_array = l_tokens[:27]
+        n_circles = len(l_array)
+        vg_texts = VGroup(*[Text(i, color=LOGO_WHITE) for i in l_array])
+        vg_texts.arrange_submobjects(RIGHT, buff=0.22).scale(0.5).to_edge(3*DOWN)
+
+        self.bert_data.add(vg_texts)
+
+        plain_rec = VGroup()
+        for i in range(n_circles):
+            if l_array[i] in ['，', '。']:
+                integ = Rectangle(width=0.1, height=0.1, color=MAROON, stroke_width=0.9)
+            else:
+                len_char = len(l_array[i])
+                integ = Rectangle(width=0.66*0.5 * len_char, height=0.75*0.5, color=MAROON, stroke_width=0.9)
+            integ.move_to(vg_texts[i].get_center())
+            plain_rec.add(integ)
+
+        self.bert_data.add(plain_rec)
+
+        self.play(FadeTransform(text, vg_texts))
+        self.wait(2)
+
+        svg_image = SVGMobject('../images/NN.svg', fill_color=WHITE).scale(0.8).next_to(self.NN_node, LEFT)
+        self.play(FadeIn(svg_image))
+        
+        self.play(FadeIn(self.NN_node, target_position= svg_image),
+                  FadeIn(self.NN_weight, target_position= svg_image))
+        
+        self.wait(2)
+
+        self.play(FadeIn(plain_rec))
+        self.wait(2)
+
+        ### mask操作,月亮 13
+        plain_rec[13].animate.set_opacity(1)
+        self.wait(2)
+
+
+
+
+
 
 
 class supervised_learning(Scene):
