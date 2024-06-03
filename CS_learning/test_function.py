@@ -7,26 +7,16 @@ from CS_learning.common_func import CommonFunc
 
 class test(Scene):
     def construct(self):
-        cnn = SVGMobject('svg_icon/cnn.svg',
-                         opacity=None,
-                         stroke_color=BLUE,
-                         stroke_opacity=1,
-                         stroke_width=1).scale(0.8).to_edge(RIGHT).shift(1.5*UP)
+        output_chart = BarChart(
+            values=[0.1] * 2,
+            bar_names=['target', 'others'],
+            y_range=[0, 1, 10],
+            y_length=4,
+            x_length=4,
+            x_axis_config={"font_size": 50},
+        ).scale(0.65).to_edge(UP)
+        c_bar_lbls = output_chart.get_bar_labels(font_size=32)
 
-        rnn = SVGMobject('svg_icon/rnn.svg',
-                         opacity=None,
-                         stroke_color=BLUE,
-                         stroke_opacity=1,
-                         stroke_width=1).scale(1).next_to(cnn, 2*DOWN)
-        #
-        self.play(FadeIn(cnn), FadeIn(rnn))
-
-        transformer = SVGMobject('svg_icon/attention.svg',
-                                 opacity=None,
-                                 stroke_color=BLUE,
-                                 stroke_opacity=0.9,
-                                 stroke_width=0.8).scale(1.3).to_edge(0.5*LEFT)
-
-        self.play(Create(transformer))
-        self.wait(2)
+        self.play(FadeIn(output_chart),
+                  Create(c_bar_lbls))
         # self.play(Indicate(s[-1]))

@@ -781,7 +781,7 @@ class llm_train(Scene):
 
     def nn(self):
         def get_nodes(n):
-            nodes = VGroup(*[Circle(radius=0.3
+            nodes = VGroup(*[Circle(radius=0.22
                                     , stroke_color=BLUE
                                     , stroke_width=2
                                     , fill_color=GRAY
@@ -795,7 +795,7 @@ class llm_train(Scene):
 
         vg_nodes = VGroup(node1, node2, node3)
 
-        vg_nodes.arrange(DOWN, buff=0.8)
+        vg_nodes.arrange(DOWN, buff=0.4).shift(DOWN)
 
         self.NN_node = vg_nodes
 
@@ -810,7 +810,7 @@ class llm_train(Scene):
                     line = DashedLine(start=right_layer_nodes[l].get_edge_center(UP)
                                 , end=left_layer_nodes[r].get_edge_center(DOWN)
                                 , color=WHITE,
-                                stroke_width=0.8,
+                                stroke_width=0.9,
                                 # , stroke_opacity=0.4
                                 )
 
@@ -861,9 +861,106 @@ class llm_train(Scene):
         self.play(FadeIn(plain_rec))
         self.wait(2)
 
-        ### mask操作,月亮 13
-        plain_rec[13].animate.set_opacity(1)
+        ### mask操作1,月亮 13
+
+        self.play(plain_rec[13].animate.set_opacity(1))
+        self.wait(1)
+
+        mask_brace = Brace(plain_rec[13], DOWN)
+        mask_text = Text("掩码（masked）").scale(0.3).next_to(mask_brace, 0.5*DOWN)
+        self.play(Create(mask_brace),
+                  Create(mask_text))
+        self.wait(1)
+
+        self.play(FadeOut(self.bert_data.copy(), target_position=self.NN_node[-1]))
+
+        output_chart = BarChart(
+            values=[0.5] * 2,
+            bar_names=['target', 'others'],
+            y_range=[0, 1, 10],
+            y_length=4,
+            x_length=4,
+            bar_colors=[YELLOW, WHITE],
+            x_axis_config={"font_size": 50},
+        ).scale(0.65).to_edge(UP)
+        output_lables = output_chart.get_bar_labels(font_size=32)
+
+        self.play(FadeIn(output_chart, target_position=self.NN_node[0]))
+
+        self.play(Create(output_lables))
+
+        vg_output = VGroup(output_chart, output_lables)
+
         self.wait(2)
+        self.play(vg_output.animate.shift(1.5*LEFT))
+
+        text_loss = MathTex("\mathcal{L}(", "Y_{true}",",","Y_{pred}",")").to_edge(LEFT+UP)
+
+        real_chart = BarChart(
+            values=[0.9, 0.1],
+            bar_names=['target', 'others'],
+            y_range=[0, 1, 10],
+            y_length=4,
+            x_length=4,
+            bar_colors=[YELLOW, WHITE],
+            x_axis_config={"font_size": 50},
+        ).scale(0.65).next_to(vg_output, RIGHT)
+        real_labels = real_chart.get_bar_labels(font_size=32)
+
+        vg_real = VGroup(real_labels, real_chart)
+
+        self.play(Create(vg_real))
+
+        self.wait(2)
+
+        self.play(FadeTransform(VGroup(vg_output, vg_real).copy(), text_loss))
+
+        self.wait(2)
+
+        self.play(Indicate(vg_output),
+                  Indicate(text_loss[-2]))
+        self.wait(1)
+        self.play(Indicate(vg_real),
+                  Indicate(text_loss[1]))
+        self.wait(2)
+
+        ax = CommonFunc.add_axes(x_range=[0, 5], y_range=[0, 10], x_length=8, y_length=4,
+                                 axis_config={"include_tip": False, "include_numbers": False}).scale(0.4).next_to(text_loss, DOWN)
+
+        path = VMobject()
+        dot = Dot(ax.c2p(0, 10), radius=DEFAULT_DOT_RADIUS, color=RED)
+        path.set_points_as_corners([dot.get_center(), dot.get_center()])
+
+        def update_path(path):
+            previous_path = path.copy()
+            previous_path.add_points_as_corners([dot.get_center()])
+            path.become(previous_path)
+        path.add_updater(update_path)
+
+        self.play(FadeIn(ax),
+                  FadeIn(dot))
+
+        self.wait(1)
+
+        self.add(path)
+        self.play(dot.animate.move_to(ax.c2p(1, 8)))
+
+        self.wait(2)
+
+        # for i in np.linspace(0.55,0.88,5):
+        #     pass
+
+
+
+
+
+
+
+
+        # output_ =
+
+
+
 
 
 
