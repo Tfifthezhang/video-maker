@@ -10,6 +10,7 @@
 
 from manim import *
 import numpy as np
+import random
 import sys
 import os
 
@@ -743,6 +744,7 @@ class llm_train(Scene):
         self.sentence_example()
         self.nn()
         self.BERT_train()
+        self.GPT_train()
 
     def sentence_example(self):
         svg_image = SVGMobject('svg_icon/文档.svg', fill_color=WHITE).scale(0.9).to_edge(LEFT+2*UP)
@@ -823,6 +825,23 @@ class llm_train(Scene):
 
         self.NN_weight = VGroup(weight_12, weight_23)
 
+    @staticmethod
+    def generate_random_numbers_with_sum(n, total_sum):
+        if n < 1:
+            raise ValueError("Number of elements must be at least 1.")
+        prefix_sum = total_sum
+        numbers = []
+        for _ in range(n - 1):
+            # 这里使用random.uniform生成指定区间的随机数
+            random_val = random.uniform(0, prefix_sum)
+            numbers.append(random_val)
+            prefix_sum -= random_val  # 更新剩余的和
+
+        # 计算最后一个数
+        numbers.append(prefix_sum)
+        numbers = list(map(lambda x: round(x, 2),numbers))
+        return numbers
+
     def BERT_train(self):
         text = self.text
         tokens = self.token
@@ -861,7 +880,7 @@ class llm_train(Scene):
         self.play(FadeIn(plain_rec))
         self.wait(2)
 
-        ### mask操作1,月亮 13
+        # mask操作1,月亮 13
 
         self.play(plain_rec[13].animate.set_opacity(1))
         self.wait(1)
@@ -874,61 +893,102 @@ class llm_train(Scene):
 
         self.play(FadeOut(self.bert_data.copy(), target_position=self.NN_node[-1]))
 
+        ## 上下文
+        front_brace = Brace(plain_rec[0:13], DOWN, color= GREEN)
+        front_text = Text("上文").scale(0.4).next_to(front_brace, 0.5 * DOWN)
+        back_brace = Brace(plain_rec[14:], DOWN, color= GREEN)
+        back_text = Text("下文").scale(0.4).next_to(back_brace, 0.5 * DOWN)
+
+        vg_front_back = VGroup(front_brace, front_text, back_brace, back_text)
+        self.play(FadeIn(vg_front_back))
+
+        self.wait(1)
+        self.play(FocusOn(plain_rec[13]))
+
+        ## 输出的可能词语
+        output_words = ["月亮", "废墟", "杂草", "枯树", "野兽", "砂石", "孤坟", "荒丘", "残垣", "乌鸦"]
+        output_prob = [0.1]*10
+        l_output_words_text = VGroup(*[Text(i) for i in output_words])
+        l_output_words_text.arrange_submobjects(RIGHT, buff=0.2).scale(0.65).to_edge(UP)
+
+        l_output_prob_float = VGroup(*[DecimalNumber(output_prob[j],
+                                                     num_decimal_places=1).next_to(l_output_words_text[j], DOWN) for j in range(len(output_prob))])
+        self.play(FadeIn(VGroup(l_output_words_text, l_output_prob_float), target_position=self.NN_node[0]))
+
+        ## 输出的概率分布
+        colors_chart = [YELLOW]
+        colors_chart.extend([WHITE]*9)
         output_chart = BarChart(
-            values=[0.5] * 2,
-            bar_names=['target', 'others'],
+            values=[0.1]*10,
             y_range=[0, 1, 10],
             y_length=4,
-            x_length=4,
-            bar_colors=[YELLOW, WHITE],
+            x_length=6,
+            bar_colors=colors_chart,
             x_axis_config={"font_size": 50},
         ).scale(0.65).to_edge(UP)
-        output_lables = output_chart.get_bar_labels(font_size=32)
-
-        self.play(FadeIn(output_chart, target_position=self.NN_node[0]))
-
-        self.play(Create(output_lables))
+        output_lables = output_chart.get_bar_labels(font_size=22)
 
         vg_output = VGroup(output_chart, output_lables)
+        self.wait(2)
+        self.play(FadeTransform(VGroup(l_output_words_text, l_output_prob_float), vg_output))
 
         self.wait(2)
         self.play(vg_output.animate.shift(1.5*LEFT))
+        #
+        text_loss = MathTex("\mathcal{L}(",
+                            "Y_{pred}",
+                            ",",
+                            "Y_{true}",
+                            ")").to_edge(LEFT+UP)
 
-        text_loss = MathTex("\mathcal{L}(", "Y_{true}",",","Y_{pred}",")").to_edge(LEFT+UP)
+        self.play(Write(text_loss))
+        self.wait(2)
 
+        self.bert_data.add(text_loss)
+
+        self.play(Indicate(vg_output),
+                  Indicate(text_loss[1]))
+        self.wait(1)
+
+        ## 真实的可能词语
+        real_words = ["月亮", "废墟", "杂草", "枯树", "野兽", "砂石", "孤坟", "荒丘", "残垣", "乌鸦"]
+        real_prob = [0.99]+[0]*9
+        l_real_words_text = VGroup(*[Text(i) for i in real_words])
+        l_real_words_text.arrange_submobjects(RIGHT, buff=0.2).scale(0.65).to_edge(2*UP)
+
+        l_real_prob_float = VGroup(*[DecimalNumber(real_prob[j],
+                                                     num_decimal_places=2).next_to(l_real_words_text[j], DOWN) for j in range(len(real_prob))])
+        self.play(Indicate(text_loss[-2]))
+        self.wait(1)
+        self.play(FadeTransform(text_loss[-2].copy(), VGroup(l_real_words_text,l_real_prob_float)),
+                  FadeOut(vg_output))
+        self.wait(1)
+        self.play(Indicate(vg_texts[13]),
+                  Indicate(VGroup(l_real_words_text,l_real_prob_float)))
+        self.wait(1)
+
+        ## 真实的概率分布
         real_chart = BarChart(
-            values=[0.9, 0.1],
-            bar_names=['target', 'others'],
+            values=[0.99]+ [0]*9,
             y_range=[0, 1, 10],
             y_length=4,
-            x_length=4,
+            x_length=6,
             bar_colors=[YELLOW, WHITE],
-            x_axis_config={"font_size": 50},
-        ).scale(0.65).next_to(vg_output, RIGHT)
-        real_labels = real_chart.get_bar_labels(font_size=32)
+            x_axis_config={"font_size": 50}).scale(0.65).next_to(output_chart, RIGHT)
+        real_labels = real_chart.get_bar_labels(font_size=20)
 
         vg_real = VGroup(real_labels, real_chart)
 
-        self.play(Create(vg_real))
+        self.play(FadeTransform(VGroup(l_real_words_text,l_real_prob_float), vg_real),
+                  FadeIn(vg_output))
 
         self.wait(2)
 
-        self.play(FadeTransform(VGroup(vg_output, vg_real).copy(), text_loss))
-
-        self.wait(2)
-
-        self.play(Indicate(vg_output),
-                  Indicate(text_loss[-2]))
-        self.wait(1)
-        self.play(Indicate(vg_real),
-                  Indicate(text_loss[1]))
-        self.wait(2)
-
-        ax = CommonFunc.add_axes(x_range=[0, 5], y_range=[0, 10], x_length=8, y_length=4,
-                                 axis_config={"include_tip": False, "include_numbers": False}).scale(0.4).next_to(text_loss, DOWN)
+        ax = CommonFunc.add_axes(x_range=[0, 6], y_range=[0, 25], x_length=6, y_length=4,
+                                 axis_config={"include_tip": False, "include_numbers": False}).scale(0.36).next_to(text_loss, DOWN)
 
         path = VMobject()
-        dot = Dot(ax.c2p(0, 10), radius=DEFAULT_DOT_RADIUS, color=RED)
+        dot = Dot(ax.c2p(0, 25), radius=DEFAULT_DOT_RADIUS, color=RED)
         path.set_points_as_corners([dot.get_center(), dot.get_center()])
 
         def update_path(path):
@@ -938,35 +998,97 @@ class llm_train(Scene):
         path.add_updater(update_path)
 
         self.play(FadeIn(ax),
-                  FadeIn(dot))
+                  FadeTransform(text_loss.copy(), dot))
 
         self.wait(1)
 
         self.add(path)
-        self.play(dot.animate.move_to(ax.c2p(1, 8)))
+        #
+        for x in np.linspace(0.1, 5.1, 10):
+            self.play(dot.animate.move_to(ax.c2p(x, (x-5.1)**2)))
+            scale_bar = (x-0.1)*0.8/5+0.1
+            next_chart = BarChart(
+                values=[round(scale_bar, 2)]+self.generate_random_numbers_with_sum(9, 1-scale_bar),
+                y_range=[0, 1, 10],
+                y_length=4,
+                x_length=6,
+                bar_colors=[YELLOW]+[WHITE]*9,
+                x_axis_config={"font_size": 50},
+            ).scale(0.65).move_to(output_chart.get_center())
+            next_labels = next_chart.get_bar_labels(font_size=22)
+
+            self.play(Transform(output_chart, next_chart),
+                      Transform(output_lables, next_labels),
+                      ShowPassingFlash(self.NN_weight.copy().set_color(YELLOW)),
+                      ApplyWave(self.NN_node))
 
         self.wait(2)
 
-        # for i in np.linspace(0.55,0.88,5):
-        #     pass
+        self.play(Indicate(output_chart),
+                  Indicate(real_chart))
+        self.wait(1)
 
+        # bert
+        bert_text = Text('BERT').scale(0.8).to_edge(2*RIGHT)
+        self.play(FadeTransform(vg_front_back, bert_text))
 
+        # 多层级的mask
 
+        mask_text.add_updater(lambda m: m.next_to(mask_brace, 0.5*DOWN))
 
+        l_mask_index = [5, 9, 19, 25, 21]
+        vg_mask = VGroup()
+        for i in l_mask_index:
+            self.play(plain_rec.animate.set_opacity(0.1))
+            self.play(plain_rec[i].animate.set_opacity(1),
+                      mask_brace.animate.next_to(plain_rec[i], DOWN))
+            vg_mask.add(plain_rec[i])
 
+        # 按照比例mask
+        self.play(plain_rec.animate.set_opacity(0.1),
+                  FadeOut(mask_brace),
+                  FadeOut(mask_text))
+        self.wait(1)
+        self.play(vg_mask.animate.set_opacity(1))
 
+        self.wait(2)
 
+        self.play(FadeOut(vg_output),
+                  FadeOut(vg_real),
+                  FadeOut(VGroup(ax,dot,path)),
+                  text_loss.animate.next_to(self.NN_node, 3*UP),
+                  FadeOut(bert_text))
 
-        # output_ =
+        self.wait(1)
 
+        sum_text = MathTex('\sum', color=MAROON).next_to(text_loss, LEFT)
+        self.play(FadeTransform(vg_mask, sum_text))
+        self.wait(2)
 
+    def GPT_train(self):
+        vg_texts = self.bert_data[0]
+        plain_rec = self.bert_data[1]
+        text_loss = self.bert_data[2]
 
+        ## 从"街道"开始截断
+        self.play(FadeOut(vg_texts[7:]))
+        front_brace = Brace(plain_rec[0:7], DOWN, color= GREEN)
+        front_text = Text("上文").scale(0.4).next_to(front_brace, 0.5 * DOWN)
 
+        vg_front_back = VGroup(front_brace, front_text)
+        self.play(FadeIn(vg_front_back))
 
+        # GPT
+        GPT_text = Text('GPT').scale(0.8).to_edge(2*RIGHT)
+        self.play(FadeTransform(vg_front_back, GPT_text))
 
-
-
-
+        for i in range(7, 27):
+            self.play(FadeOut(vg_texts[0:i].copy(), target_position=self.NN_node[-1]))
+            self.play(Indicate(text_loss[1]))
+            self.play(FocusOn(plain_rec[i]))
+            self.play(FadeIn(vg_texts[i]))
+            self.play(Indicate(vg_texts[i]),
+                      Indicate(text_loss[-2]))
 
 class supervised_learning(Scene):
     def construct(self):
