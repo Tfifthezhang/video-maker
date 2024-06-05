@@ -323,6 +323,7 @@ class represent_learning(Scene):
 
         # 输出y
         svg_clf = SVGMobject('svg_icon/logistic.svg', fill_color=WHITE).scale(0.6).next_to(self.NN_func[-1], RIGHT)
+        self.NN_func.add(svg_clf)
 
         self.play(FadeIn(svg_clf))
         self.play(FadeOut(self.NN_func[-1].copy(), target_position=svg_clf))
@@ -364,6 +365,7 @@ class represent_learning(Scene):
 
 
         Y_tex = MathTex('Y', color=MAROON).scale(2).next_to(svg_clf, 2*RIGHT)
+        self.NN_func.add(Y_tex)
 
         self.play(FadeIn(Y_tex, target_position=svg_clf),
                   FadeTransform(clf.copy(), graph))
@@ -372,6 +374,20 @@ class represent_learning(Scene):
         self.play(Indicate(Y_tex),
                   Indicate(graph))
         self.wait(2)
+
+        self.play(FadeOut(VGroup(self.NN_weight, self.NN_node,
+                                 self.cat_dog_example[-1], graph,
+                                 clf, weight_output, clf_text, clf_brace)),
+                  self.NN_func.animate.to_edge(UP))
+
+    def represent_convert(self):
+        ax = NumberPlane(x_range=[-6, 6], y_range=[-4, 4], x_length=8, y_length=6,
+                         axis_config={"include_tip": False, "include_numbers": False}).to_edge(RIGHT)
+        arrow = Arrow(ORIGIN, [2, 2, 0], buff=0)
+        tip_text = Text('(2, 2)').next_to(arrow.get_end(), RIGHT)
+
+
+
 
 
 class unsupervised_example(Scene):
