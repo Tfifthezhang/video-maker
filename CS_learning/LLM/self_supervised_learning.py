@@ -1082,13 +1082,53 @@ class llm_train(Scene):
         GPT_text = Text('GPT').scale(0.8).to_edge(2*RIGHT)
         self.play(FadeTransform(vg_front_back, GPT_text))
 
+        output_chart = BarChart(
+            values=self.generate_random_numbers_with_sum(10, 1),
+            y_range=[0, 1, 10],
+            y_length=4,
+            x_length=6,
+            bar_colors=[YELLOW]+[WHITE]*9,
+            x_axis_config={"font_size": 50},
+        ).scale(0.65).to_edge(LEFT+UP)
+        output_lables = output_chart.get_bar_labels(font_size=22)
+
+        vg_output = VGroup(output_chart, output_lables)
+
+        real_chart = BarChart(
+            values=[0.99] + [0]*9,
+            y_range=[0, 1, 10],
+            y_length=4,
+            x_length=6,
+            bar_colors=[YELLOW]+[WHITE]*9,
+            x_axis_config={"font_size": 50}).scale(0.65).next_to(text_loss, RIGHT).shift(UP)
+        real_lables = real_chart.get_bar_labels(font_size=22)
+
+        vg_real = VGroup(real_chart, real_lables)
+
         for i in range(7, 27):
             self.play(FadeOut(vg_texts[0:i].copy(), target_position=self.NN_node[-1]))
             self.play(Indicate(text_loss[1]))
+            if i == 7:
+                self.play(FadeIn(vg_output, target_position=text_loss[1]))
+            else:
+                new_chart = BarChart(
+                    values=self.generate_random_numbers_with_sum(10, 1),
+                    y_range=[0, 1, 10],
+                    y_length=4,
+                    x_length=6,
+                    bar_colors=[YELLOW] + [WHITE] * 9,
+                    x_axis_config={"font_size": 50},
+                ).scale(0.65).to_edge(LEFT + UP)
+                new_lables = new_chart.get_bar_labels(font_size=22)
+                vg_new = VGroup(new_chart, new_lables)
+                self.play(Transform(vg_output, vg_new))
             self.play(FocusOn(plain_rec[i]))
+            if i == 7:
+                self.play(FadeIn(vg_real, target_position=text_loss[-2]))
+            else:
+                self.play(Indicate(vg_real),
+                          Indicate(text_loss[-2]))
             self.play(FadeIn(vg_texts[i]))
-            self.play(Indicate(vg_texts[i]),
-                      Indicate(text_loss[-2]))
 
 class supervised_learning(Scene):
     def construct(self):
@@ -1153,7 +1193,12 @@ class supervised_learning(Scene):
         self.play(Indicate(self.basic_formula_item['x']),
                   Indicate(self.basic_formula_item['y']))
         self.wait(1)
+class next_chapter(Scene):
+    def construct(self):
+        title = Text("下一期预告").to_edge(UP)
+        self.play(Write(title))
 
+        pass
 
 class thanks_end(Scene):
     def construct(self):
