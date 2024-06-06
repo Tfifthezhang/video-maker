@@ -461,9 +461,9 @@ class represent_learning(Scene):
         # arrow = Arrow(ax.c2p(0,0), ax.c2p(1,2), buff=0)
         # tip_text = Text('(2, 2)').next_to(arrow.get_end(), RIGHT)
 
-
-
-
+class ssl_end(Scene):
+    def construct(self):
+        text = Text('用数据的其他部分预测数据的一部分')
 
 class unsupervised_example(Scene):
     def construct(self):
