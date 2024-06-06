@@ -34,9 +34,44 @@ class Clock(VGroup):
 
 class test(Scene):
     def construct(self):
-        a= Clock()
-        sum_text = MathTex('\sum', color=MAROON).next_to(a,DOWN)
 
-        self.play(FadeIn(a), FadeIn(sum_text))
+        ax = NumberPlane(x_range=[0, 8], y_range=[0, 8], x_length=8, y_length=6,
+                         axis_config={"include_tip": False, "include_numbers": False}).scale(0.9).to_edge(2*DOWN+LEFT)
+        self.play(Create(ax))
+
+        arrow_1 = Arrow(ax.c2p(0, 0), ax.c2p(1, 2), buff=0)
+        tip1_text = Text('北京').scale(0.6).next_to(arrow_1.get_end(), RIGHT)
+        vg_1 = VGroup(arrow_1,tip1_text)
+
+        arrow_2 = Arrow(ax.c2p(0, 0), ax.c2p(4, 6), buff=0)
+        tip2_text = Text('中国').scale(0.6).next_to(arrow_2.get_end(), RIGHT)
+        vg_2 = VGroup(arrow_2, tip2_text)
+
+        self.play(FadeIn(vg_1),
+                  FadeIn(vg_2))
+
+        arrow_3 = Arrow(ax.c2p(0, 0), ax.c2p(4, 1), buff=0)
+        tip3_text = Text('巴黎').scale(0.6).next_to(arrow_3.get_end(), RIGHT)
+        vg_3 = VGroup(arrow_3, tip3_text)
+
+        arrow_4 = Arrow(ax.c2p(0, 0), ax.c2p(7, 5), buff=0)
+        tip4_text = Text('法国').scale(0.6).next_to(arrow_4.get_end(), RIGHT)
+        vg_4 = VGroup(arrow_4, tip4_text)
+
+        self.play(FadeIn(vg_3),
+                  FadeIn(vg_4))
+
+        differ = Arrow(ax.c2p(4, 6), ax.c2p(1, 2), buff=0, color=MAROON)
+        differ2 = Arrow(ax.c2p(7, 5), ax.c2p(4, 1), buff=0, color=MAROON)
+
+        self.play(Write(differ))
+        self.wait(1)
+
+        self.play(differ.animate.move_to(differ2))
+
         self.wait(2)
+
+        interface = Text('中国—北京+巴黎=法国').scale(0.8).to_edge(RIGHT)
+        self.play(FadeTransform(differ.copy(), interface))
+        self.wait(1)
         # self.play(Indicate(s[-1]))

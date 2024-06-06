@@ -39,6 +39,7 @@ class represent_learning(Scene):
         self.nn_structure()
         self.nn_example1()
         self.represent_clf()
+        self.represent_convert()
 
     def intro(self):  # 机器学习的任务是什么，机器学习效果依赖于好的特征
         svg_image = SVGMobject('../images/NN.svg', fill_color=WHITE).scale(1.2)
@@ -319,6 +320,12 @@ class represent_learning(Scene):
                   VGroup(self.NN_node, self.NN_weight).animate.to_edge(LEFT),
                   self.cat_dog_example[-1].animate.to_edge(RIGHT).shift(UP))
 
+        rl = Text('表征学习').scale(0.8).to_edge(UP+LEFT)
+        rl_en = Text('Representation Learning', color=GRAY).scale(0.3).next_to(rl, DOWN)
+
+        self.wait(1)
+        self.play(Write(VGroup(rl, rl_en)))
+
         self.wait(2)
 
         # 输出y
@@ -376,15 +383,83 @@ class represent_learning(Scene):
         self.wait(2)
 
         self.play(FadeOut(VGroup(self.NN_weight, self.NN_node,
-                                 self.cat_dog_example[-1], graph,
+                                 self.cat_dog_example[-1], graph,vg_sigmoid,
                                  clf, weight_output, clf_text, clf_brace)),
-                  self.NN_func.animate.to_edge(UP))
+                  self.NN_func.animate.move_to(ORIGIN))
+        self.wait(1)
 
     def represent_convert(self):
-        ax = NumberPlane(x_range=[-6, 6], y_range=[-4, 4], x_length=8, y_length=6,
-                         axis_config={"include_tip": False, "include_numbers": False}).to_edge(RIGHT)
-        arrow = Arrow(ORIGIN, [2, 2, 0], buff=0)
-        tip_text = Text('(2, 2)').next_to(arrow.get_end(), RIGHT)
+        arrow = Arrow(self.NN_func[-1].get_bottom(), self.NN_func[1].get_bottom(), color=GRAY)
+        arrow.shift(DOWN)
+
+        self.play(Write(arrow))
+        self.wait(1)
+
+        mob_x = Circle(radius=4, color=TEAL_A).move_to(self.NN_func[1])
+        mob_y = Circle(radius=4, color=TEAL_A).move_to(self.NN_func[-1])
+
+        self.play(Broadcast(mob_y, focal_point=self.NN_func[-1].get_center()),
+                  Broadcast(mob_x, focal_point=self.NN_func[1].get_center()))
+        self.wait(1)
+        self.play(Indicate(self.NN_func[2]))
+
+        ## 预训练+微调
+        pretrain = SurroundingRectangle(self.NN_func[:3], color=YELLOW_C)
+
+        self.play(FadeOut(arrow),
+                  FadeIn(pretrain))
+
+        self.wait(1)
+
+        mob_fx = Circle(radius=4, color=TEAL_A).move_to(self.NN_func[2])
+        self.play(Broadcast(mob_fx, focal_point=self.NN_func[2].get_center()))
+
+        self.play(VGroup(self.NN_func, pretrain).animate.scale(0.9).to_edge(UP))
+
+        ax = NumberPlane(x_range=[0, 8], y_range=[0, 8], x_length=8, y_length=6,
+                         axis_config={"include_tip": False, "include_numbers": False}).scale(0.8).to_edge(2*DOWN+LEFT)
+        self.play(Create(ax))
+
+        arrow_1 = Arrow(ax.c2p(0, 0), ax.c2p(1, 2), buff=0)
+        tip1_text = Text('北京').scale(0.6).next_to(arrow_1.get_end(), RIGHT)
+        vg_1 = VGroup(arrow_1,tip1_text)
+
+        arrow_2 = Arrow(ax.c2p(0, 0), ax.c2p(4, 6), buff=0)
+        tip2_text = Text('中国').scale(0.6).next_to(arrow_2.get_end(), RIGHT)
+        vg_2 = VGroup(arrow_2, tip2_text)
+
+        self.play(FadeIn(vg_1),
+                  FadeIn(vg_2))
+
+        arrow_3 = Arrow(ax.c2p(0, 0), ax.c2p(4, 1), buff=0)
+        tip3_text = Text('巴黎').scale(0.6).next_to(arrow_3.get_end(), RIGHT)
+        vg_3 = VGroup(arrow_3, tip3_text)
+
+        arrow_4 = Arrow(ax.c2p(0, 0), ax.c2p(7, 5), buff=0)
+        tip4_text = Text('法国').scale(0.6).next_to(arrow_4.get_end(), RIGHT)
+        vg_4 = VGroup(arrow_4, tip4_text)
+
+        self.play(FadeIn(vg_3),
+                  FadeIn(vg_4))
+
+        differ = Arrow(ax.c2p(4, 6), ax.c2p(1, 2), buff=0, color=MAROON)
+        differ2 = Arrow(ax.c2p(7, 5), ax.c2p(4, 1), buff=0, color=MAROON)
+
+        self.play(Write(differ))
+        self.wait(1)
+
+        self.play(differ.animate.move_to(differ2))
+
+        self.wait(2)
+
+        interface = Text('中国—北京+巴黎=法国').scale(0.8).to_edge(RIGHT)
+        self.play(FadeTransform(differ.copy(), interface))
+        self.wait(1)
+
+        # ax = NumberPlane(x_range=[-6, 6], y_range=[-4, 4], x_length=8, y_length=6,
+        #                  axis_config={"include_tip": False, "include_numbers": False}).to_edge(RIGHT)
+        # arrow = Arrow(ax.c2p(0,0), ax.c2p(1,2), buff=0)
+        # tip_text = Text('(2, 2)').next_to(arrow.get_end(), RIGHT)
 
 
 
