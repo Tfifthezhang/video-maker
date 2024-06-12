@@ -461,9 +461,6 @@ class represent_learning(Scene):
         # arrow = Arrow(ax.c2p(0,0), ax.c2p(1,2), buff=0)
         # tip_text = Text('(2, 2)').next_to(arrow.get_end(), RIGHT)
 
-class ssl_end(Scene):
-    def construct(self):
-        text = Text('用数据的其他部分预测数据的一部分')
 
 class unsupervised_example(Scene):
     def construct(self):
@@ -1284,6 +1281,96 @@ class supervised_learning(Scene):
         self.play(Indicate(self.basic_formula_item['x']),
                   Indicate(self.basic_formula_item['y']))
         self.wait(1)
+
+class ssl_end(Scene):
+    def construct(self):
+        self.ssl()
+        self.table_compare()
+        self.represent_learning()
+        pass
+
+    def ssl(self):
+        s_text1 = Text('我给你瘦落的街道，绝望的落日，荒郊的月亮').scale(0.6)
+        s_text2 = Text('我给你一个久久地望着孤月的人的悲哀。').scale(0.6).next_to(s_text1, DOWN)
+
+        self.play(FadeIn(s_text1))
+
+        self.play(FocusOn(s_text2.get_center()), Wiggle(s_text1))
+        self.wait(1)
+        self.play(FadeIn(s_text2, target_position=s_text1))
+
+        self.wait(1)
+
+        self.play(Swap(s_text1, s_text2))
+        self.play(Wiggle(s_text1), Wiggle(s_text2))
+        self.play(Swap(s_text2, s_text1))
+        self.wait(1)
+
+        text = Text('自监督学习：用数据的一部分去预测数据的另一部分', color=GRAY).scale(0.8).to_edge(UP)
+        self.play(FadeIn(text))
+        self.wait(1)
+
+        self.play(FadeOut(s_text1),
+                  FadeOut(s_text2))
+        self.wait(1)
+
+        self.text = text
+
+    def table_compare(self):
+        t0 = MobjectTable(
+            [[MathTex('\\times', color=RED).scale(1.5), MathTex('\checkmark',color=GREEN).scale(1.5), MathTex('\\times', color=RED).scale(1.5)],
+             [MathTex('\\times', color=RED).scale(1.5), MathTex('\checkmark',color=GREEN).scale(1.5), MathTex('\checkmark',color=GREEN).scale(1.5)]],
+            row_labels=[Text("人工标注").scale(0.7), Text("损失函数引导").scale(0.7)],
+            col_labels=[Text("无监督学习").scale(0.7), Text("有监督学习").scale(0.7), Text("自监督学习", color=YELLOW_E).scale(0.7)]).scale(0.8)
+        self.play(Write(t0))
+        self.wait(2)
+
+        self.play(t0.animate.shift(UP))
+        self.wait(1)
+
+        self.table = t0
+
+    def represent_learning(self):
+        formula_x = MathTex("X").scale(2)
+        svg_image = SVGMobject('../images/NN.svg', fill_color=WHITE).scale(0.8).next_to(formula_x, RIGHT)
+        formula_y = MathTex("f(X)").scale(2).next_to(svg_image, 2 * RIGHT)
+        svg_clf = SVGMobject('svg_icon/logistic.svg', fill_color=WHITE).scale(0.8).next_to(formula_y, RIGHT)
+        Y_tex = MathTex('Y').scale(2).next_to(svg_clf, 2 * RIGHT)
+
+        vg_func = VGroup(formula_x, svg_image, formula_y, svg_clf, Y_tex).to_edge(5*LEFT+3*DOWN).scale(0.8)
+
+        self.play(SpinInFromNothing(vg_func))
+        self.wait(1)
+
+        pre_trained = SurroundingRectangle(vg_func[:3])
+        text_pretrained = Text('预训练').scale(0.8).next_to(pre_trained, DOWN)
+
+        self.play(Write(pre_trained),
+                  Write(text_pretrained))
+        self.wait(1)
+
+        self.play(FadeOut(self.text),
+                  FadeOut(self.table))
+
+        title = Text("下一期预告").to_edge(UP)
+        self.play(Write(title))
+
+        self.play(VGroup(vg_func,pre_trained,text_pretrained).animate.scale(1.5).shift(2*UP))
+        finetune = SurroundingRectangle(vg_func[3:])
+        text_finetune = Text('微调').scale(0.8).next_to(finetune, DOWN)
+
+        self.play(FadeTransform(pre_trained, finetune),
+                  FadeOut(text_pretrained))
+        self.wait(2)
+        self.play(Write(text_finetune))
+
+        self.wait(1)
+
+
+
+
+
+
 class next_chapter(Scene):
     def construct(self):
         title = Text("下一期预告").to_edge(UP)
@@ -1299,13 +1386,12 @@ class thanks_end(Scene):
 
         self.play(SpinInFromNothing(svg_image))
 
-        self.play(Create(text))
-
         source_path = 'svg_icon/charge/'
 
         l_image_path = [image_path for image_path in os.listdir(source_path) if image_path.split('.')[-1] == 'jpg']
-        vg_anchor = VGroup(*[Circle(1) for _ in range(len(l_image_path))])
-        vg_anchor.arrange_in_grid(rows=3, buff=0.1).to_edge(2 * RIGHT)
+        print(l_image_path)
+        vg_anchor = VGroup(*[Circle(0.8) for _ in range(len(l_image_path))])
+        vg_anchor.arrange_in_grid(rows=3, buff=0.15).to_edge(2 * RIGHT)
         # self.add(vg_anchor)
 
         for i in range(len(l_image_path)):
@@ -1316,9 +1402,11 @@ class thanks_end(Scene):
                 # image = cv2.imread(os.path.join(source_path, image_path),3)
                 # resize_array = cv2.resize(image, (512,512))
                 image = ImageMobject(os.path.join(source_path, image_path)).move_to(vg_anchor[i].get_center())
-                image.height = 1.2
-                image.width = 1.2
-                name_text = Text(name).scale(0.6).next_to(image, 0.5 * DOWN)
+                image.height = 1
+                image.width = 1
+                name_text = Text(name).scale(0.4).next_to(image, 0.5 * DOWN)
                 self.add(image, name_text)
 
-        self.wait(3)
+        self.play(FadeIn(text, target_position=vg_anchor))
+
+        self.wait(2)

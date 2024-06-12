@@ -1,0 +1,4 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/self_supervised_learning/1080p60/partial_movie_files/thanks_end/3529212410_558634731_223132457.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/self_supervised_learning/1080p60/partial_movie_files/thanks_end/3040924799_3254681863_3889963567.mp4'
+file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/self_supervised_learning/1080p60/partial_movie_files/thanks_end/3040924799_1141282389_3829836346.mp4'
