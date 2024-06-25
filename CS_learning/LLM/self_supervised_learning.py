@@ -1366,16 +1366,10 @@ class ssl_end(Scene):
 
         self.wait(1)
 
-
-
-
-
-
 class next_chapter(Scene):
     def construct(self):
         title = Text("下一期预告").to_edge(UP)
         self.play(Write(title))
-
         pass
 
 class thanks_end(Scene):
