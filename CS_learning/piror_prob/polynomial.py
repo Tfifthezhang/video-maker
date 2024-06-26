@@ -15,7 +15,9 @@ from sklearn.preprocessing import PolynomialFeatures
 class PolynomialRegression(Scene):
     def construct(self):
         self.poly_ax =VGroup()
-        pass
+
+        self.data_prepare()
+        self.poly_reagression()
 
     @staticmethod
     def true_fun(X):
@@ -28,47 +30,35 @@ class PolynomialRegression(Scene):
 
         X_test = np.linspace(0, 1, 200)
         y_test = self.true_fun(X_test)
+        gaussian_noise = np.random.normal(loc=0, scale=0.1, size=(200,))
+        y_test = gaussian_noise+y_test
         return X, y, X_test, y_test
 
-    def poly_regression(self):
-        degrees = [1, 4, 15]
+    def data_prepare(self):
         X, y, X_test, y_test = self.X_Y(30)
 
-        ax = CommonFunc.add_axes(x_range=[0, 1], y_range=[-1, 1], x_length=8, y_length=6,
+        ax = CommonFunc.add_axes(x_range=[-0.1, 1], y_range=[-1, 1], x_length=8, y_length=6,
                                  axis_config={"include_tip": False, "include_numbers": False})
         self.play(Create(ax))
+        self.poly_ax.add(ax)
 
-        axes_labels = ax.get_axis_labels(x_label=MathTex('x'), y_label=MathTex('y'))
-        self.play(Create(axes_labels))
-        self.linear_ax.add(axes_labels)
+        # axes_labels = ax.get_axis_labels(x_label=MathTex('x'), y_label=MathTex('y'))
+        # self.play(Create(axes_labels))
+        # self.poly_ax.add(axes_labels)
 
-        x = np.linspace(-7.5, 7.5, 150)
-        gaussian_noise = np.random.normal(loc=0, scale=3, size=(150,))
-        y = 0.8 * x - 0.7
-        y_noise = y + gaussian_noise
-        coords = list(zip(x, y_noise))
+        coords = list(zip(X_test, y_test))
 
         dots = VGroup(
             *[Dot(ax.c2p(coord[0], coord[1]), radius=0.5 * DEFAULT_DOT_RADIUS, color=BLUE) for coord in coords])
-        self.linear_ax.add(dots)
+        self.poly_ax.add(dots)
         self.play(FadeIn(dots))
-
-        inital_plot = ax.plot(lambda x: 0.8 * x - 0.7, x_range=[-7, 7], use_smoothing=True, color=MAROON)
-        inital_label = ax.get_graph_label(graph=inital_plot, label=MathTex('y = 0.8x - 0.7')).scale(0.8)
-
-        self.play(Write(inital_plot), Write(inital_label))
-        self.linear_ax.add(inital_label)
-        self.linear_ax.add(inital_plot)
-
-        regression_brace = Brace(dots, LEFT)
-        regression_text = MathTex('y \in \mathbb{R}', color=MAROON).next_to(regression_brace, LEFT)
-
-        self.play(Create(regression_brace), Write(regression_text))
-        self.linear_ax.add(regression_brace)
-        self.linear_ax.add(regression_text)
 
         self.wait(2)
 
+    def poly_reagression(self):
+        ax = self.poly_ax[0]
+        degrees = [1, 4, 15]
+        X, y, X_test, y_test = self.X_Y(30)
         for i in range(len(degrees)):
             polynomial_features = PolynomialFeatures(degree=degrees[i], include_bias=False)
             linear_regression = LinearRegression()
@@ -78,8 +68,13 @@ class PolynomialRegression(Scene):
                     ("linear_regression", linear_regression),
                 ]
             )
-            pipeline.fit(X[:, np.newaxis], y)
+            pipeline.fit(X_test[:, np.newaxis], y_test)
             y_predict = pipeline.predict(X_test[:, np.newaxis])
+            inital_plot = ax.plot(X_test, y_predict, x_range=[-0.1, 1], use_smoothing=True, color=MAROON)
+            self.play(Create(inital_plot))
+            self.wait(1)
+
+
 
 
 

@@ -1,1 +1,1 @@
-manim -qh LLM/self_supervised_learning.py ssl_end
+manim -qh piror_prob/polynomial.py PolynomialRegression
