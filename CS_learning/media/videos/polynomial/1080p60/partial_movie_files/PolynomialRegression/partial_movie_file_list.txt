@@ -1,5 +1,6 @@
 # This file is used internally by FFMPEG.
-file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/polynomial/1080p60/partial_movie_files/PolynomialRegression/3529212410_3853417592_223132457.mp4'
-file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/polynomial/1080p60/partial_movie_files/PolynomialRegression/3040924799_2166581555_1193748343.mp4'
-file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/polynomial/1080p60/partial_movie_files/PolynomialRegression/3040924799_371359687_1539209446.mp4'
-file 'file:/Users/tfifthefrank/video-maker/CS_learning/media/videos/polynomial/1080p60/partial_movie_files/PolynomialRegression/3040924799_1141282389_2627256271.mp4'
+file 'file:/Users/tfifthezhang/video-maker/CS_learning/media/videos/polynomial/1080p60/partial_movie_files/PolynomialRegression/3529212410_2881618154_223132457.mp4'
+file 'file:/Users/tfifthezhang/video-maker/CS_learning/media/videos/polynomial/1080p60/partial_movie_files/PolynomialRegression/3040924799_2426649841_3461293443.mp4'
+file 'file:/Users/tfifthezhang/video-maker/CS_learning/media/videos/polynomial/1080p60/partial_movie_files/PolynomialRegression/3040924799_784179552_924862783.mp4'
+file 'file:/Users/tfifthezhang/video-maker/CS_learning/media/videos/polynomial/1080p60/partial_movie_files/PolynomialRegression/3040924799_2342707416_2487027121.mp4'
+file 'file:/Users/tfifthezhang/video-maker/CS_learning/media/videos/polynomial/1080p60/partial_movie_files/PolynomialRegression/3040924799_784179552_1780242307.mp4'
