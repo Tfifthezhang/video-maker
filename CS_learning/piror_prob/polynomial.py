@@ -15,6 +15,7 @@ from sklearn.preprocessing import PolynomialFeatures
 class PolynomialRegression(Scene):
     def construct(self):
         self.poly_ax =VGroup()
+        self.linear_formula = None
 
         self.data_prepare()
         self.poly_reagression()
@@ -46,7 +47,7 @@ class PolynomialRegression(Scene):
     def data_prepare(self):
         X, y, X_test, y_test = self.X_Y(30)
 
-        ax = CommonFunc.add_axes(x_range=[-0.1, 1], y_range=[-6,6], x_length=8, y_length=6,
+        ax = CommonFunc.add_axes(x_range=[-0.1, 1], y_range=[-1.5, 1.5], x_length=8, y_length=6,
                                  axis_config={"include_tip": False, "include_numbers": False})
         self.play(Create(ax))
         self.poly_ax.add(ax)
@@ -54,16 +55,30 @@ class PolynomialRegression(Scene):
         coords = list(zip(X, y))
 
         dots = VGroup(
-            *[Dot(ax.c2p(coord[0], coord[1]), radius=0.5 * DEFAULT_DOT_RADIUS, color=BLUE) for coord in coords])
+            *[Dot(ax.c2p(coord[0], coord[1]), radius=0.8 * DEFAULT_DOT_RADIUS, color=BLUE) for coord in coords])
         self.poly_ax.add(dots)
         self.play(FadeIn(dots))
 
         self.wait(2)
 
+    def linear_example(self):
+        ax = self.poly_ax[0]
+        s_function = '0.5366803303178728 + -1.6093117914612283 * x ** 1'
+
+        linear_rg = MathTex('y = \omega x + b').to_edge(UP + LEFT)
+
+        init_linear = ax.plot(lambda x: eval(s_function), x_range=[-0.1, 1, 0.005], use_smoothing=True, color=YELLOW)
+        self.play(Create(init_linear))
+
+        self.wait(1)
+
+    def poly_formula(self):
+        pass
     def poly_reagression(self):
         ax = self.poly_ax[0]
-        degrees = [8]
+        degrees = range(1, 20)
         X, y, X_test, y_test = self.X_Y(30)
+
         for i in range(len(degrees)):
             polynomial_features = PolynomialFeatures(degree=degrees[i], include_bias=False)
             linear_regression = LinearRegression()
@@ -74,14 +89,16 @@ class PolynomialRegression(Scene):
                 ]
             )
             pipeline.fit(X[:, np.newaxis], y)
-            #y_predict = pipeline.predict(X_test[:, np.newaxis])
-            #pipeline.fit(X[:, np.newaxis], y)
             l_coef, inter = pipeline[-1].coef_, pipeline[-1].intercept_
             formula = self.alay_formula(l_coef, inter)
-            print(formula)
-            inital_plot = ax.plot(lambda x: eval(formula), x_range=[-0.1, 1], use_smoothing=True, color=MAROON)
-            self.play(Create(inital_plot))
-            self.wait(2)
+            if i == 0:
+                inital_plot = ax.plot(lambda x: eval(formula), x_range=[-0.1, 1, 0.005], use_smoothing=True, color=MAROON)
+                self.play(Create(inital_plot))
+                print(formula)
+            else:
+                fit_plot = ax.plot(lambda x: eval(formula), x_range=[-0.1, 1, 0.005], use_smoothing=True, color=MAROON)
+                self.play(Transform(inital_plot, fit_plot))
+            self.wait(1)
 
 
 
