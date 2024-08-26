@@ -16,8 +16,11 @@ class PolynomialRegression(Scene):
     def construct(self):
         self.poly_ax =VGroup()
         self.linear_formula = None
+        self.degree= None
 
         self.data_prepare()
+        self.linear_example()
+        self.poly_formula()
         self.poly_reagression()
 
     @staticmethod
@@ -32,6 +35,14 @@ class PolynomialRegression(Scene):
             s = '{}*x**{}'.format(l_coef[i], i+1)
             s_init += '+' + s
         return s_init
+
+    def get_vertical_line(self, ax, dots, X, graph):
+        vg_diff_line = VGroup()
+        for i in range(len(dots)):
+            dot = dots[i]
+            graph_dot = ax.input_to_graph_point(X[i], graph=graph)
+            vg_diff_line.add(CommonFunc.add_line(dot, graph_dot, color=RED))
+        return vg_diff_line
 
     def X_Y(self, n_samples):
         np.random.seed(0)
@@ -48,7 +59,7 @@ class PolynomialRegression(Scene):
         X, y, X_test, y_test = self.X_Y(30)
 
         ax = CommonFunc.add_axes(x_range=[-0.1, 1], y_range=[-1.5, 1.5], x_length=8, y_length=6,
-                                 axis_config={"include_tip": False, "include_numbers": False})
+                                 axis_config={"include_tip": False, "include_numbers": False}).scale(0.9)
         self.play(Create(ax))
         self.poly_ax.add(ax)
 
@@ -62,21 +73,49 @@ class PolynomialRegression(Scene):
         self.wait(2)
 
     def linear_example(self):
-        ax = self.poly_ax[0]
-        s_function = '0.5366803303178728 + -1.6093117914612283 * x ** 1'
+        ax, dots = self.poly_ax[0], self.poly_ax[1]
+        X, y, X_test, y_test = self.X_Y(30)
 
+        s_function = '0.5366803303178728 + -1.6093117914612283 * x ** 1'
         linear_rg = MathTex('y = \omega x + b').to_edge(UP + LEFT)
+        self.play(Write(linear_rg))
+        self.linear_formula = linear_rg
 
         init_linear = ax.plot(lambda x: eval(s_function), x_range=[-0.1, 1, 0.005], use_smoothing=True, color=YELLOW)
         self.play(Create(init_linear))
+        self.wait(1)
+
+        vg_diff_line = self.get_vertical_line(ax, dots, X, init_linear)
+
+        self.play(Create(vg_diff_line))
 
         self.wait(1)
 
+        self.inital_plot = init_linear
+        self.vg_diff_line = vg_diff_line
+
+
     def poly_formula(self):
-        pass
+        poly_rg = MathTex("y = \omega_n x^", "n", "+ \omega_{n-1}x^{n-1}+.....+ \omega_1x+b").to_edge(UP + LEFT)
+        self.play(FadeTransformPieces(self.linear_formula, poly_rg))
+        self.wait(1)
+
+        self.linear_formula = poly_rg
+
+        self.play(FocusOn(poly_rg[1]))
+        self.wait(1)
+
+        poly_degree = Variable(1, Text("最高阶n").scale(0.65), var_type=Integer).to_edge(LEFT)
+        poly_degree.label.set_color(MAROON)
+
+        self.play(FadeIn(poly_degree, target_position=poly_rg[1]))
+        self.wait(2)
+
+        self.degree = poly_degree
+
     def poly_reagression(self):
-        ax = self.poly_ax[0]
-        degrees = range(1, 20)
+        ax, dots = self.poly_ax[0], self.poly_ax[1]
+        degrees = range(2, 20)
         X, y, X_test, y_test = self.X_Y(30)
 
         for i in range(len(degrees)):
@@ -91,25 +130,38 @@ class PolynomialRegression(Scene):
             pipeline.fit(X[:, np.newaxis], y)
             l_coef, inter = pipeline[-1].coef_, pipeline[-1].intercept_
             formula = self.alay_formula(l_coef, inter)
-            if i == 0:
-                inital_plot = ax.plot(lambda x: eval(formula), x_range=[-0.1, 1, 0.005], use_smoothing=True, color=MAROON)
-                self.play(Create(inital_plot))
-                print(formula)
-            else:
-                fit_plot = ax.plot(lambda x: eval(formula), x_range=[-0.1, 1, 0.005], use_smoothing=True, color=MAROON)
-                self.play(Transform(inital_plot, fit_plot))
+
+            fit_plot = ax.plot(lambda x: eval(formula), x_range=[-0.1, 1, 0.005], use_smoothing=True, color=YELLOW)
+            vg_diff_fit_line = self.get_vertical_line(ax, dots, X, fit_plot)
+
+            self.play(self.degree.tracker.animate.set_value(degrees[i]))
+            self.play(Transform(self.inital_plot, fit_plot),
+                      Transform(self.vg_diff_line, vg_diff_fit_line))
             self.wait(1)
 
+            ## 添加mse
 
+            ax = CommonFunc.add_axes(x_range=[0, 6], y_range=[0, 25], x_length=6, y_length=4,
+                                     axis_config={"include_tip": False, "include_numbers": False}).scale(0.36).next_to(
+                text_loss, DOWN)
 
+            path = VMobject()
+            dot = Dot(ax.c2p(0, 25), radius=DEFAULT_DOT_RADIUS, color=RED)
+            path.set_points_as_corners([dot.get_center(), dot.get_center()])
 
+            def update_path(path):
+                previous_path = path.copy()
+                previous_path.add_points_as_corners([dot.get_center()])
+                path.become(previous_path)
 
+            path.add_updater(update_path)
 
+            self.play(FadeIn(ax),
+                      FadeTransform(text_loss.copy(), dot))
 
+            self.wait(1)
 
-
-
-
-
-
-
+            self.add(path)
+            #
+            for x in np.linspace(0.1, 5.1, 10):
+                self.play(dot.animate.move_to(ax.c2p(x, (x - 5.1) ** 2)))
