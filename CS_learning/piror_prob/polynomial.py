@@ -20,6 +20,7 @@ class PolynomialRegression(Scene):
 
         self.data_prepare()
         self.linear_example()
+        self.mse_dot()
         self.poly_formula()
         self.poly_reagression()
 
@@ -94,6 +95,26 @@ class PolynomialRegression(Scene):
         self.inital_plot = init_linear
         self.vg_diff_line = vg_diff_line
 
+    def mse_dot(self):
+        mse_ax = CommonFunc.add_axes(x_range=[0, 20], y_range=[0, 25], x_length=6, y_length=4,
+                                 axis_config={"include_tip": False, "include_numbers": False}).scale(0.45).to_edge(RIGHT)
+        mse_formula = Text('均方误差MSE').scale(0.45).next_to(mse_ax, UP)
+        path = VMobject()
+        dot = Dot(mse_ax.c2p(0, 25), radius=DEFAULT_DOT_RADIUS, color=RED)
+        path.set_points_as_corners([dot.get_center(), dot.get_center()])
+
+        def update_path(path):
+            previous_path = path.copy()
+            previous_path.add_points_as_corners([dot.get_center()])
+            path.become(previous_path)
+
+        path.add_updater(update_path)
+
+        self.play(FadeIn(mse_ax),Create(mse_formula),
+                  FadeTransform(self.vg_diff_line, dot))
+        self.add(path)
+
+        self.vg_mse = VGroup(mse_ax, dot, path, mse_formula)
 
     def poly_formula(self):
         poly_rg = MathTex("y = \omega_n x^", "n", "+ \omega_{n-1}x^{n-1}+.....+ \omega_1x+b").to_edge(UP + LEFT)
@@ -130,6 +151,8 @@ class PolynomialRegression(Scene):
             pipeline.fit(X[:, np.newaxis], y)
             l_coef, inter = pipeline[-1].coef_, pipeline[-1].intercept_
             formula = self.alay_formula(l_coef, inter)
+            if degrees[i]==18:
+                continue
 
             fit_plot = ax.plot(lambda x: eval(formula), x_range=[-0.1, 1, 0.005], use_smoothing=True, color=YELLOW)
             vg_diff_fit_line = self.get_vertical_line(ax, dots, X, fit_plot)
@@ -137,31 +160,6 @@ class PolynomialRegression(Scene):
             self.play(self.degree.tracker.animate.set_value(degrees[i]))
             self.play(Transform(self.inital_plot, fit_plot),
                       Transform(self.vg_diff_line, vg_diff_fit_line))
+            self.play(self.vg_mse[1].animate.move_to(self.vg_mse[0].c2p(i+1, (5-0.26*(i+1))**2)))
             self.wait(1)
 
-            ## 添加mse
-
-            ax = CommonFunc.add_axes(x_range=[0, 6], y_range=[0, 25], x_length=6, y_length=4,
-                                     axis_config={"include_tip": False, "include_numbers": False}).scale(0.36).next_to(
-                text_loss, DOWN)
-
-            path = VMobject()
-            dot = Dot(ax.c2p(0, 25), radius=DEFAULT_DOT_RADIUS, color=RED)
-            path.set_points_as_corners([dot.get_center(), dot.get_center()])
-
-            def update_path(path):
-                previous_path = path.copy()
-                previous_path.add_points_as_corners([dot.get_center()])
-                path.become(previous_path)
-
-            path.add_updater(update_path)
-
-            self.play(FadeIn(ax),
-                      FadeTransform(text_loss.copy(), dot))
-
-            self.wait(1)
-
-            self.add(path)
-            #
-            for x in np.linspace(0.1, 5.1, 10):
-                self.play(dot.animate.move_to(ax.c2p(x, (x - 5.1) ** 2)))
