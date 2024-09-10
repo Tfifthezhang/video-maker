@@ -16,12 +16,14 @@ class BirthdayParadox(Scene):
         self.degree= None
         self.vg_svg = None
         self.vg_date = None
+        self.vg_calendar = None
         self.tex = None
 
         self.intro_problem()
         self.intro_calendar()
-        #self.intro_combine()
+        self.intro_combine()
         self.intro_prob()
+        #self.intro_prob()
         #self.data_prepare()
         #self.mse_dot()
 
@@ -79,11 +81,17 @@ class BirthdayParadox(Scene):
                   Write(text_day))
         self.wait(2)
 
-    def intro_combine(self):
-        self.play(FadeOut(self.vg_date))
-        self.play(self.vg_svg.animate.scale(0.8).to_edge(UP))
+        self.vg_calendar = VGroup(vg_circle, brace_in, text_day)
 
-        tex1 = MathTex("P(x=1)").scale(1).next_to(self.vg_svg, DOWN)
+    def intro_combine(self):
+        self.play(FadeOut(self.vg_date),
+                  FadeOut(self.vg_calendar),
+                  FadeOut(self.vg_svg))
+        vg_svg_copy = self.vg_svg.copy().move_to(ORIGIN).scale(0.8).to_edge(UP)
+        self.play(FadeIn(vg_svg_copy))
+        self.wait(1)
+
+        tex1 = MathTex("P(x=1)").scale(1).next_to(vg_svg_copy, DOWN)
         self.play(FadeIn(tex1))
 
         vg_tex = VGroup()
@@ -96,16 +104,16 @@ class BirthdayParadox(Scene):
         self.play(Write(vg_tex))
 
         self.play(Indicate(vg_tex[0]))
-        self.play(self.vg_svg[12].animate.set_color(RED),
-                  self.vg_svg[0].animate.set_color(RED))
+        self.play(vg_svg_copy[12].animate.set_color(RED),
+                  vg_svg_copy[0].animate.set_color(RED))
         self.wait(1)
 
         self.play(Indicate(vg_tex[1]))
-        self.play(self.vg_svg[15].animate.set_color(RED))
+        self.play(vg_svg_copy[15].animate.set_color(RED))
         self.wait(1)
 
         self.play(Indicate(vg_tex[-1]))
-        self.play(self.vg_svg.animate.set_color(RED))
+        self.play(vg_svg_copy.animate.set_color(RED))
         self.wait(1)
 
         self.play(Circumscribe(vg_tex))
@@ -119,28 +127,72 @@ class BirthdayParadox(Scene):
         tex_plus = MathTex("+").scale(1).next_to(tex1, DOWN).shift(0.2*UP)
         self.play(FadeIn(tex_plus))
 
-        vg_plus = VGroup(tex1,tex2,tex_plus)
+        vg_plus = VGroup(tex1, tex2, tex_plus)
 
         tex_eq = MathTex(" = 1").scale(1).next_to(vg_plus, RIGHT)
         vg_plus.add(tex_eq)
         self.play(Create(tex_eq))
         self.wait(1)
 
-        tex_final = MathTex("P(x\geq2)", "=", "1", "-", "P(x=1)").next_to(self.vg_svg, DOWN)
+        tex_final = MathTex("P(x\geq2)", "=", "1", "-", "P(x=1)").next_to(vg_svg_copy, DOWN)
         self.play(TransformMatchingTex(vg_plus, tex_final))
         self.wait(1)
-
         self.tex = tex_final
 
+        self.play(FadeOut(vg_svg_copy),
+                  FadeOut(tex_final))
+        #self.play(tex_final.animate.to_edge(RIGHT))
+        self.wait(1)
+
+class ProbCompute(Scene):
+    def construct(self):
+        self.intro_problem()
+        self.intro_calendar()
+        self.intro_prob()
+        self.intro_math()
+    def intro_problem(self):
+        n_svg = 24
+        vg_svg = VGroup(*[SVGMobject('svg_icon/people.svg', fill_color=WHITE).scale(0.5) for _ in range(n_svg)])
+
+        vg_svg.arrange_in_grid(rows=4, buff=0.6).to_edge(LEFT)
+        self.vg_svg = vg_svg
+
+    def intro_calendar(self):
+        n_circles = 365
+        vg_circle = VGroup(*[Circle(radius=0.3, color=BLUE).scale(0.6) for _ in range(n_circles)])
+        vg_circle.arrange_in_grid(cols=12, buff=0.1).scale(0.45).to_edge(RIGHT)
+
+        self.vg_calendar = vg_circle
+
     def intro_prob(self):
-        self.play(FadeOut(self.vg_date))
         vg_prob = VGroup(*[MathTex("\\frac{365-%d}{365}" % i, color=YELLOW).scale(0.45) for i in range(24)])
+        self.play(FadeIn(self.vg_calendar))
+        l = random.sample(range(365), 24)
         for n in range(24):
             vg_prob[n].next_to(self.vg_svg[n], 0.5*UP)
+            self.play(FadeIn(self.vg_svg[n]))
+            self.play(self.vg_calendar[l[n]].animate.set_color(YELLOW))
+            self.play(Transform(self.vg_calendar[l[n]].copy(), vg_prob[n]))
 
-        self.play(FadeIn(vg_prob))
-        #self.play()
+        self.vg_prob = vg_prob
 
+    def intro_math(self):
+        self.play(FadeOut(self.vg_calendar))
+        tex_prob = MathTex("\\frac{365-i}{365}").next_to(self.vg_svg, 5*RIGHT)
+        tex_prod = MathTex("\prod_0^{23} ").next_to(tex_prob, LEFT)
+
+        self.play(FadeIn(tex_prob))
+        self.wait(1)
+        self.play(Indicate(self.vg_prob),
+                  Indicate(tex_prob))
+        self.wait(1)
+        self.play(FadeIn(tex_prod))
+
+        #tex_final = MathTex("P(x\geq2)", "=", "1", "-", "P(x=1)").next_to(vg_svg_copy, DOWN)
+
+class BirthdayProof(Scene):
+    def construct(self):
+        pass
 
     def data_prepare(self):
         ax = CommonFunc.add_axes(x_range=[0, 101], y_range=[0, 1.0], x_length=8, y_length=6,
