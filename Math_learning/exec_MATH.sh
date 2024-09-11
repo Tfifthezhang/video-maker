@@ -1,1 +1,1 @@
-manim -qh Birthday/birthday.py ProbCompute
+manim -qh Birthday/birthday.py BirthdayProof
