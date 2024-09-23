@@ -128,7 +128,7 @@ class BirthdayParadox(Scene):
         self.play(FadeIn(tex1))
 
         vg_tex = VGroup()
-        for i in range(2, 24):
+        for i in range(2, 25):
             tex = MathTex("P(x={})".format(i))
             vg_tex.add(tex)
 
