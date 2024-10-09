@@ -1,1 +1,1 @@
-manim -qh Birthday/birthday.py BirthdayParadox
+manim -qh Tuesday/tuesday.py TuesdayParadox
