@@ -83,13 +83,81 @@ class TuesdayParadox(Scene):
 
 class TuesdayAnaly(Scene):
     def construct(self):
-        self.vg_problem = VGroup()
+        self.vg_table = None
+
+        self.get_table()
 
     def get_table(self):
-        svg_boy = SVGMobject('svg_icon/boy.svg', fill_color=BLUE).scale(0.55)
-        svg_girl = SVGMobject('svg_icon/girl.svg', fill_color=RED).scale(0.55)
-        t0 = MobjectTable(row_labels=[Text("周一 男"), Text("周二 男")],
-                          col_labels=[Text("C1"), Text("C2")])
+        l_week = ['周一 男', '周二 男', '...', '周日 男', '周一 女', '...', '周日 女']
+        svg_boy = SVGMobject('svg_icon/boy.svg', fill_color=BLUE).scale(0.3)
+        svg_girl = SVGMobject('svg_icon/girl.svg', fill_color=RED).scale(0.3)
+        a_sample = [[VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                    VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                    VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                    VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                    VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                    VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                    VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(RIGHT)],
+
+                    [VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                    VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                    VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                    VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(RIGHT)],
+
+                    [VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                    VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                    VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                    VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(RIGHT)],
+
+                    [VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(RIGHT)],
+
+                    [VGroup(svg_girl.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_girl.copy()).arrange_submobjects(RIGHT)],
+
+                    [VGroup(svg_girl.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_girl.copy()).arrange_submobjects(RIGHT)],
+
+                    [VGroup(svg_girl.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                     VGroup(svg_girl.copy(), svg_girl.copy()).arrange_submobjects(RIGHT)]
+                    ]
+        #t0 = MobjectTable(row_labels=labels, col_labels=labels, table=[[Text('10').scale(0.1)]*14]*14)
+        t0 = MobjectTable(a_sample,
+                          col_labels=[Text(i) for i in l_week],
+                          row_labels=[Text(i) for i in l_week]).scale(0.5)
+
+        self.play(FadeIn(t0))
+        self.wait(2)
+
+        self.vg_table = t0
+    def table_analy(self):
+        pass
 
 
 
