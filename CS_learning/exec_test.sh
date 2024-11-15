@@ -1,1 +1,1 @@
-manim -qh test_function.py test
+manim -qh test_function.py SineWave
