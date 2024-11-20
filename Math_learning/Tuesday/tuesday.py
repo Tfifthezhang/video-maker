@@ -14,9 +14,11 @@ from CS_learning.common_func import CommonFunc
 class TuesdayParadox(Scene):
     def construct(self):
         self.vg_problem = VGroup()
+        self.vg_answer = None
 
         self.intro_problem()
         self.problem_anly()
+        self.problem_trans()
 
     def intro_problem(self):
         n_circles = 2
@@ -63,7 +65,7 @@ class TuesdayParadox(Scene):
         t1 = MobjectTable([[VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(RIGHT), VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(LEFT)],
                            [VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT), VGroup(svg_girl.copy(), svg_girl.copy()).arrange_submobjects(RIGHT)]])
 
-        vg_answer = VGroup(answer1, t0, answer2, t1).arrange_in_grid(2,2).to_edge(RIGHT)
+        vg_answer = VGroup(answer1, t0, answer2, t1).arrange_in_grid(2, 2).to_edge(RIGHT)
 
         self.play(FadeIn(answer1, target_position=self.vg_problem[-2][-1]),
                   FadeIn(answer2, target_position=self.vg_problem[-2][-1]))
@@ -73,13 +75,22 @@ class TuesdayParadox(Scene):
         self.play(FadeIn(t1, target_position=answer2))
         self.wait(1)
 
-        #cell = t1.get_cell((2, 2))
         cell = t1.get_entries((2, 2))
         self.play(FadeOut(cell))
 
         self.wait(2)
 
-        #self.play(FadeIn(vg_answer))
+        self.vg_answer = vg_answer
+
+    def problem_trans(self):
+        answer1, t0, answer2, t1 = self.vg_answer
+
+        cell = t1.get_entries((1, 2))
+        self.play(FadeOut(cell))
+        answer3 = MathTex("P=\\frac{1}{2}").move_to(answer2)
+        self.play(Transform(answer2, answer3))
+
+        self.wait(2)
 
 class TuesdayAnaly(Scene):
     def construct(self):
@@ -156,6 +167,7 @@ class TuesdayAnaly(Scene):
         self.wait(2)
 
         self.vg_table = t0
+
     def table_analy(self):
         pass
 
