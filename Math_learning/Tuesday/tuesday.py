@@ -302,9 +302,23 @@ class TuesdayAnaly(Scene):
         self.play(Indicate(target_row))
         self.wait(1)
 
-        #self.play(target_col.animate.set_color(YELLOW))
+        self.play(target_col.animate.set_color(YELLOW),
+                  target_row.animate.set_color(YELLOW))
 
-        #self.play(t0.add_highlighted_cell((3, 3), color=GREEN))
+        self.wait(2)
+
+        # cell = t0.get_cell((3, 3))
+        # self.play(cell.animate.set_fill_color(YELLOW))
+        highlight = t0.get_highlighted_cell((3,3), color=GREEN)
+        self.play(t0.animate.add_to_back(highlight))
+
+        highlight2 = t0.get_highlighted_cell((2,3), color=GREEN)
+        self.play(t0.animate.add_to_back(highlight2))
+
+        #t0.add_highlighted_cell((2,3), color=GREEN)
+        # self.play(t0.animate.add_highlighted_cell((3,3), color=GREEN))
+        # self.play(t0.animate.add_highlighted_cell((4,3), color=GREEN))
+        # self.play(t0.animate.add_highlighted_cell((5,3), color=GREEN))
         #t0.add_highlighted_cell((3, 3), color=GREEN)
 
         # for i in range(2, 9):
