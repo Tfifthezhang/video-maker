@@ -619,8 +619,8 @@ class ProblemGeneral(Scene):
                      VGroup(svg_girl.copy(), svg_girl.copy()).arrange_submobjects(RIGHT)]
                     ]
         l_week = ['周一 男', '周二 男', '...', '周日 男', '周一 女', '...', '周日 女']
-        l_month = ['1月 男', '1月 男', '...', '12月 男', '1月 女', '...', '12月 女']
-        l_time = ['0点 男', '1点 男', '...', '24点 男', '0点 女', '...', '24点 女']
+        l_month = ['1月 男', '2月 男', '...', '12月 男', '1月 女', '...', '12月 女']
+        l_time = ['1点 男', '2点 男', '...', '24点 男', '0点 女', '...', '24点 女']
         l_day = ['1.1 男', '1.2 男', '...', '12.31 男', '1.1 女', '...', '12.31 女']
         samples = [a_sample, b_sample, c_sample, d_sample]
         l_class = [l_week, l_month, l_time, l_day]
@@ -642,6 +642,7 @@ class ProblemGeneral(Scene):
 
     def table_display(self):
         vg_table = self.table
+        vg_scene = VGroup()
         l_times = [MathTex("7", "\\times", "2", "\\times", "2"),
                    MathTex("12", "\\times", "2", "\\times", "2"),
                    MathTex("24", "\\times", "2", "\\times", "2"),
@@ -651,12 +652,27 @@ class ProblemGeneral(Scene):
                    MathTex("\\frac{24-1}{48-1} = \\frac{23}{47}"),
                    MathTex("\\frac{48-1}{96-1} = \\frac{47}{95}"),
                    MathTex("\\frac{730-1}{1460-1} = \\frac{729}{1459}")]
-        for table_example in vg_table:
-            tex_count = MathTex("7", "\\times", "2", "\\times", "2")
-            brace = Brace(table_example, DOWN)
+        for i in range(4):
+            brace = Brace(vg_table[i], RIGHT)
+            l_times[i].next_to(brace, RIGHT)
+            l_texts[i].next_to(vg_table[i], UP)
+            l_probs[i].scale(0.85).next_to(vg_table[i], DOWN)
+            vg_scene.add(VGroup(vg_table[i],brace,l_times[i],l_texts[i],l_probs[i]).scale(0.85).to_edge(1.5*LEFT+0.8*UP))
 
+        #vg_scene.arrange_submobjects(RIGHT, buff=1)
+        #vg_scene.arrange_submobjects(RIGHT,buff=1).scale(0.9).shift(vg_scene[0].width*1.5*RIGHT)
+        #vg_scene.arrange_in_grid(rows=2, buff=0.5).scale(0.5)
 
-        vg_table.arrange_in_grid(rows=2, buff=0.5).scale(0.5)
+        #self.play(FadeIn(vg_scene[0]))
+        vg_scene[1].next_to(vg_scene[0], RIGHT)
+        vg_scene[2].next_to(vg_scene[1], RIGHT)
+        vg_scene[3].next_to(vg_scene[2], RIGHT)
 
-        self.play(FadeIn(vg_table))
+        self.play(FadeIn(vg_scene))
+        # self.play(ReplacementTransform(vg_scene[0], vg_scene[1]))
         self.wait(2)
+
+        self.play(vg_scene.animate.shift(vg_scene[0].width*LEFT))
+
+        self.wait(2)
+
