@@ -153,8 +153,8 @@ class TuesdayAnaly(Scene):
         self.vg_table = None
         self.vg_problem = VGroup()
 
-        # self.intro_problem()
-        # self.problem_anly()
+        self.intro_problem()
+        self.problem_anly()
         self.get_table()
         self.table_analy()
 
@@ -356,12 +356,14 @@ class TuesdayAnaly(Scene):
         self.wait(1)
 
 
-class ProblemGeneral(Scene):
+class ProblemGeneral(ThreeDScene):
     def construct(self):
         self.table = VGroup()
+        self.vg_scene = None
 
         self.get_table()
         self.table_display()
+        self.prob_anly()
         # self.get_func()
 
     @staticmethod
@@ -647,32 +649,66 @@ class ProblemGeneral(Scene):
                    MathTex("12", "\\times", "2", "\\times", "2"),
                    MathTex("24", "\\times", "2", "\\times", "2"),
                    MathTex("365", "\\times", "2", "\\times", "2")]
-        l_texts = [Text('男孩在周二出生'), Text('男孩在二月出生'), Text('男孩在两点出生'), Text('男孩在二月二日出生')]
-        l_probs = [MathTex("\\frac{14-1}{28-1} = \\frac{13}{27}"),
-                   MathTex("\\frac{24-1}{48-1} = \\frac{23}{47}"),
-                   MathTex("\\frac{48-1}{96-1} = \\frac{47}{95}"),
-                   MathTex("\\frac{730-1}{1460-1} = \\frac{729}{1459}")]
+        l_texts = [Text('男孩在周二出生'), Text('男孩在二月出生'), Text('男孩在两点出生'), Text('男孩在一月二日出生')]
+        l_probs = [MathTex("\\frac{14-1}{28-1}", "=", "\\frac{13}{27}"),
+                   MathTex("\\frac{24-1}{48-1}", "=", "\\frac{23}{47}"),
+                   MathTex("\\frac{48-1}{96-1}","=","\\frac{47}{95}"),
+                   MathTex("\\frac{730-1}{1460-1}","=","\\frac{729}{1459}")]
         for i in range(4):
             brace = Brace(vg_table[i], RIGHT)
             l_times[i].next_to(brace, RIGHT)
             l_texts[i].next_to(vg_table[i], UP)
             l_probs[i].scale(0.85).next_to(vg_table[i], DOWN)
-            vg_scene.add(VGroup(vg_table[i],brace,l_times[i],l_texts[i],l_probs[i]).scale(0.85).to_edge(1.5*LEFT+0.8*UP))
+            vg_scene.add(VGroup(vg_table[i], brace, l_times[i],l_texts[i],l_probs[i]).scale(0.85).to_edge(1.5*LEFT+0.8*UP))
 
         #vg_scene.arrange_submobjects(RIGHT, buff=1)
         #vg_scene.arrange_submobjects(RIGHT,buff=1).scale(0.9).shift(vg_scene[0].width*1.5*RIGHT)
-        #vg_scene.arrange_in_grid(rows=2, buff=0.5).scale(0.5)
-
-        #self.play(FadeIn(vg_scene[0]))
-        vg_scene[1].next_to(vg_scene[0], RIGHT)
-        vg_scene[2].next_to(vg_scene[1], RIGHT)
-        vg_scene[3].next_to(vg_scene[2], RIGHT)
-
+        vg_scene.arrange_in_grid(rows=2, buff=0.8).scale(0.5)
         self.play(FadeIn(vg_scene))
+        # vg_scene[1].next_to(vg_scene[0], RIGHT)
+        # vg_scene[2].next_to(vg_scene[1], RIGHT)
+        # vg_scene[3].next_to(vg_scene[2], RIGHT)
+
+        self.move_camera(frame_center=vg_scene[0], zoom=2)
         # self.play(ReplacementTransform(vg_scene[0], vg_scene[1]))
         self.wait(2)
+        self.move_camera(frame_center=vg_scene[1], zoom=2)
+        self.wait(2)
+        self.move_camera(frame_center=vg_scene[2], zoom=2)
+        self.wait(2)
+        self.move_camera(frame_center=vg_scene[3], zoom=2)
+        self.wait(2)
 
-        self.play(vg_scene.animate.shift(vg_scene[0].width*LEFT))
+        self.vg_scene = vg_scene
+
+    def prob_anly(self):
+        self.move_camera(frame_center=ORIGIN, zoom=1)
+
+        vg_other = VGroup(*[vg[:4] for vg in self.vg_scene])
+        vg_prob = VGroup(*[i[-1] for i in self.vg_scene])
+        vg_res = VGroup(*[vg[-1] for vg in vg_prob])
+
+        self.play(FadeOut(vg_other),
+                  FadeOut(VGroup(*[vg[:2] for vg in vg_prob])),
+                  vg_res.animate.arrange_submobjects(RIGHT, buff=0.5).scale(1.8).to_edge(UP))
 
         self.wait(2)
+
+        ax = CommonFunc.add_axes(x_range=[1, 60], y_range=[0, 0.5], x_length=10, y_length=6,
+                                 axis_config={"include_tip": False, "include_numbers": False}).scale(0.9).next_to(vg_res,DOWN)
+        self.play(Create(ax))
+
+        coords = [(7, 13/27), (12,23/47), (24,47/95), (60, 119/239)]
+        for i in coords:
+            dot = Dot(ax.coords_to_point(i[0],i[1]), color=GREEN)
+            lines = ax.get_lines_to_point(ax.c2p(i[0], i[1]))
+            self.play(Create(dot))
+
+        self.wait(1)
+        # fit_plot = ax.plot(lambda x: self.prob_anly(k=4*x), x_range=[1, 360], use_smoothing=True, color=YELLOW)
+        #
+        # self.play(Create(fit_plot))
+        # self.wait(2)
+
+
 
