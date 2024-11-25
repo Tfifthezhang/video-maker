@@ -363,12 +363,13 @@ class ProblemGeneral(ThreeDScene):
 
         self.get_table()
         self.table_display()
-        self.prob_anly()
+        self.gener_anly()
         # self.get_func()
 
     @staticmethod
     def prob_anly(k):
         k = int(k)
+        #k  = np.power(10,k)
         res = (k / 2 - 1) / (k - 1)
         return res
 
@@ -681,7 +682,7 @@ class ProblemGeneral(ThreeDScene):
 
         self.vg_scene = vg_scene
 
-    def prob_anly(self):
+    def gener_anly(self):
         self.move_camera(frame_center=ORIGIN, zoom=1)
 
         vg_other = VGroup(*[vg[:4] for vg in self.vg_scene])
@@ -694,21 +695,40 @@ class ProblemGeneral(ThreeDScene):
 
         self.wait(2)
 
-        ax = CommonFunc.add_axes(x_range=[1, 60], y_range=[0, 0.5], x_length=10, y_length=6,
-                                 axis_config={"include_tip": False, "include_numbers": False}).scale(0.9).next_to(vg_res,DOWN)
+        math_inter = MathTex('\\frac{k-1}{2k-1}', color=YELLOW).scale(0.9).to_edge(UP+LEFT)
+        self.play(FadeIn(math_inter, target_position=vg_res))
+        self.wait(1)
+
+        ax = CommonFunc.add_axes(x_range=[0, 3], y_range=[0, 0.55], x_length=10, y_length=6,
+                                 axis_config={"include_tip": True, "include_numbers": False},
+                                 x_axis_config={"scaling": LogBase(custom_labels=False)}).scale(0.9).next_to(vg_res,DOWN)
         self.play(Create(ax))
 
-        coords = [(7, 13/27), (12,23/47), (24,47/95), (60, 119/239)]
-        for i in coords:
-            dot = Dot(ax.coords_to_point(i[0],i[1]), color=GREEN)
-            lines = ax.get_lines_to_point(ax.c2p(i[0], i[1]))
-            self.play(Create(dot))
+        coords = [(7, 13/27), (12, 23/47), (24, 47/95), (360, 729/1459)]
+        dns = [DecimalNumber(i, show_ellipsis=True, num_decimal_places=5) for i in [0.48148, 0.48936, 0.49473, 0.49965]]
+        dnx = [Integer(i) for i in [7, 12, 24, 365]]
+        for n, i in enumerate(coords):
+            dot = Dot(ax.coords_to_point(i[0], i[1]), radius = 0.05, color=MAROON)
+            v_line = ax.get_vertical_line(ax.c2p(i[0], i[1]))
+            dns[n].next_to(dot, UP).scale(0.4)
+            dnx[n].next_to(v_line, DOWN).scale(0.55)
+            self.play(FadeTransform(vg_res[n], dot),
+                      FadeIn(v_line),
+                      Write(dnx[n]))
+            self.play(Write(dns[n]))
 
         self.wait(1)
-        # fit_plot = ax.plot(lambda x: self.prob_anly(k=4*x), x_range=[1, 360], use_smoothing=True, color=YELLOW)
-        #
-        # self.play(Create(fit_plot))
-        # self.wait(2)
+        fit_plot = ax.plot(lambda x: self.prob_anly(k=4*x), x_range=[0, 2.7], use_smoothing=True, color=YELLOW)
+        fit_label = ax.get_graph_label(graph=fit_plot, label=MathTex('\\frac{2x-1}{4x-1}').scale(0.8)).next_to(fit_plot,LEFT)
+        self.play(Create(fit_plot),
+                  Write(fit_label))
+        self.wait(1)
+
+        h_line = ax.get_horizontal_line(ax.c2p(600, 0.51),line_func=DashedLine, color = RED)
+        math_prob = MathTex('P=0.5', color=RED).scale(0.85).next_to(h_line, RIGHT)
+        self.play(FadeIn(h_line), Write(math_prob))
+        self.wait(2)
+
 
 
 

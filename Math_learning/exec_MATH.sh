@@ -1,1 +1,1 @@
-manim -qh Tuesday/tuesday.py ProblemGeneral
+manim -qh Tuesday/tuesday.py TuesdayAnaly

@@ -129,9 +129,9 @@ class CommonFunc:
 
     @classmethod
     def add_axes(cls, x_range, y_range, x_length, y_length, axis_config={"include_tip": True, "include_numbers": True},
-                 y_axis_config={'scaling': LinearBase()}):
+                 y_axis_config={'scaling': LinearBase()}, x_axis_config={'scaling': LinearBase()}):
         axes = Axes(x_range=x_range, y_range=y_range, x_length=x_length, y_length=y_length, axis_config=axis_config,
-                    y_axis_config=y_axis_config)
+                    y_axis_config=y_axis_config,x_axis_config=x_axis_config)
         return axes
 
     @classmethod
