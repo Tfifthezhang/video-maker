@@ -16,6 +16,7 @@ class TuesdayParadox(Scene):
         self.vg_problem = VGroup()
         self.vg_answer = None
         self.vg_another = VGroup()
+        self.vg_text = None
 
         self.intro_problem()
         self.problem_anly()
@@ -54,8 +55,6 @@ class TuesdayParadox(Scene):
         self.vg_problem.add(svg_people, arrow, rectangle, vg_boy)
 
     def problem_anly(self):
-        self.play(self.vg_problem.animate.to_edge(LEFT))
-
         answer1 = MathTex("P=\\frac{1}{2}")
         answer2 = MathTex("P=\\frac{1}{3}")
 
@@ -69,6 +68,16 @@ class TuesdayParadox(Scene):
                             VGroup(svg_girl.copy(), svg_girl.copy()).arrange_submobjects(RIGHT)]])
 
         vg_answer = VGroup(answer1, t0, answer2, t1).arrange_in_grid(2, 2).to_edge(RIGHT)
+
+        text1 = Text("其中一个是男孩",color=GREEN).scale(0.7)
+        en_text1 = Text("One of them is a boy",color=GREEN).scale(0.5).next_to(text1, RIGHT)
+        vg_text1 = VGroup(text1,en_text1).scale(0.85).next_to(vg_answer, 0.5*UP)
+        self.vg_text = vg_text1
+
+
+        self.play(self.vg_problem.animate.to_edge(LEFT),
+                  Write(vg_text1))
+        self.wait(1)
 
         self.play(FadeIn(answer1, target_position=self.vg_problem[-2][-1]),
                   FadeIn(answer2, target_position=self.vg_problem[-2][-1]))
@@ -111,42 +120,116 @@ class TuesdayParadox(Scene):
                   Transform(self.vg_problem[2], vg_another[3]),
                   Transform(self.vg_problem[-1], vg_another[-1]))
 
+        text2 = Text("第一个是男孩", color=GREEN).scale(0.7)
+        en_text2 = Text("The first one is a boy", color=GREEN).scale(0.5).next_to(text2, RIGHT)
+        vg_text2 = VGroup(text2, en_text2).scale(0.85).next_to(self.vg_answer, 0.5*UP)
+        self.play(Transform(self.vg_text, vg_text2))
+        self.wait(2)
+
     def problem_trans(self):
         answer1, t0, answer2, t1 = self.vg_answer
 
         cell = t1.get_entries((1, 2))
         self.play(FadeOut(cell))
-        answer3 = MathTex("P=\\frac{1}{2}").move_to(answer2)
-        self.play(Transform(answer2, answer3))
-
         self.wait(2)
+
+        answer3 = MathTex("P=\\frac{1}{2}").move_to(answer2)
+
+        c = t1.get_columns()[0]
+        r = t0.get_rows()[0]
+
+        self.play(Circumscribe(c),
+                  Circumscribe(r))
+        self.wait(1)
+        self.play(Transform(answer2, answer3))
+        self.wait(1)
+
+        self.play(Indicate(answer1),
+                  Indicate(answer2))
 
 
 class TuesdayProblem(Scene):
     def construct(self):
+        self.vg_text = VGroup()
+        self.ellipse = None
+        self.vg_answer = None
+
         self.prob_contra()
+        self.prob_anly2()
+        self.prob_change()
 
     def prob_contra(self):
-        text1 = Text("其中一个是男孩").scale(0.7)
-        en_text1 = Text("One of them is a boy").scale(0.4).next_to(text1, DOWN)
+        text1 = Text("其中一个是男孩",color=BLUE).scale(0.7)
+        en_text1 = Text("One of them is a boy", color=BLUE).scale(0.4).next_to(text1, 0.5*DOWN)
+        self.vg_text.add(VGroup(text1,en_text1))
 
-        vg_text1 = VGroup(text1, en_text1).to_edge(2 * UP + LEFT)
+        text2 = Text("其中一个是男孩,出生在周二").scale(0.52)
+        en_text2 = Text("One of them is a boy, born on Tuesday").scale(0.3).next_to(text2, 0.5*DOWN)
+        self.vg_text.add(VGroup(text2, en_text2))
 
-        text2 = Text('第一个是男孩').scale(0.7).next_to(vg_text1, DOWN)
-        en_text2 = Text("The first one is a boy").scale(0.4).next_to(text2, DOWN)
+        text3 = Text("其中一个是男孩，出生在二月").scale(0.52)
+        en_text3 = Text("One of them is a boy，born in February").scale(0.3).next_to(text3, 0.5*DOWN)
+        self.vg_text.add(VGroup(text3, en_text3))
 
-        vg_text2 = VGroup(text2, en_text2)
+        text4 = Text("其中一个是男孩，出生在两点").scale(0.52)
+        en_text4 = Text("One of them is a boy, born at two o'clock").scale(0.3).next_to(text4, 0.5*DOWN)
+        self.vg_text.add(VGroup(text4, en_text4))
 
-        self.play(FadeIn(vg_text1), FadeIn(vg_text2))
+        text5 = Text("其中一个是男孩，出生1月2日").scale(0.52)
+        en_text5 = Text("One of them is a boy, born on January 2nd ").scale(0.3).next_to(text5, 0.5*DOWN)
+        self.vg_text.add(VGroup(text5, en_text5))
 
-        ellipse1 = Ellipse(width=5.0, height=6.0, fill_opacity=0.8, color=BLUE)
-        ellipse2 = Ellipse(width=2.0, height=3.0, fill_opacity=1, color=RED)
+        text0 = Text('第一个是男孩', color=ORANGE).scale(0.7)
+        en_text0 = Text("The first one is a boy", color=ORANGE).scale(0.4).next_to(text0, 0.5*DOWN)
+        self.vg_text.add(VGroup(text0, en_text0))
 
-        self.play(FadeTransform(vg_text1.copy(), ellipse1))
-        self.play(FadeTransform(vg_text2.copy(), ellipse2))
+        self.vg_text.arrange_submobjects(DOWN, buff=0.2).to_edge(LEFT)
+
+        self.play(FadeIn(self.vg_text[0]), FadeIn(self.vg_text[-1]))
+        #self.play(FadeIn(self.vg_text))
+
+        ellipse1 = Ellipse(width=4, height=6, fill_opacity=0.8, color=BLUE)
+        ellipse2 = Ellipse(width=2, height=3, fill_opacity=1, color=ORANGE)
+
+        self.vg_ellipse = VGroup(ellipse1, ellipse2)
+
+        self.play(FadeTransform(self.vg_text[0].copy(), ellipse1))
+        self.play(FadeTransform(self.vg_text[-1].copy(), ellipse2))
 
         self.wait(2)
 
+    def prob_anly2(self):
+
+        svg_boy = SVGMobject('svg_icon/boy.svg', fill_color=BLUE).scale(0.55)
+        svg_girl = SVGMobject('svg_icon/girl.svg', fill_color=RED).scale(0.55)
+        t0 = MobjectTable([[svg_boy.copy(), svg_girl.copy()]])
+
+        t1 = MobjectTable([[VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                            VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(LEFT)],
+                           [VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                            VGroup()]])
+
+        vg_answer = VGroup(t0, t1).arrange_in_grid(rows=2, buff=1).scale(0.6).to_edge(RIGHT)
+
+        self.play(FadeTransform(self.vg_ellipse[0].copy(), t1))
+        self.play(FadeTransform(self.vg_ellipse[1].copy(), t0))
+
+        self.wait(1)
+        self.vg_answer = vg_answer
+
+    def prob_change(self):
+        # 不确定坍缩
+        arrow = Arrow(start=self.vg_text[0].get_edge_center(DOWN), end=self.vg_text[-1].get_edge_center(UP))
+        self.play(GrowFromPoint(arrow, self.vg_text[0]))
+        self.wait(1)
+
+        self.play(self.vg_ellipse[0].animate.set(width=2, height=3, run_time=1))
+
+        self.wait(1)
+        cell = self.vg_answer[1].get_entries((1, 2))
+        self.play(FadeOut(cell))
+
+        self.wait(1)
 
 class TuesdayAnaly(Scene):
     def construct(self):
@@ -727,8 +810,145 @@ class ProblemGeneral(ThreeDScene):
         h_line = ax.get_horizontal_line(ax.c2p(600, 0.51),line_func=DashedLine, color = RED)
         math_prob = MathTex('P=0.5', color=RED).scale(0.85).next_to(h_line, RIGHT)
         self.play(FadeIn(h_line), Write(math_prob))
+        self.wait(1)
+
+        new_dot = Dot(ax.coords_to_point(1, 1/3), radius=0.1, color=GREEN)
+        new_tex = MathTex('(1,\\frac{1}{3})', color=GREEN).scale(0.6).next_to(new_dot, RIGHT)
+
+        self.play(Create(new_dot),
+                  Create(new_tex))
+        self.wait(1)
+        svg_boy = SVGMobject('svg_icon/boy.svg', fill_color=BLUE).scale(0.55)
+        svg_girl = SVGMobject('svg_icon/girl.svg', fill_color=RED).scale(0.55)
+        t1 = MobjectTable([[VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(RIGHT),
+                            VGroup(svg_boy.copy(), svg_girl.copy()).arrange_submobjects(LEFT)],
+                           [VGroup(svg_boy.copy(), svg_boy.copy()).arrange_submobjects(RIGHT),
+                            VGroup()]]).scale(0.4).next_to(new_tex, DOWN)
+        self.play(FadeIn(t1, target_mobject=new_dot))
+        self.wait(1)
+
+class TuesdayIntercept(Scene):
+    def construct(self):
+        self.vg_text = VGroup()
+        self.ellipse = None
+        self.vg_answer = None
+
+        self.prob_contra()
+        self.prob_ell()
+        self.prob_path()
+        #self.prob_anly2()
+        #self.prob_change()
+
+    def prob_contra(self):
+        text1 = Text("其中一个是男孩", color=BLUE).scale(0.7)
+        en_text1 = Text("One of them is a boy", color=BLUE).scale(0.4).next_to(text1, 0.5*DOWN)
+        self.vg_text.add(VGroup(text1, en_text1))
+
+        text2 = Text("其中一个是男孩，出生在周二").scale(0.52)
+        en_text2 = Text("One of them is a boy, born on Tuesday").scale(0.3).next_to(text2, 0.5*DOWN)
+        self.vg_text.add(VGroup(text2, en_text2))
+
+        text3 = Text("其中一个是男孩，出生在二月").scale(0.52)
+        en_text3 = Text("One of them is a boy，born in February").scale(0.3).next_to(text3, 0.5*DOWN)
+        self.vg_text.add(VGroup(text3, en_text3))
+
+        text4 = Text("其中一个是男孩，出生在两点").scale(0.52)
+        en_text4 = Text("One of them is a boy, born at two o'clock").scale(0.3).next_to(text4, 0.5*DOWN)
+        self.vg_text.add(VGroup(text4, en_text4))
+
+        text5 = Text("其中一个是男孩，出生1月2日").scale(0.52)
+        en_text5 = Text("One of them is a boy, born on January 2nd ").scale(0.3).next_to(text5, 0.5*DOWN)
+        self.vg_text.add(VGroup(text5, en_text5))
+
+        text0 = Text('第一个是男孩', color=ORANGE).scale(0.7)
+        en_text0 = Text("The first one is a boy", color=ORANGE).scale(0.4).next_to(text0, 0.5*DOWN)
+        self.vg_text.add(VGroup(text0, en_text0))
+
+        self.vg_text.arrange_submobjects(DOWN, buff=0.2).to_edge(LEFT)
+
+        self.play(FadeIn(self.vg_text[0]), FadeIn(self.vg_text[-1]))
+        #self.play(FadeIn(self.vg_text))
+
+        l_size = [(4, 6, 0.6, BLUE),
+                  (3.6, 5.4, 0.75, GOLD),
+                  (3.2, 4.8, 0.8, GREEN),
+                  (2.8, 4.2, 0.85, YELLOW),
+                  (2.4, 3.6, 0.9, TEAL),
+                  (2, 3, 1, ORANGE)]
+        vg_ellipse = VGroup(*[Ellipse(width=i[0], height=i[1], fill_opacity=i[2], color=i[-1]) for i in l_size]).next_to(self.vg_text, RIGHT)
+
+        self.vg_ellipse = vg_ellipse
         self.wait(2)
 
+    def prob_ell(self):
+        self.play(Write(self.vg_text[1:5]))
+        self.wait(1)
 
+        for i in range(6):
+            self.play(FadeTransform(self.vg_text[i].copy(), self.vg_ellipse[i]))
+        self.wait(1)
+
+    def prob_path(self):
+        select_text = self.vg_text[1:5]
+        coords = [(7, 13 / 27), (12, 23 / 47), (24, 47 / 95), (360, 729 / 1459)]
+        l_size = [
+                  (3.6, 5.4, 0.75, GOLD),
+                  (3.2, 4.8, 0.8, GREEN),
+                  (2.8, 4.2, 0.85, YELLOW),
+                  (2.4, 3.6, 0.9, TEAL),
+                  ]
+        ax = CommonFunc.add_axes(x_range=[0, 3], y_range=[0, 0.55], x_length=5, y_length=3,
+                                 axis_config={"include_tip": False, "include_numbers": False},
+                                 x_axis_config={"scaling": LogBase(custom_labels=False)}).scale(0.9).next_to(self.vg_ellipse, 0.5*RIGHT)
+
+        p = Variable(1/3, MathTex("P"), num_decimal_places=5).scale(0.9).next_to(ax, 4*UP)
+
+        path = VMobject()
+        dot = Dot(ax.c2p(1, 1/3), radius=DEFAULT_DOT_RADIUS*0.6, color=MAROON)
+        path.set_points_as_corners([dot.get_center(), dot.get_center()])
+
+        def update_path(path):
+            previous_path = path.copy()
+            previous_path.add_points_as_corners([dot.get_center()])
+            path.become(previous_path)
+        path.add_updater(update_path)
+
+        self.play(FadeIn(ax),
+                  Create(dot))
+        self.add(path)
+        self.play(Write(p))
+
+        p.add_updater(lambda v: v.tracker.set_value(ax.point_to_coords(dot.get_center())[1]))
+
+        for i in range(4):
+            self.play(Indicate(select_text[i]),
+                      self.vg_ellipse[i].animate.set(width=l_size[i][0], height=l_size[i][1]),
+                      dot.animate.move_to(ax.c2p(coords[i][0], coords[i][-1])),run_time=1)
+            self.play(FadeOut(self.vg_ellipse[i]))
+
+        self.wait(2)
+
+        h_line = ax.get_horizontal_line(ax.c2p(500, 0.52),line_func=DashedLine, color = RED)
+        math_prob = MathTex('P=0.5', color=RED).scale(0.6).next_to(h_line, UP)
+
+        self.play(FadeTransform(self.vg_ellipse[-1].copy(),VGroup(h_line, math_prob)))
+        self.wait(1)
+
+        self.play(self.vg_ellipse[-2].animate.set(width=2.1, height=3.1),
+                  dot.animate.move_to(ax.c2p(600, 0.49999)), run_time=10)
+
+    def prob_change(self):
+        # 不确定坍缩
+        arrow = Arrow(start=self.vg_text[0].get_edge_center(DOWN), end=self.vg_text[-1].get_edge_center(UP))
+        self.play(GrowFromPoint(arrow, self.vg_text[0]))
+        self.wait(1)
+
+        self.play(self.vg_ellipse[0].animate.set(width=2, height=3, run_time=1))
+
+        self.wait(1)
+        cell = self.vg_answer[1].get_entries((1, 2))
+        self.play(FadeOut(cell))
+
+        self.wait(1)
 
 

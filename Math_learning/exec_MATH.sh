@@ -1,1 +1,2 @@
-manim -qh Tuesday/tuesday.py TuesdayAnaly
+manim -qh Tuesday/tuesday.py TuesdayIntercept
+
