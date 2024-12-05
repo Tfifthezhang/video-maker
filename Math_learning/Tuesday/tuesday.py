@@ -778,7 +778,7 @@ class ProblemGeneral(ThreeDScene):
 
         self.wait(2)
 
-        math_inter = MathTex('\\frac{k-1}{2k-1}', color=YELLOW).scale(0.9).to_edge(UP+LEFT)
+        math_inter = MathTex('\\frac{2k-1}{4k-1}', color=YELLOW).scale(0.9).to_edge(UP+LEFT)
         self.play(FadeIn(math_inter, target_position=vg_res))
         self.wait(1)
 
