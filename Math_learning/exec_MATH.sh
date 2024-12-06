@@ -1,2 +1,2 @@
-manim -qh Tuesday/tuesday.py ProblemGeneral
+manim -qh BertrandsParadox/bertands_paradox.py MidpointMethod
 

@@ -1,0 +1,6 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/TestGlow/3529212410_3511931257_223132457.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/TestGlow/3040924799_1704852926_1493117627.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/TestGlow/3040924799_1704852926_580624977.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/TestGlow/3040924799_2720814230_3014369190.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/TestGlow/3040924799_1704852926_237971269.mp4'

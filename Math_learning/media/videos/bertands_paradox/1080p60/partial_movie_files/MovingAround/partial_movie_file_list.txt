@@ -1,0 +1,8 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/MovingAround/3529212410_1909133249_1412841409.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/MovingAround/3040924799_1704852926_1811144784.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/MovingAround/3040924799_3732286128_2359757048.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/MovingAround/3040924799_3783723526_2424045532.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/MovingAround/3040924799_1704852926_2247903825.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/MovingAround/3040924799_1142926261_3211711843.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/MovingAround/3040924799_1704852926_2894828450.mp4'
