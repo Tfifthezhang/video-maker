@@ -13,78 +13,131 @@ from CS_learning.common_func import CommonFunc
 
 class ThusdaySim(Scene):
     def construct(self):
-        self.sex = None
-        self.week = None
+        self.vg_sample = None
+        self.vg_chart = None
+        self.pointer = None
+        self.c_label = None
 
         self.display()
-        #self.processing()
+        self.table_dis()
+        self.processing()
     def display(self):
         svg_boy = SVGMobject('svg_icon/boy.svg', fill_color=BLUE).scale(0.55)
         svg_girl = SVGMobject('svg_icon/girl.svg', fill_color=RED).scale(0.55)
+        vg_sex = VGroup(svg_boy, svg_girl).arrange_submobjects(DOWN, buff=1)
 
         l_week = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
         circles = VGroup(*[Circle(color=YELLOW).scale(0.55) for _ in range(7)]).arrange_submobjects(RIGHT,buff=0.3)
         vg_text = VGroup(*[Text(l_week[i]).scale(0.6).move_to(circles[i].get_center()) for i in range(7)])
-        vg_week1 = VGroup(circles, vg_text).scale(0.6)
-        vg_week2 = vg_week1.copy()
+        vg_week = VGroup(circles, vg_text).scale(0.7)
 
-        VGroup(svg_boy, vg_week1, svg_girl,vg_week2).arrange_in_grid(rows=2, buff=1).to_edge(2*UP)
+        vg_sample = VGroup(vg_sex,vg_week).arrange_submobjects(RIGHT).to_edge(0.5*UP)
 
-        self.play(Create(svg_boy),
-                  Create(svg_girl),
-                  Create(vg_week1),
-                  Create(vg_week2))
+        self.play(Create(vg_sample))
 
         self.wait(2)
 
-        # self.sex = vg_sex
-        # self.week = vg_week
+        self.vg_sample = vg_sample
+
+        pointer1 = Vector(RIGHT,color=TEAL_A).next_to(svg_boy, LEFT)
+        pointer2 = Vector(UP, color=TEAL_A).next_to(circles[0], DOWN)
+        self.play(pointer1.animate.next_to(svg_girl, LEFT),
+                  pointer2.animate.next_to(circles[-1], DOWN))
+        self.wait(1)
+
+        self.pointer = VGroup(pointer1, pointer2)
+
+    def table_dis(self):
+
+        values_sex = [0]*4
+        chart1 = BarChart(
+            values_sex,
+            bar_names=['bb', 'bg', 'gb', 'gg'],
+            y_range=[0, 30, 10],
+            y_length=6,
+            x_length=10,
+            x_axis_config={"font_size": 50})
+
+        values_week = [0] * 2
+        chart2 = BarChart(
+            values_week,
+            bar_names=['One of them is a boy, born on Tuesday',
+                       'The remaining one is a boy'],
+            y_range=[0, 20, 10],
+            y_length=6,
+            x_length=10,
+            x_axis_config={"font_size": 30})
+
+        vg_chart = VGroup(chart1, chart2).arrange_submobjects(RIGHT, buff=2).scale(0.5).next_to(self.vg_sample, DOWN)
+        self.play(Create(vg_chart))
+        self.wait(2)
+
+        self.vg_chart = vg_chart
+
+        c_bar_lbls = chart2.get_bar_labels(font_size=48)
+        self.play(Write(c_bar_lbls))
+        self.wait(1)
+
+        self.c_label = c_bar_lbls
+
+        # answer = MathTex("\\frac{7}{15}").scale(1)
+        # cal_P = MathTex("\\approx", "0.467").scale(0.8).next_to(answer, 1.2 * RIGHT)
+        #
+        # VGroup(answer, cal_P).arrange_submobjects(RIGHT).to_edge(RIGHT).shift(2*UP)
+        # self.play(ReplacementTransform(c_bar_lbls, answer))
+        # self.play(Write(cal_P))
+        # self.wait(1)
 
     def processing(self):
+        np.random.seed(17)
+        vg_sex = self.vg_sample[0]
+        circles = self.vg_sample[1][0]
+        chart1, chart2 = self.vg_chart
+        p1, p2 = self.pointer
 
-        vg_sex = self.sex
-        vg_week = self.week[0]
+        a_week = np.random.randint(low=0, high=7, size=(200, 2))
+        a_sex = np.random.randint(0, 2, size=(200, 2))
 
-        a_week = np.random.randint(low=0, high=7, size=(100,2))
-        a_sex = np.random.randint(0, 2, size=(100, 2))
+        d_chart1_value = {'0': 0, '1': 0, '2': 0, '3': 0}
+        d_chart2_value = {'O': 0, 'T': 0}
 
-        tracker1 = ValueTracker(0)
-        pointer = Vector(UP).next_to(vg_sex[int(tracker1.get_value())], DOWN)
-        pointer.add_updater(lambda m: m.next_to(vg_sex[int(tracker1.get_value())], DOWN))
+        for i in range(200):
+            l_week = a_week[i]
+            l_sex = a_sex[i]
 
-        self.play(FadeIn(pointer))
+            if sum(l_sex) == 0:
+                d_chart1_value['0'] += 1
+            if sum(l_sex) == 2:
+                d_chart1_value['3'] += 1
+            if sum(l_sex) == 1:
+                if l_sex[0] == 0:
+                    d_chart1_value['1'] += 1
+                if l_sex[0] == 1:
+                    d_chart1_value['2'] += 1
 
-        self.play(tracker1.animate.set_value(1))
+            if (l_week[0] == 1 and l_sex[0] == 0) or (l_week[1] == 1 and l_sex[1] == 0):
+                d_chart2_value['O'] += 1
+                if sum(l_sex) == 0:
+                    d_chart2_value['T'] += 1
 
-        self.wait(1)
+            for j in range(2):
+                sex = l_sex[j]
+                week = l_week[j]
+        #         self.play(p1.animate.next_to(vg_sex[sex], LEFT),
+        #                   p2.animate.next_to(circles[week], DOWN))
+        #
+        #     self.play(chart1.animate.change_bar_values(list(d_chart1_value.values())),
+        #               chart2.animate.change_bar_values(list(d_chart2_value.values())),
+        #               Transform(self.c_label,chart2.get_bar_labels(font_size=48)))
+        print(d_chart1_value, d_chart2_value)
+        # self.wait(1)
 
-        tracker2 = ValueTracker(0)
-        pointer_week = Vector(UP).next_to(vg_week[int(tracker2.get_value())], DOWN)
-        pointer_week.add_updater(lambda m: m.next_to(vg_week[int(tracker2.get_value())], DOWN))
+        answer = MathTex("\\frac{7}{15}").scale(1)
+        cal_P = MathTex("\\approx", "0.467").scale(0.8).next_to(answer, 1.2 * RIGHT)
 
-        self.play(FadeIn(pointer_week))
-
-        self.play(tracker2.animate.set_value(6))
-
-        self.wait(1)
-
-        m = Variable(0, label=MathTex('m'), var_type=Integer)
-
-        n = Variable(0, label=MathTex('n'), var_type=Integer)
-
-        VGroup(n, m).arrange_submobjects(DOWN,buff=1).to_edge(2*DOWN)
-
-        self.play(Write(m))
-        self.play(Write(n))
-        for _ in range(100):
-            i_sex = np.random.randint(2)
-            self.play(tracker1.animate.set_value(i_sex))
-            i_week = np.random.randint(7)
-            self.play(tracker2.animate.set_value(i_week))
-
-            self.play(m.tracker.animate.set_value(m.tracker.get_value() + 1))
-            if i_sex==0 and i_week==1:
-                self.play(n.tracker.animate.set_value(n.tracker.get_value() + 1))
+        VGroup(answer, cal_P).arrange_submobjects(RIGHT).to_edge(RIGHT).shift(2*UP)
+        self.play(ReplacementTransform(self.c_label.copy(), answer))
+        self.play(Write(cal_P))
         self.wait(1)
 
 class GeoSim(Scene):
