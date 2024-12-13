@@ -1,2 +1,3 @@
-manim -qh Tuesday/tuesday_simulation.py ThusdaySim
+manim -qh Tuesday/tuesday_simulation.py BarGen
+
 
