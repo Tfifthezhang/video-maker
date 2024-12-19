@@ -1,0 +1,12 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/screen_ad/1080p60/partial_movie_files/ScreenFunc/3529212410_3291753810_223132457.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/screen_ad/1080p60/partial_movie_files/ScreenFunc/3040924799_1141282389_1556708975.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/screen_ad/1080p60/partial_movie_files/ScreenFunc/3040924799_2427413840_4266596010.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/screen_ad/1080p60/partial_movie_files/ScreenFunc/3040924799_2470551363_1644363538.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/screen_ad/1080p60/partial_movie_files/ScreenFunc/3040924799_2214571932_3764401782.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/screen_ad/1080p60/partial_movie_files/ScreenFunc/3040924799_2651626118_1279618460.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/screen_ad/1080p60/partial_movie_files/ScreenFunc/3040924799_3400052815_3857705572.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/screen_ad/1080p60/partial_movie_files/ScreenFunc/3040924799_3890345977_771013772.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/screen_ad/1080p60/partial_movie_files/ScreenFunc/3040924799_1446750137_1125907227.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/screen_ad/1080p60/partial_movie_files/ScreenFunc/3040924799_1532023130_1700134664.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/screen_ad/1080p60/partial_movie_files/ScreenFunc/3040924799_1141282389_455715346.mp4'

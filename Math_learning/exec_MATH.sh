@@ -1,3 +1,3 @@
-manim -qh Tuesday/tuesday_simulation.py BarGen
+manim -qh Ad/screen_ad.py ScreenFunc
 
 
