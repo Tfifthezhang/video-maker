@@ -260,7 +260,42 @@ class RatioFunc(Scene):
 
 class ImageTrans(Scene):
     def construct(self):
+        self.gamma_trans()
         self.intro_image()
+
+    def gamma_trans(self):
+        grid = Axes(
+            x_range=[0, 1, 0.05],  # step size determines num_decimal_places.
+            y_range=[0, 1, 0.05],
+            x_length=9,
+            y_length=5.5,
+            axis_config={
+                "numbers_to_include": np.arange(0, 1 + 0.1, 0.1),
+                "font_size": 24,
+            },
+            tips=False,
+        )
+
+        y_label = grid.get_y_axis_label("y", edge=LEFT, direction=LEFT, buff=0.4)
+        x_label = grid.get_x_axis_label("x")
+        grid_labels = VGroup(x_label, y_label)
+
+        graphs = VGroup()
+        for n in np.arange(1, 10 + 0.5, 1):
+            graphs += grid.plot(lambda x: x ** n, color=WHITE)
+            graphs += grid.plot(
+                lambda x: x ** (1 / n), color=WHITE, use_smoothing=False
+            )
+
+        # Extra lines and labels for point (1,1)
+        graphs += grid.get_horizontal_line(grid.c2p(1, 1, 0), color=BLUE)
+        graphs += grid.get_vertical_line(grid.c2p(1, 1, 0), color=BLUE)
+        graphs += Dot(point=grid.c2p(1, 1, 0), color=YELLOW)
+        graphs += Tex("(1,1)").scale(0.75).next_to(grid.c2p(1, 1, 0))
+
+        self.vg_axes = VGroup(grid, graphs, grid_labels)
+
+        self.play(Create(self.vg_axes))
     @staticmethod
     def get_image(l_gamma_values):
         import cv2
@@ -271,19 +306,144 @@ class ImageTrans(Scene):
                               for i in np.arange(0, 256)]).astype("uint8")
             # 应用查找表
             return cv2.LUT(image, table)
+
+        l_image = []
         # 读取图像
-        image_path = '/Users/tfifthefrank/Downloads/1901734940339.jpg'  # 替换为你的图像路径
+        image_path = '/Users/tfifthefrank/Downloads/exampe.jpg'  # 替换为你的图像路径
         original_image = cv2.imread(image_path)
         # 显示原始图像和不同伽马值处理后的图像
         for gamma in l_gamma_values:
             adjusted_image = adjust_gamma(original_image, gamma)
-            return adjusted_image
+            l_image.append(adjusted_image)
+        return l_image
     def intro_image(self):
-        # from PIL import Image
-        # image = Image.open('/Users/tfifthefrank/Downloads/188173493648.jpg')
-        # img_array = np.array(image)
-        image_array = self.get_image(l_gamma_values=[0.35])
-        img = ImageMobject(image_array)
-        img.height = 0.8
-        self.play(FadeIn(img))
+        self.play(self.vg_axes.animate.scale(0.8).to_edge(LEFT))
+
+        vg_image = Group()
+        image_array = self.get_image(l_gamma_values=np.linspace(0.1,10,10))
+        for i in image_array:
+            img = ImageMobject(i).to_edge(RIGHT)
+            img.height = 5
+            vg_image.add(img)
+
+        self.play(FadeIn(vg_image[0]))
+        for j in range(9):
+            self.play(Transform(vg_image[j], vg_image[j+1]))
         self.wait(1)
+
+class A4Filled(ThreeDScene):
+    def construct(self):
+        self.get_A4()
+        self.contras()
+
+    @staticmethod
+    def get_rectangle_corners(bottom_left, top_right):
+        return [
+            (top_right[0], top_right[1],0),
+            (bottom_left[0], top_right[1],0),
+            (bottom_left[0], bottom_left[1],0),
+            (top_right[0], bottom_left[1],0),
+        ]
+
+    def new_rec(self, dia):
+        start_point = dia.get_start()
+        end_point = dia.get_end()
+        res_coor = self.get_rectangle_corners(start_point, end_point)
+        polygon = Polygon(*res_coor, color=WHITE)
+        return polygon
+
+    def get_A4(self):
+        rec = Rectangle(height=1.414, width=1).scale(5)
+        self.play(Create(rec))
+        A0 = MathTex('A0').next_to(rec, RIGHT)
+        self.play(FadeIn(A0))
+        self.wait(2)
+
+        middle_points = [(rec.get_corner(UL)+rec.get_corner(DL))/2, (rec.get_corner(UR)+rec.get_corner(DR))/2]
+        line1 = Line(middle_points[0], middle_points[1], color=MAROON)
+        self.play(FadeIn(line1))
+        A1_posiion = ((line1.get_start() + line1.get_end()) / 2 + (rec.get_corner(DR)+rec.get_corner(DL))/2)/2
+        text1 = MathTex('A1').scale(1).move_to(A1_posiion)
+        self.play(FadeIn(text1, target_position=(line1.get_start() + line1.get_end()) / 2))
+        self.wait(1)
+
+        middle_points2 = [(rec.get_corner(UL)+rec.get_corner(UR))/2, (line1.get_start()+line1.get_end())/2]
+        line2 = Line(middle_points2[0], middle_points2[1], color=MAROON)
+        self.play(FadeIn(line2))
+        A2_posiion = ((line2.get_start() + line2.get_end()) / 2 + (rec.get_corner(UR)+line1.get_end())/2)/2
+        text2 = MathTex('A2').scale(1).move_to(A2_posiion)
+        self.play(FadeIn(text2, target_position=(line2.get_start() + line2.get_end()) / 2))
+        self.wait(1)
+
+        middle_points3 = [(rec.get_corner(UL)+line1.get_start())/2, (line2.get_start()+line2.get_end())/2]
+        line3 = Line(middle_points3[0], middle_points3[1], color=MAROON)
+        self.play(FadeIn(line3))
+        A3_posiion = ((line3.get_start() + line3.get_end()) / 2 + (line1.get_start()+(line1.get_start() + line1.get_end())/2)/2)/2
+        text3 = MathTex('A3').scale(1).move_to(A3_posiion)
+        self.play(FadeIn(text3, target_position=(line3.get_start() + line3.get_end()) / 2))
+        self.wait(1)
+
+        middle_points4 = [(rec.get_corner(UL)+line2.get_start())/2, (line3.get_start()+line3.get_end())/2]
+        line4 = Line(middle_points4[0], middle_points4[1], color=MAROON)
+        self.play(FadeIn(line4))
+        A4_posiion = ((line4.get_start() + line4.get_end()) / 2 + (line3.get_end()+line2.get_start())/2)/2
+        text4 = MathTex('A4').scale(1).move_to(A4_posiion)
+        self.play(FadeIn(text4, target_position=(line4.get_start() + line4.get_end()) / 2))
+        self.wait(1)
+
+        self.vg_tex = VGroup(A0,text1,text2,text3,text4)
+        self.vg_rec = VGroup(rec, line1, line2, line3, line4)
+
+        self.play(VGroup(self.vg_rec, self.vg_tex).animate.to_edge(LEFT))
+
+        self.wait(1)
+
+    def contras(self):
+        rect_16_9 = Rectangle(width=6.22, height=3.5, color=WHITE).scale(0.7)
+        size_16_9 = MathTex("x= 16:9", color=MAROON).scale(1)
+        rect_3_2 = Rectangle(width=6, height=4.0, color=WHITE).scale(0.7)
+        size_3_2 = MathTex("x= 3:2", color=MAROON).scale(1)
+        vg_rec = VGroup(rect_16_9, size_16_9,rect_3_2, size_3_2).arrange_in_grid(rows=4).scale(1).to_edge(3*RIGHT)
+
+        self.play(Create(vg_rec))
+        self.wait(2)
+
+        res_coor1 = self.get_rectangle_corners(rect_16_9.get_corner(DL),
+                                               rect_16_9.get_corner(UL)+np.array([2.475*0.7,0,0]))
+        polygon1 = Polygon(*res_coor1, stroke_width=1, fill_color=RED, fill_opacity=0.8)
+
+        res_coor2 = self.get_rectangle_corners(polygon1.get_corner(DR),
+                                               polygon1.get_corner(UR) + np.array([2.475 * 0.7, 0, 0]))
+        polygon2 = Polygon(*res_coor2, stroke_width=1, fill_color=RED, fill_opacity=0.8)
+
+        self.play(GrowFromPoint(polygon1, self.vg_rec[0].get_center()))
+        self.play(GrowFromPoint(polygon2, self.vg_rec[0].get_center()))
+        self.wait(2)
+
+        res_coor3 = self.get_rectangle_corners(rect_3_2.get_corner(DL),
+                                               rect_3_2.get_corner(UL)+np.array([2.8288543*0.7, 0, 0]))
+        polygon3 = Polygon(*res_coor3, stroke_width=1, fill_color=RED, fill_opacity=0.8)
+
+        res_coor4 = self.get_rectangle_corners(polygon3.get_corner(DR),
+                                               polygon3.get_corner(UR) + np.array([2.8288543*0.7, 0, 0]))
+        polygon4 = Polygon(*res_coor4, stroke_width=1, fill_color=RED, fill_opacity=0.8)
+
+        self.play(GrowFromPoint(polygon3, self.vg_rec[0].get_center()))
+        self.play(GrowFromPoint(polygon4, self.vg_rec[0].get_center()))
+        self.wait(1)
+
+        S_16_9 = MathTex('U = 0.7955', color=RED).scale(0.8).next_to(rect_16_9, LEFT)
+        S_3_2 = MathTex('U = 0.9428', color=RED).scale(0.8).next_to(rect_3_2, LEFT)
+
+        self.play(FadeIn(S_16_9, target_position=rect_16_9.get_center()),
+                  FadeIn(S_3_2, target_position=rect_3_2.get_center()))
+        self.wait(1)
+
+        self.play(Indicate(S_3_2),
+                  Indicate(size_3_2))
+        self.wait(1)
+
+
+
+
+
