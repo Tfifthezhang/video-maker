@@ -2,6 +2,7 @@
 from datetime import datetime
 import random
 from manim import *
+import cv2
 import numpy as np
 import sys
 
@@ -201,9 +202,9 @@ class RatioFunc(Scene):
                                  axis_config={"include_tip": False, "include_numbers": False}).scale(0.8).to_edge(LEFT).shift(0.6*DOWN)
         self.play(Create(ax))
         fit_plot = ax.plot(lambda x: self.area_func(x), x_range=[0.5, 3], use_smoothing=True, color=YELLOW)
-        lable = ax.get_graph_label(fit_plot, "d=27", x_val=3, direction=RIGHT)
+        lable = ax.get_graph_label(fit_plot, "d=28", x_val=3, direction=RIGHT)
 
-        self.play(FadeTransform(self.tex.copy(),fit_plot),
+        self.play(FadeTransform(self.tex.copy(), fit_plot),
                   Write(lable))
 
         coord1 = ax.c2p(1, self.area_func(1))
@@ -261,31 +262,27 @@ class RatioFunc(Scene):
 class ImageTrans(Scene):
     def construct(self):
         self.gamma_trans()
+        self.contra_gamma()
         self.intro_image()
-
     def gamma_trans(self):
         grid = Axes(
             x_range=[0, 1, 0.05],  # step size determines num_decimal_places.
             y_range=[0, 1, 0.05],
-            x_length=9,
-            y_length=5.5,
+            x_length=8,
+            y_length=6,
             axis_config={
                 "numbers_to_include": np.arange(0, 1 + 0.1, 0.1),
                 "font_size": 24,
             },
             tips=False,
-        )
+        ).scale(0.9)
 
-        y_label = grid.get_y_axis_label("y", edge=LEFT, direction=LEFT, buff=0.4)
-        x_label = grid.get_x_axis_label("x")
+        y_label = grid.get_y_axis_label(MathTex("V_{out}"), edge=LEFT, direction=LEFT, buff=0.4)
+        x_label = grid.get_x_axis_label(MathTex("V_{in}"))
         grid_labels = VGroup(x_label, y_label)
 
         graphs = VGroup()
-        for n in np.arange(1, 10 + 0.5, 1):
-            graphs += grid.plot(lambda x: x ** n, color=WHITE)
-            graphs += grid.plot(
-                lambda x: x ** (1 / n), color=WHITE, use_smoothing=False
-            )
+        graphs += grid.plot(lambda x: x ** 1, color=WHITE, use_smoothing=False)
 
         # Extra lines and labels for point (1,1)
         graphs += grid.get_horizontal_line(grid.c2p(1, 1, 0), color=BLUE)
@@ -293,12 +290,38 @@ class ImageTrans(Scene):
         graphs += Dot(point=grid.c2p(1, 1, 0), color=YELLOW)
         graphs += Tex("(1,1)").scale(0.75).next_to(grid.c2p(1, 1, 0))
 
-        self.vg_axes = VGroup(grid, graphs, grid_labels)
+        gamma_tex = MathTex('V_{out} = V_{in}^{\gamma}').next_to(grid, UP)
 
-        self.play(Create(self.vg_axes))
-    @staticmethod
-    def get_image(l_gamma_values):
-        import cv2
+        self.play(Create(grid),
+                  Create(grid_labels))
+
+        self.play(Create(graphs))
+
+        self.wait(2)
+
+        self.play(Write(gamma_tex))
+        self.wait(2)
+
+        true_plot = grid.plot(lambda x: x ** (1 / 5), color=BLUE, use_smoothing=False)
+        true_lable = grid.get_graph_label(true_plot, MathTex("\gamma=\\frac{1}{5}").scale(0.8), x_val=0.2, direction=UP)
+
+        self.play(FadeTransform(gamma_tex.copy(),VGroup(true_plot,true_lable)))
+
+        graphs += true_plot
+        grid_labels += true_lable
+
+        true_plot2 = grid.plot(lambda x: x ** (5), color=RED, use_smoothing=False)
+        true_lable2 = grid.get_graph_label(true_plot2, MathTex("\gamma=5").scale(0.8), x_val=0.8, direction=RIGHT)
+
+        self.play(FadeTransform(gamma_tex.copy(), VGroup(true_plot2, true_lable2)))
+
+        graphs += true_plot2
+        grid_labels += true_lable2
+
+        self.vg_axes = VGroup(grid, graphs, grid_labels, gamma_tex)
+        self.wait(1)
+
+    def get_image(self, image_path, l_gamma_values):
         def adjust_gamma(image, gamma=1.0):
             # 构建查找表
             invGamma = 1.0 / gamma
@@ -309,26 +332,88 @@ class ImageTrans(Scene):
 
         l_image = []
         # 读取图像
-        image_path = '/Users/tfifthefrank/Downloads/exampe.jpg'  # 替换为你的图像路径
+        #image_path = '/Users/tfifthefrank/Downloads/exampe.jpg'  # 替换为你的图像路径
+        #ssave_path = '/Users/tfifthefrank/Downloads/example4.png'
         original_image = cv2.imread(image_path)
         # 显示原始图像和不同伽马值处理后的图像
         for gamma in l_gamma_values:
             adjusted_image = adjust_gamma(original_image, gamma)
+            #cv2.imwrite(save_path, adjusted_image)
             l_image.append(adjusted_image)
         return l_image
-    def intro_image(self):
-        self.play(self.vg_axes.animate.scale(0.8).to_edge(LEFT))
 
+    def contra_gamma(self):
+        self.play(self.vg_axes.animate.scale(0.8).to_edge(LEFT))
+        self.wait(1)
+        grid, graphs, grid_labels, gamma_tex = self.vg_axes
         vg_image = Group()
-        image_array = self.get_image(l_gamma_values=np.linspace(0.1,10,10))
-        for i in image_array:
-            img = ImageMobject(i).to_edge(RIGHT)
-            img.height = 5
+        l_paths = ['/Users/tfifthefrank/Downloads/example4.jpg',
+                   '/Users/tfifthefrank/Downloads/exampe2.png',
+                   '/Users/tfifthefrank/Downloads/exampe1.png']
+
+        image_array = self.get_image(image_path=l_paths[0], l_gamma_values=[1, 1/5, 5])
+        for i in range(3):
+            img = ImageMobject(image_array[i]).next_to(self.vg_axes, RIGHT)
+            img.height = 4.5
             vg_image.add(img)
 
+        self.play(Indicate(graphs[0]),
+                  Indicate(grid_labels[0]))
+
+        var = Variable(1, MathTex("\gamma"), num_decimal_places=3).scale(0.8).next_to(vg_image[0],UP)
+        self.play(FadeIn(var, target_mobject=gamma_tex.get_center()))
+
         self.play(FadeIn(vg_image[0]))
-        for j in range(9):
-            self.play(Transform(vg_image[j], vg_image[j+1]))
+
+        self.wait(2)
+
+        self.play(Indicate(graphs[-2]),
+                  Indicate(grid_labels[-2]),
+                  var.tracker.animate.set_value(1/5))
+        self.play(Transform(vg_image[0], vg_image[1]))
+
+        self.wait(2)
+
+        self.play(Indicate(graphs[-1]),
+                  Indicate(grid_labels[-1]),
+                  var.tracker.animate.set_value(5))
+        self.play(Transform(vg_image[0], vg_image[2]))
+
+        self.wait(2)
+
+        self.vg_gamma = Group(vg_image[0], var)
+
+    def intro_image(self):
+        vg_extra_plot= VGroup()
+        original_image, var = self.vg_gamma
+        grid, graphs, grid_labels, gamma_tex = self.vg_axes
+
+        self.play(FadeOut(grid_labels[-1]),
+                  FadeOut(grid_labels[-2]))
+
+        for n in np.linspace(4.9, 1/4.9, 50):
+            if n > 1:
+                up_plot = grid.plot(lambda x: x ** n, color=RED, stroke_width=1)
+            else:
+                up_plot = grid.plot(lambda x: x ** n, color=BLUE, stroke_width=1)
+            vg_extra_plot.add(up_plot)
+
+        self.play(Create(vg_extra_plot))
+
+        self.wait(2)
+
+        vg_image = Group()
+        l_var = np.linspace(4.9, 1/4.9, 50)
+        image_array = self.get_image('/Users/tfifthefrank/Downloads/example4.jpg',l_gamma_values=l_var)
+        for i in image_array:
+            img = ImageMobject(i).next_to(self.vg_axes, RIGHT)
+            img.height = 4.5
+            vg_image.add(img)
+
+        for j in range(47):
+            self.play(var.tracker.animate.set_value(l_var[j]),
+                      Indicate(vg_extra_plot[j]),
+                      Transform(original_image, vg_image[j]))
         self.wait(1)
 
 class A4Filled(ThreeDScene):
