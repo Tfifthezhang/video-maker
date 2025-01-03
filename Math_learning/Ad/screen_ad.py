@@ -41,7 +41,6 @@ class ScreenFunc(Scene):
     def intro_screen(self):
 
         rect = Rectangle(width=6.0, height=4.0, color=WHITE)
-
         dia = Line(start=rect.get_corner(DL), end=rect.get_corner(UR), color=MAROON)
 
         poly_rec = self.new_rec(dia)
@@ -64,7 +63,7 @@ class ScreenFunc(Scene):
         len_dia = MathTex('d', '=', '\sqrt{a^2+b^2}', color=MAROON).scale(0.9)
         s_area = MathTex('S', '=', 'ab', color=BLUE).scale(0.9)
 
-        vg_tex = VGroup(len_dia, s_area).arrange_submobjects(DOWN, buff=1).to_edge(RIGHT)
+        vg_tex = VGroup(len_dia, s_area).arrange_submobjects(DOWN,  buff=1).to_edge(RIGHT)
 
         self.play(SpinInFromNothing(dia))
         self.play(FadeTransform(dia.copy(), vg_tex[0]))
@@ -153,7 +152,7 @@ class ScreenFunc(Scene):
 
         self.wait(1)
 
-        math_final = MathTex('S^2', '\leq', '\\frac{d^2}{2}').next_to(math_eqal2, DOWN)
+        math_final = MathTex('S', '\leq', '\\frac{d^2}{2}').next_to(math_eqal2, DOWN)
         math_final[0].set_color(BLUE)
         math_final[-1].set_color(MAROON)
         self.play(FadeIn(math_final, target_position=math_eqal2))
@@ -199,7 +198,7 @@ class RatioFunc(Scene):
 
     def curve(self):
         ax = CommonFunc.add_axes(x_range=[0.5, 3, 0.5], y_range=[0.2, 450, 100], x_length=10, y_length=6,
-                                 axis_config={"include_tip": False, "include_numbers": False}).scale(0.8).to_edge(LEFT).shift(0.6*DOWN)
+                                 axis_config={"include_tip": False, "include_numbers":True}).scale(0.8).to_edge(LEFT).shift(0.6*DOWN)
         self.play(Create(ax))
         fit_plot = ax.plot(lambda x: self.area_func(x), x_range=[0.5, 3], use_smoothing=True, color=YELLOW)
         lable = ax.get_graph_label(fit_plot, "d=28", x_val=3, direction=RIGHT)
@@ -324,7 +323,7 @@ class ImageTrans(Scene):
     def get_image(self, image_path, l_gamma_values):
         def adjust_gamma(image, gamma=1.0):
             # 构建查找表
-            invGamma = 1.0 / gamma
+            invGamma = gamma
             table = np.array([((i / 255.0) ** invGamma) * 255
                               for i in np.arange(0, 256)]).astype("uint8")
             # 应用查找表
@@ -367,17 +366,17 @@ class ImageTrans(Scene):
 
         self.wait(2)
 
-        self.play(Indicate(graphs[-2]),
-                  Indicate(grid_labels[-2]),
-                  var.tracker.animate.set_value(1/5))
-        self.play(Transform(vg_image[0], vg_image[1]))
-
-        self.wait(2)
-
         self.play(Indicate(graphs[-1]),
                   Indicate(grid_labels[-1]),
                   var.tracker.animate.set_value(5))
         self.play(Transform(vg_image[0], vg_image[2]))
+
+        self.wait(2)
+
+        self.play(Indicate(graphs[-2]),
+                  Indicate(grid_labels[-2]),
+                  var.tracker.animate.set_value(1/5))
+        self.play(Transform(vg_image[0], vg_image[1]))
 
         self.wait(2)
 
@@ -391,7 +390,7 @@ class ImageTrans(Scene):
         self.play(FadeOut(grid_labels[-1]),
                   FadeOut(grid_labels[-2]))
 
-        for n in np.linspace(4.9, 1/4.9, 50):
+        for n in np.linspace(1/4.9,4.9,50):
             if n > 1:
                 up_plot = grid.plot(lambda x: x ** n, color=RED, stroke_width=1)
             else:
@@ -403,14 +402,14 @@ class ImageTrans(Scene):
         self.wait(2)
 
         vg_image = Group()
-        l_var = np.linspace(4.9, 1/4.9, 50)
+        l_var = np.linspace(1/4.9,4.9,50)
         image_array = self.get_image('/Users/tfifthefrank/Downloads/example4.jpg',l_gamma_values=l_var)
         for i in image_array:
             img = ImageMobject(i).next_to(self.vg_axes, RIGHT)
             img.height = 4.5
             vg_image.add(img)
 
-        for j in range(47):
+        for j in range(21):
             self.play(var.tracker.animate.set_value(l_var[j]),
                       Indicate(vg_extra_plot[j]),
                       Transform(original_image, vg_image[j]))

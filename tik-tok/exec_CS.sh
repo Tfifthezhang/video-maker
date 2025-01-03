@@ -1,1 +1,1 @@
-manim -qh -r 1080,1920 test_tt.py BubbleSort_TT
+manim -qh -r 1080,1920 2025_formula.py Formula2025

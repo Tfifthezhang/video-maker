@@ -1,0 +1,13 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/Introduction/1016836490_2908531263_223132457.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/Introduction/3744695940_557270168_2586604559.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/Introduction/3744695940_4042641242_455136005.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/Introduction/3744695940_495254885_2696181742.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/Introduction/3744695940_567036437_3159539128.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/Introduction/3744695940_4042641242_1069124612.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/Introduction/3744695940_813299037_1417519687.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/Introduction/3744695940_4042641242_3238140542.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/Introduction/2477634664_1213557828_1503316298.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/Introduction/427566083_3608406541_2844418802.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/Introduction/427566083_1993457895_867238198.mp4'
+file 'file:/Users/tfifthefrank/video-maker/Math_learning/media/videos/bertands_paradox/1080p60/partial_movie_files/Introduction/427566083_4042641242_3899057541.mp4'

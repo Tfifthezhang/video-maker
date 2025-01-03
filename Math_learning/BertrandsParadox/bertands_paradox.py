@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+import os
 import random
 from manim import *
 import numpy as np
@@ -504,7 +505,7 @@ class CircumferenceMethod(MovingCameraScene):
             endingdot = Dot(obj.get_end(), color=YELLOW, stroke_color=RED, stroke_width=3)
             return VGroup(obj, startingdot, endingdot)
 
-        n = 1000
+        n = 100
         chords = VGroup(*[get_chord_by_circumference(circle_group[0]) for _ in range(n)])
         thicker_chords = VGroup()
         for obj in chords:
