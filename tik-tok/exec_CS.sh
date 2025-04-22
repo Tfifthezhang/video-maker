@@ -1,1 +1,1 @@
-manim -qh -r 1080,1920 2025_formula.py Formula2025
+manim -qh -r 1080,1920 ost.py OST

@@ -5,11 +5,10 @@ from manim import *
 import cv2
 import numpy as np
 import sys
+from CS_learning.common_func import CommonFunc
 
 np.random.seed(17)
 sys.path.append('..')
-
-from CS_learning.common_func import CommonFunc
 
 
 class ScreenFunc(Scene):
@@ -20,15 +19,15 @@ class ScreenFunc(Scene):
         self.intro_screen()
         self.proof1()
         self.proof2()
-        #self.curve()
+        # self.curve()
 
     @staticmethod
     def get_rectangle_corners(bottom_left, top_right):
         return [
-            (top_right[0], top_right[1],0),
-            (bottom_left[0], top_right[1],0),
-            (bottom_left[0], bottom_left[1],0),
-            (top_right[0], bottom_left[1],0),
+            (top_right[0], top_right[1], 0),
+            (bottom_left[0], top_right[1], 0),
+            (bottom_left[0], bottom_left[1], 0),
+            (top_right[0], bottom_left[1], 0),
         ]
 
     def new_rec(self, dia):
@@ -39,7 +38,6 @@ class ScreenFunc(Scene):
         return polygon
 
     def intro_screen(self):
-
         rect = Rectangle(width=6.0, height=4.0, color=WHITE)
         dia = Line(start=rect.get_corner(DL), end=rect.get_corner(UR), color=MAROON)
 
@@ -63,7 +61,7 @@ class ScreenFunc(Scene):
         len_dia = MathTex('d', '=', '\sqrt{a^2+b^2}', color=MAROON).scale(0.9)
         s_area = MathTex('S', '=', 'ab', color=BLUE).scale(0.9)
 
-        vg_tex = VGroup(len_dia, s_area).arrange_submobjects(DOWN,  buff=1).to_edge(RIGHT)
+        vg_tex = VGroup(len_dia, s_area).arrange_submobjects(DOWN, buff=1).to_edge(RIGHT)
 
         self.play(SpinInFromNothing(dia))
         self.play(FadeTransform(dia.copy(), vg_tex[0]))
@@ -74,7 +72,7 @@ class ScreenFunc(Scene):
 
         self.tex = VGroup(length1, length2, len_dia, s_area)
 
-        #t = ValueTracker(0)
+        # t = ValueTracker(0)
 
         poly_rec.add_updater(lambda x: x.become(self.new_rec(dia)))
         self.play(Rotate(dia, angle=PI, about_point=ORIGIN), run_time=10)
@@ -83,7 +81,7 @@ class ScreenFunc(Scene):
     def proof1(self):
         dia, poly_rec = self.rec
 
-        r =3.6742
+        r = 3.6742
         circ = Circle(radius=r, color=PURPLE)
         self.play(FadeIn(circ))
 
@@ -91,15 +89,15 @@ class ScreenFunc(Scene):
         dot_chord = Dot(poly_rec.get_corner(DR), color=BLUE)
         midlle_line = Line(dot_middle.get_center(), dot_chord.get_center(), color=BLUE)
 
-        #midlle_line_pre = Line3D.perpendicular_to(dia, dot_chord.get_center(), color=BLUE)
+        # midlle_line_pre = Line3D.perpendicular_to(dia, dot_chord.get_center(), color=BLUE)
 
         def get_projection(line, point):
-            d = np.array(line.get_end()-line.get_start())
+            d = np.array(line.get_end() - line.get_start())
             v = np.array(point.get_center() - line.get_start())
-            return np.array(line.get_start())+np.dot(v, d)/np.dot(d, d)*d
+            return np.array(line.get_start()) + np.dot(v, d) / np.dot(d, d) * d
 
         perpend_line = Line(dot_chord.get_center(), get_projection(dia, dot_chord), color=YELLOW)
-        angle = RightAngle(dia, perpend_line,length=0.3,quadrant=(-1,-1))
+        angle = RightAngle(dia, perpend_line, length=0.3, quadrant=(-1, -1))
 
         self.play(Write(dot_middle),
                   Write(dot_chord),
@@ -114,33 +112,34 @@ class ScreenFunc(Scene):
 
         dot_chord.add_updater(lambda x: x.become(Dot(poly_rec.get_corner(DR), color=BLUE)))
         midlle_line.add_updater(lambda x: x.become(Line(dot_middle.get_center(), dot_chord.get_center(), color=BLUE)))
-        perpend_line.add_updater(lambda x: x.become(Line(dot_chord.get_center(), get_projection(dia, dot_chord), color=YELLOW)))
+        perpend_line.add_updater(
+            lambda x: x.become(Line(dot_chord.get_center(), get_projection(dia, dot_chord), color=YELLOW)))
         angle.add_updater(lambda x: x.become(RightAngle(dia, perpend_line, length=0.3, quadrant=(-1, -1))))
 
         self.wait(2)
 
-        self.play(Rotate(dia, angle=PI/6, about_point=ORIGIN), run_time=5)
+        self.play(Rotate(dia, angle=PI / 6, about_point=ORIGIN), run_time=5)
 
-        self.play(Rotate(dia, angle=-PI/9.7, about_point=ORIGIN), run_time=5)
+        self.play(Rotate(dia, angle=-PI / 9.7, about_point=ORIGIN), run_time=5)
 
         self.rec.add(VGroup(circ, dot_middle, dot_chord, midlle_line, perpend_line, angle))
 
     def proof2(self):
         length1, length2, len_dia, s_area = self.tex
 
-        math_eqal = MathTex('a=b').scale(0.8).to_edge(UP+LEFT)
+        math_eqal = MathTex('a=b').scale(0.8).to_edge(UP + LEFT)
         self.play(FadeTransform(VGroup(length1, length2), math_eqal))
 
         self.wait(1)
 
         self.play(self.rec.animate.scale(0.8).to_edge(LEFT))
 
-        math_eqal = MathTex('\sqrt{a\cdot b}' , '\leq','\\frac{a+b}{2}').next_to(self.rec, 1.5*RIGHT)
+        math_eqal = MathTex('\sqrt{a\cdot b}', '\leq', '\\frac{a+b}{2}').next_to(self.rec, 1.5 * RIGHT)
 
         self.play(FadeIn(math_eqal))
         self.wait(1)
 
-        math_eqal2 = MathTex('\sqrt{a^2 \cdot b^2}', '\leq', '\\frac{a^2+b^2}{2}').next_to(self.rec, 1.5*RIGHT)
+        math_eqal2 = MathTex('\sqrt{a^2 \cdot b^2}', '\leq', '\\frac{a^2+b^2}{2}').next_to(self.rec, 1.5 * RIGHT)
 
         self.play(ReplacementTransform(math_eqal, math_eqal2))
         self.wait(1)
@@ -158,6 +157,7 @@ class ScreenFunc(Scene):
         self.play(FadeIn(math_final, target_position=math_eqal2))
         self.wait(1)
 
+
 class RatioFunc(Scene):
     def construct(self):
         self.rec = None
@@ -168,21 +168,22 @@ class RatioFunc(Scene):
 
     @staticmethod
     def area_func(x, c=27):
-        return x/(x**2+1)*c**2
+        return x / (x ** 2 + 1) * c ** 2
 
     def display(self):
         len_dia = MathTex('d', '=', '\sqrt{a^2+b^2}', color=MAROON).scale(0.9)
         s_area = MathTex('S', '=', 'ab', color=BLUE).scale(0.9)
-        vg_tex = VGroup(len_dia, s_area).arrange_submobjects(DOWN, buff=1).shift(2*UP)
+        vg_tex = VGroup(len_dia, s_area).arrange_submobjects(DOWN, buff=1).shift(2 * UP)
 
         self.add(vg_tex)
 
-        ratio_tex = MathTex('x', '=', '\\frac{a}{b}', color=WHITE).scale(0.9). next_to(vg_tex, RIGHT)
+        ratio_tex = MathTex('x', '=', '\\frac{a}{b}', color=WHITE).scale(0.9).next_to(vg_tex, RIGHT)
         ratio_tex[0].set_color(YELLOW)
 
         self.play(FadeIn(ratio_tex, target_position=vg_tex))
 
-        sd_tex = MathTex('S', '=', 'f(', 'x', ',','d',')', '=', '\\frac{x}{x^2+1}d^2', color=WHITE). next_to(vg_tex, DOWN)
+        sd_tex = MathTex('S', '=', 'f(', 'x', ',', 'd', ')', '=', '\\frac{x}{x^2+1}d^2', color=WHITE).next_to(vg_tex,
+                                                                                                              DOWN)
         sd_tex[0].set_color(BLUE)
         sd_tex[3].set_color(YELLOW)
         sd_tex[3].set_color(MAROON)
@@ -192,13 +193,14 @@ class RatioFunc(Scene):
 
         self.play(FadeOut(vg_tex),
                   FadeOut(ratio_tex),
-                  sd_tex.animate.scale(0.85).to_edge(LEFT+UP))
+                  sd_tex.animate.scale(0.85).to_edge(LEFT + UP))
 
         self.tex = sd_tex
 
     def curve(self):
         ax = CommonFunc.add_axes(x_range=[0.5, 3, 0.5], y_range=[0.2, 450, 100], x_length=10, y_length=6,
-                                 axis_config={"include_tip": False, "include_numbers":True}).scale(0.8).to_edge(LEFT).shift(0.6*DOWN)
+                                 axis_config={"include_tip": False, "include_numbers": True}).scale(0.8).to_edge(
+            LEFT).shift(0.6 * DOWN)
         self.play(Create(ax))
         fit_plot = ax.plot(lambda x: self.area_func(x), x_range=[0.5, 3], use_smoothing=True, color=YELLOW)
         lable = ax.get_graph_label(fit_plot, "d=28", x_val=3, direction=RIGHT)
@@ -219,11 +221,12 @@ class RatioFunc(Scene):
         size_16_9 = MathTex("x= 16:9", color=MAROON).scale(1)
         rect_3_2 = Rectangle(width=6, height=5.0, color=WHITE).scale(0.7)
         size_3_2 = MathTex("x= 3:2", color=MAROON).scale(1)
-        vg_rec = VGroup(rect_16_9, rect_3_2, size_16_9, size_3_2).arrange_in_grid(rows=2).scale(0.6).to_edge(RIGHT).shift(1.5*UP)
+        vg_rec = VGroup(rect_16_9, rect_3_2, size_16_9, size_3_2).arrange_in_grid(rows=2).scale(0.6).to_edge(
+            RIGHT).shift(1.5 * UP)
 
         self.play(Create(vg_rec))
 
-        dia_16_9 = Line(start=rect_16_9.get_corner(UL), end = rect_16_9.get_corner(DR), color=YELLOW)
+        dia_16_9 = Line(start=rect_16_9.get_corner(UL), end=rect_16_9.get_corner(DR), color=YELLOW)
         dia_3_2 = Line(start=rect_3_2.get_corner(UL), end=rect_3_2.get_corner(DR), color=YELLOW)
 
         self.play(FadeTransform(lable.copy(), dia_16_9),
@@ -256,13 +259,15 @@ class RatioFunc(Scene):
 
         self.wait(2)
 
-        #lines_1 = ax.get_lines_to_point(circ.get_right(), color=GREEN_B)
+        # lines_1 = ax.get_lines_to_point(circ.get_right(), color=GREEN_B)
+
 
 class ImageTrans(Scene):
     def construct(self):
         self.gamma_trans()
         self.contra_gamma()
         self.intro_image()
+
     def gamma_trans(self):
         grid = Axes(
             x_range=[0, 1, 0.05],  # step size determines num_decimal_places.
@@ -304,7 +309,7 @@ class ImageTrans(Scene):
         true_plot = grid.plot(lambda x: x ** (1 / 5), color=BLUE, use_smoothing=False)
         true_lable = grid.get_graph_label(true_plot, MathTex("\gamma=\\frac{1}{5}").scale(0.8), x_val=0.2, direction=UP)
 
-        self.play(FadeTransform(gamma_tex.copy(),VGroup(true_plot,true_lable)))
+        self.play(FadeTransform(gamma_tex.copy(), VGroup(true_plot, true_lable)))
 
         graphs += true_plot
         grid_labels += true_lable
@@ -331,13 +336,13 @@ class ImageTrans(Scene):
 
         l_image = []
         # 读取图像
-        #image_path = '/Users/tfifthefrank/Downloads/exampe.jpg'  # 替换为你的图像路径
-        #ssave_path = '/Users/tfifthefrank/Downloads/example4.png'
+        # image_path = '/Users/tfifthefrank/Downloads/exampe.jpg'  # 替换为你的图像路径
+        # ssave_path = '/Users/tfifthefrank/Downloads/example4.png'
         original_image = cv2.imread(image_path)
         # 显示原始图像和不同伽马值处理后的图像
         for gamma in l_gamma_values:
             adjusted_image = adjust_gamma(original_image, gamma)
-            #cv2.imwrite(save_path, adjusted_image)
+            # cv2.imwrite(save_path, adjusted_image)
             l_image.append(adjusted_image)
         return l_image
 
@@ -350,7 +355,7 @@ class ImageTrans(Scene):
                    '/Users/tfifthefrank/Downloads/exampe2.png',
                    '/Users/tfifthefrank/Downloads/exampe1.png']
 
-        image_array = self.get_image(image_path=l_paths[0], l_gamma_values=[1, 1/5, 5])
+        image_array = self.get_image(image_path=l_paths[0], l_gamma_values=[1, 1 / 5, 5])
         for i in range(3):
             img = ImageMobject(image_array[i]).next_to(self.vg_axes, RIGHT)
             img.height = 4.5
@@ -359,7 +364,7 @@ class ImageTrans(Scene):
         self.play(Indicate(graphs[0]),
                   Indicate(grid_labels[0]))
 
-        var = Variable(1, MathTex("\gamma"), num_decimal_places=3).scale(0.8).next_to(vg_image[0],UP)
+        var = Variable(1, MathTex("\gamma"), num_decimal_places=3).scale(0.8).next_to(vg_image[0], UP)
         self.play(FadeIn(var, target_mobject=gamma_tex.get_center()))
 
         self.play(FadeIn(vg_image[0]))
@@ -375,7 +380,7 @@ class ImageTrans(Scene):
 
         self.play(Indicate(graphs[-2]),
                   Indicate(grid_labels[-2]),
-                  var.tracker.animate.set_value(1/5))
+                  var.tracker.animate.set_value(1 / 5))
         self.play(Transform(vg_image[0], vg_image[1]))
 
         self.wait(2)
@@ -383,14 +388,14 @@ class ImageTrans(Scene):
         self.vg_gamma = Group(vg_image[0], var)
 
     def intro_image(self):
-        vg_extra_plot= VGroup()
+        vg_extra_plot = VGroup()
         original_image, var = self.vg_gamma
         grid, graphs, grid_labels, gamma_tex = self.vg_axes
 
         self.play(FadeOut(grid_labels[-1]),
                   FadeOut(grid_labels[-2]))
 
-        for n in np.linspace(1/4.9,4.9,50):
+        for n in np.linspace(1 / 4.9, 4.9, 50):
             if n > 1:
                 up_plot = grid.plot(lambda x: x ** n, color=RED, stroke_width=1)
             else:
@@ -402,8 +407,8 @@ class ImageTrans(Scene):
         self.wait(2)
 
         vg_image = Group()
-        l_var = np.linspace(1/4.9,4.9,50)
-        image_array = self.get_image('/Users/tfifthefrank/Downloads/example4.jpg',l_gamma_values=l_var)
+        l_var = np.linspace(1 / 4.9, 4.9, 50)
+        image_array = self.get_image('/Users/tfifthefrank/Downloads/example4.jpg', l_gamma_values=l_var)
         for i in image_array:
             img = ImageMobject(i).next_to(self.vg_axes, RIGHT)
             img.height = 4.5
@@ -415,6 +420,7 @@ class ImageTrans(Scene):
                       Transform(original_image, vg_image[j]))
         self.wait(1)
 
+
 class A4Filled(ThreeDScene):
     def construct(self):
         self.get_A4()
@@ -423,10 +429,10 @@ class A4Filled(ThreeDScene):
     @staticmethod
     def get_rectangle_corners(bottom_left, top_right):
         return [
-            (top_right[0], top_right[1],0),
-            (bottom_left[0], top_right[1],0),
-            (bottom_left[0], bottom_left[1],0),
-            (top_right[0], bottom_left[1],0),
+            (top_right[0], top_right[1], 0),
+            (bottom_left[0], top_right[1], 0),
+            (bottom_left[0], bottom_left[1], 0),
+            (top_right[0], bottom_left[1], 0),
         ]
 
     def new_rec(self, dia):
@@ -443,39 +449,40 @@ class A4Filled(ThreeDScene):
         self.play(FadeIn(A0))
         self.wait(2)
 
-        middle_points = [(rec.get_corner(UL)+rec.get_corner(DL))/2, (rec.get_corner(UR)+rec.get_corner(DR))/2]
+        middle_points = [(rec.get_corner(UL) + rec.get_corner(DL)) / 2, (rec.get_corner(UR) + rec.get_corner(DR)) / 2]
         line1 = Line(middle_points[0], middle_points[1], color=MAROON)
         self.play(FadeIn(line1))
-        A1_posiion = ((line1.get_start() + line1.get_end()) / 2 + (rec.get_corner(DR)+rec.get_corner(DL))/2)/2
+        A1_posiion = ((line1.get_start() + line1.get_end()) / 2 + (rec.get_corner(DR) + rec.get_corner(DL)) / 2) / 2
         text1 = MathTex('A1').scale(1).move_to(A1_posiion)
         self.play(FadeIn(text1, target_position=(line1.get_start() + line1.get_end()) / 2))
         self.wait(1)
 
-        middle_points2 = [(rec.get_corner(UL)+rec.get_corner(UR))/2, (line1.get_start()+line1.get_end())/2]
+        middle_points2 = [(rec.get_corner(UL) + rec.get_corner(UR)) / 2, (line1.get_start() + line1.get_end()) / 2]
         line2 = Line(middle_points2[0], middle_points2[1], color=MAROON)
         self.play(FadeIn(line2))
-        A2_posiion = ((line2.get_start() + line2.get_end()) / 2 + (rec.get_corner(UR)+line1.get_end())/2)/2
+        A2_posiion = ((line2.get_start() + line2.get_end()) / 2 + (rec.get_corner(UR) + line1.get_end()) / 2) / 2
         text2 = MathTex('A2').scale(1).move_to(A2_posiion)
         self.play(FadeIn(text2, target_position=(line2.get_start() + line2.get_end()) / 2))
         self.wait(1)
 
-        middle_points3 = [(rec.get_corner(UL)+line1.get_start())/2, (line2.get_start()+line2.get_end())/2]
+        middle_points3 = [(rec.get_corner(UL) + line1.get_start()) / 2, (line2.get_start() + line2.get_end()) / 2]
         line3 = Line(middle_points3[0], middle_points3[1], color=MAROON)
         self.play(FadeIn(line3))
-        A3_posiion = ((line3.get_start() + line3.get_end()) / 2 + (line1.get_start()+(line1.get_start() + line1.get_end())/2)/2)/2
+        A3_posiion = ((line3.get_start() + line3.get_end()) / 2 + (
+                    line1.get_start() + (line1.get_start() + line1.get_end()) / 2) / 2) / 2
         text3 = MathTex('A3').scale(1).move_to(A3_posiion)
         self.play(FadeIn(text3, target_position=(line3.get_start() + line3.get_end()) / 2))
         self.wait(1)
 
-        middle_points4 = [(rec.get_corner(UL)+line2.get_start())/2, (line3.get_start()+line3.get_end())/2]
+        middle_points4 = [(rec.get_corner(UL) + line2.get_start()) / 2, (line3.get_start() + line3.get_end()) / 2]
         line4 = Line(middle_points4[0], middle_points4[1], color=MAROON)
         self.play(FadeIn(line4))
-        A4_posiion = ((line4.get_start() + line4.get_end()) / 2 + (line3.get_end()+line2.get_start())/2)/2
+        A4_posiion = ((line4.get_start() + line4.get_end()) / 2 + (line3.get_end() + line2.get_start()) / 2) / 2
         text4 = MathTex('A4').scale(1).move_to(A4_posiion)
         self.play(FadeIn(text4, target_position=(line4.get_start() + line4.get_end()) / 2))
         self.wait(1)
 
-        self.vg_tex = VGroup(A0,text1,text2,text3,text4)
+        self.vg_tex = VGroup(A0, text1, text2, text3, text4)
         self.vg_rec = VGroup(rec, line1, line2, line3, line4)
 
         self.play(VGroup(self.vg_rec, self.vg_tex).animate.to_edge(LEFT))
@@ -487,13 +494,13 @@ class A4Filled(ThreeDScene):
         size_16_9 = MathTex("x= 16:9", color=MAROON).scale(1)
         rect_3_2 = Rectangle(width=6, height=4.0, color=WHITE).scale(0.7)
         size_3_2 = MathTex("x= 3:2", color=MAROON).scale(1)
-        vg_rec = VGroup(rect_16_9, size_16_9,rect_3_2, size_3_2).arrange_in_grid(rows=4).scale(1).to_edge(3*RIGHT)
+        vg_rec = VGroup(rect_16_9, size_16_9, rect_3_2, size_3_2).arrange_in_grid(rows=4).scale(1).to_edge(3 * RIGHT)
 
         self.play(Create(vg_rec))
         self.wait(2)
 
         res_coor1 = self.get_rectangle_corners(rect_16_9.get_corner(DL),
-                                               rect_16_9.get_corner(UL)+np.array([2.475*0.7,0,0]))
+                                               rect_16_9.get_corner(UL) + np.array([2.475 * 0.7, 0, 0]))
         polygon1 = Polygon(*res_coor1, stroke_width=1, fill_color=RED, fill_opacity=0.8)
 
         res_coor2 = self.get_rectangle_corners(polygon1.get_corner(DR),
@@ -505,11 +512,11 @@ class A4Filled(ThreeDScene):
         self.wait(2)
 
         res_coor3 = self.get_rectangle_corners(rect_3_2.get_corner(DL),
-                                               rect_3_2.get_corner(UL)+np.array([2.8288543*0.7, 0, 0]))
+                                               rect_3_2.get_corner(UL) + np.array([2.8288543 * 0.7, 0, 0]))
         polygon3 = Polygon(*res_coor3, stroke_width=1, fill_color=RED, fill_opacity=0.8)
 
         res_coor4 = self.get_rectangle_corners(polygon3.get_corner(DR),
-                                               polygon3.get_corner(UR) + np.array([2.8288543*0.7, 0, 0]))
+                                               polygon3.get_corner(UR) + np.array([2.8288543 * 0.7, 0, 0]))
         polygon4 = Polygon(*res_coor4, stroke_width=1, fill_color=RED, fill_opacity=0.8)
 
         self.play(GrowFromPoint(polygon3, self.vg_rec[0].get_center()))
@@ -526,8 +533,3 @@ class A4Filled(ThreeDScene):
         self.play(Indicate(S_3_2),
                   Indicate(size_3_2))
         self.wait(1)
-
-
-
-
-
