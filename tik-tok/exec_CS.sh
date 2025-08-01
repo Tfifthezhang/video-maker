@@ -1,1 +1,1 @@
-manim -qh -r 1080,1920 ost.py OST
+manim -qh ost.py OST

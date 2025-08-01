@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2021 GRGBanking All Rights Reserved
-
-# @Time    : 2023/2/21 5:09 下午
-# @Author  : 张暐（zhangwei）
-# @File    : maximum_likelihood.py
-# @Email   : zhangwei58@grgbanking.com
-# @Software: PyCharm
 
 from manim import *
 import numpy as np
