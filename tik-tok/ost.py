@@ -294,7 +294,7 @@ class OST_MATH(Scene):
 
         vg_select = VGroup(line_select, vg_list2)
 
-        vg_line = VGroup(vg_ob, vg_select).shift(UP)
+        vg_line = VGroup(vg_ob, vg_select).shift(0.5*UP)
 
         self.add(vg_line)
         self.vg_line = vg_line
@@ -346,7 +346,7 @@ class OST_MATH(Scene):
 
         ## 条件1：最优位置的概率是1/N
 
-        prob_n = MathTex('P=\\frac{1}{N}', color=YELLOW).scale(0.8).next_to(vector_ost, DOWN)
+        prob_n = MathTex('P=','\\frac{1}{N}', color=YELLOW).scale(0.8).next_to(vector_ost, DOWN)
         prob_n.add_updater(lambda m: m.next_to(vector_ost, DOWN))
         self.play(FadeIn(prob_n, target_position=vector_ost))
 
@@ -366,12 +366,19 @@ class OST_MATH(Scene):
         self.play(ApplyWave(vg_line[0][0], ripples=2))
         self.wait(1)
 
-        prob_ob = MathTex('P_{ab} = \\frac{a}{a+b}').scale(0.9).shift(2*LEFT+2*DOWN)
+        prob_ob = MathTex('\\frac{a}{a+b}').scale(0.9).shift(1.5*UP)
         self.play(FadeTransform(VGroup(vg_line[0][0], vg_line[1][0][0]).copy(), prob_ob))
         self.wait(1)
 
         self.play(FadeOut(vg_brace_tex[1][0]))
         vg_brace_tex[1][1].add_updater(lambda m: m.next_to(vg_line[1][0][0], DOWN))
+
+        prob_sum = MathTex('\sum').next_to(prob_ob, 0.5*LEFT).shift(0.1*UP)
+        prob_sum_down = MathTex('b=0').scale(0.6).next_to(prob_sum, 0.1 * DOWN)
+        prob_sum_up = MathTex('N-a-1').scale(0.6).next_to(prob_sum, 0.1 * UP)
+
+        vg_prob_sum = VGroup(prob_sum_up, prob_sum, prob_sum_down)
+        #self.play(FadeIn(vg_prob_sum))
 
         ## 并对所有可能的位置进行概率求和
         left_gap = (vg_line[1][0][1].get_left() - vg_line[1][0][0].get_left()) * 9 / 10
@@ -386,6 +393,9 @@ class OST_MATH(Scene):
         min_value = MathTex('=0', color=WHITE).next_to(vg_brace_tex[1][1], 0.1*RIGHT)
         self.play(FadeIn(min_value, target_position=vg_line[1][0][0]))
 
+        self.wait(1)
+        self.play(FadeTransform(min_value, vg_prob_sum[-1]))
+
         ### b最大可以到N-a-1
         self.play(vg_line[1][0][0].animate.put_start_and_end_on(start=vg_line[1][0][0].get_left(),
                                                                 end=vg_line[1][0][0].get_right()+left_gap+right_gap),
@@ -394,18 +404,76 @@ class OST_MATH(Scene):
                   run_time=3)
         max_value = MathTex('=N-a-1', color=WHITE).next_to(vg_brace_tex[1][1], 0.1*RIGHT)
         self.play(FadeIn(max_value, target_position=vg_line[1][0][0]))
+        self.wait(1)
+        self.play(FadeTransform(max_value, vg_prob_sum[0]))
 
-class OST(Scene):
+        self.wait(1)
+        self.play(FadeIn(prob_sum[0]))
+        self.wait(1)
+
+        # 最后需要乘上1/N
+
+        prob_N = MathTex('\\frac{1}{N}', color=YELLOW).next_to(vg_prob_sum[1], LEFT)
+        self.play(FadeOut(vg_brace_tex[-1][-1],target_position=prob_N),
+                  FadeIn(prob_N))
+        self.wait(1)
+
+class OST(ThreeDScene):
     def construct(self):
-        l_offer = None
+        self.vg_tex = None
+        self.vg_line = None
+        self.vg_ax= None
+        self.vg_chart = None
+        # self.bar_function()
+        # self.dis_function()
+
+        self.create_tex()
+        self.create_offer()
         self.bar_function()
-        #self.dis_function()
-        pass
+        self.random_pick()
+        self.move()
+        self.max_value()
+
+    def create_tex(self):
+        prob_N = MathTex('P(a)=\\frac{1}{N}\sum_{b=0}^{N-a-1}\\frac{a}{a+b}').to_edge(2*LEFT+2*UP)
+        self.play(Write(prob_N))
+
+        a_var = Variable(1, 'a', color=RED, var_type=Integer)
+        p_var = Variable(0, 'P(a)', num_decimal_places=3)
+        p_var.add_updater(lambda v: v.tracker.set_value(self.func1(a_var.tracker.get_value(), 50)))
+
+        vg_var = VGroup(a_var, p_var)
+        vg_var.arrange(DOWN, buff=0.8).to_edge(RIGHT)
+
+        self.vg_tex = VGroup(prob_N, vg_var)
+
+    def create_offer(self):
+        line_ob = Line(start=3 * LEFT, end=2.5 * LEFT,
+                       stroke_width=20, color=BLUE).to_edge(LEFT)
+        svg_offer = SVGMobject('svg_icon/house_price.svg', fill_color=WHITE).scale(0.4)
+        svg_people = SVGMobject('svg_icon/people.svg', fill_color=WHITE).scale(0.6).next_to(svg_offer, DOWN)
+        vg_list = VGroup(svg_people, svg_offer).next_to(line_ob, UP)
+        vg_list.add_updater(lambda m: m.next_to(line_ob, UP))
+        vg_ob = VGroup(line_ob, vg_list)
+
+        line_select = Line(start=10 * LEFT, end=3 * RIGHT,
+                           stroke_width=20, color=BLUE).to_edge(RIGHT)
+        svg_offer = SVGMobject('svg_icon/house_price.svg', fill_color=WHITE).scale(0.4)
+        svg_people = SVGMobject('svg_icon/people.svg', fill_color=WHITE).scale(0.6).next_to(svg_offer, DOWN)
+        vg_list2 = VGroup(svg_people, svg_offer).next_to(line_select, UP)
+        vg_list2.add_updater(lambda m: m.next_to(line_select, UP))
+
+        vg_select = VGroup(line_select, vg_list2)
+
+        vg_line = VGroup(vg_ob, vg_select).scale(0.5).to_edge(2*UP+RIGHT)
+
+        self.play(FadeIn(vg_line))
+        self.vg_line = vg_line
 
     @staticmethod
     def func1(r, n):
         s = 0
-        res = int(n-r)
+        res = int(n-r-1)
         for m in range(res):
             s += r/(m+r)
         return s/n
@@ -415,25 +483,31 @@ class OST(Scene):
         return -x*np.log(x)
 
     def bar_function(self):
-        x_range = list(range(1,100))
-        values = [round(self.func1(i,100),3) for i in x_range]
-        inital_chart = BarChart(
+        ax = CommonFunc.add_axes(x_range=[1, 50], y_range=[0, 1, 2], x_length=8, y_length=2,
+                                 axis_config={"include_tip": False, "include_numbers": False}).scale(1.3).shift(DOWN).to_edge(LEFT)
+        dashed_line = DashedLine(start=ax.c2p(0, 0.01), end=ax.c2p(50, 0.01), color=MAROON)
+        line_label = MathTex('\\frac{1}{N}=\\frac{1}{100}', color=MAROON).scale(0.5).next_to(dashed_line, RIGHT)
+
+        self.vg_ax = VGroup(ax, dashed_line, line_label)
+
+        x_range = list(range(1, 50))
+        values = [round(self.func1(i, 50), 3) for i in x_range]
+        chart = BarChart(
                 values=values,
                 bar_names=None,
                 y_range=[0, 1, 2],
-                y_length=4,
+                y_length=2,
                 x_length=8,
                 x_axis_config={"font_size": 12},
-            ).scale(1.3).to_edge(LEFT)
-        #c_bar_lbls = inital_chart.get_bar_labels(font_size=15)
-        self.play(Create(inital_chart))
+            ).scale(1.3).shift(DOWN).to_edge(LEFT)
 
-        self.wait(3)
+        self.vg_chart = chart
 
     def dis_function(self):
-        ax = CommonFunc.add_axes(x_range=[0, 100], y_range=[0, 1], x_length=8, y_length=8,
+        ax = CommonFunc.add_axes(x_range=[0, 50], y_range=[0, 1], x_length=8, y_length=8,
                                  axis_config={"include_tip": True, "include_numbers": False}).scale(1.2)
-        graph = ax.plot(lambda x: self.func1(x, 100), x_range=[1, 99], use_smoothing=True)
+        graph = ax.plot(lambda x: self.func1(x, 50), x_range=[1, 99], use_smoothing=True)
+
         graph_label = ax.get_graph_label(graph=graph,
                                          label=MathTex('\mu'),
                                          direction=DL)
@@ -443,6 +517,146 @@ class OST(Scene):
         self.play(Create(ax_vg))
 
         self.wait(3)
+
+    def random_pick(self):
+        self.play(FadeIn(self.vg_ax[0], target_position=self.vg_tex[0]))
+
+        vector_pick = Vector(UP).next_to(self.vg_line[0][0].get_left(), DOWN)
+        self.play(DrawBorderThenFill(vector_pick))
+
+        self.play(vector_pick.animate.next_to(self.vg_line[1][0].get_right(), DOWN),run_time=2)
+
+        self.play(FadeTransform(vector_pick, self.vg_ax[1:]))
+        self.wait(1)
+
+    def move(self):
+        vg_line = self.vg_line
+        vg_tex = self.vg_tex
+        vg_ax = self.vg_ax
+        vg_chart = self.vg_chart
+
+        self.play(vg_line[0][0].animate.set_color(RED))
+
+        self.play(FadeIn(vg_tex[1][0], target_position=vg_line[0][0]))
+        self.play(FadeTransform(vg_tex[0].copy(), vg_tex[-1][1]))
+
+        right_gap = (vg_line[1][0].get_right() - vg_line[0][0].get_right()) * 19 / 20
+        # a从1增加到100
+        self.play(vg_line[0][0].animate.put_start_and_end_on(start=vg_line[0][0].get_left(),
+                                                             end=vg_line[0][0].get_right() + right_gap),
+                  vg_line[1][0].animate.put_start_and_end_on(start=vg_line[1][0].get_left() + right_gap,
+                                                             end=vg_line[1][0].get_right()),
+                  self.vg_tex[-1][0].tracker.animate.set_value(49),
+                  Create(vg_chart[0]),
+                  run_time=20)
+
+        self.wait(1)
+
+    def max_value(self):
+        vg_chart = self.vg_chart
+        vg_ax = self.vg_ax
+
+        x_range = list(range(1, 50))
+        values = [round(self.func1(i, 50), 3) for i in x_range]
+        m = values.index(max(values))
+
+        self.move_camera(frame_center=vg_chart[0][m], zoom=3)
+
+        point = Dot(vg_ax[0].coords_to_point(x_range[m]+0.5, values[m]), color=YELLOW).scale(0.3)
+        lines = vg_ax[0].get_lines_to_point(point.get_center(), color=YELLOW)
+        point_label = MathTex('({},{})'.format(x_range[m]+1, values[m])).scale(0.3).next_to(point,UP)
+
+        self.play(FadeIn(point, target_position=vg_chart[0][m]))
+        self.play(GrowFromPoint(lines, point=point.get_center()))
+        self.play(Write(point_label))
+
+        self.wait(2)
+
+class OSTCalculus(Scene):
+    def construct(self):
+        self.vg_tex = None
+        self.vg_line = None
+        self.vg_ax= None
+        self.vg_chart = None
+
+        self.create_chart_tex()
+        self.trans_far()
+    @staticmethod
+    def func1(r, n):
+        s = 0
+        res = int(n-r-1)
+        for m in range(res):
+            s += r/(m+r)
+        return s/n
+
+    @staticmethod
+    def func2(x):
+        return -x*np.log(x)
+
+    def create_chart_tex(self):
+        prob_N = MathTex('P(a)=\\frac{1}{N}\sum_{b=0}^{N-a-1}\\frac{a}{a+b}').scale(0.8).to_edge(UP)
+
+        self.vg_tex = VGroup(prob_N)
+
+        self.add(prob_N)
+
+        ax = CommonFunc.add_axes(x_range=[1, 50], y_range=[0, 1, 2], x_length=8, y_length=2,
+                                 axis_config={"include_tip": False, "include_numbers": False}).scale(1.5)
+        n = Variable(var=50, label=MathTex('N'), var_type=Integer). next_to(ax, DOWN)
+        self.vg_ax = VGroup(ax, n)
+
+        self.add(ax)
+
+        x_range = list(range(1, 50))
+        values = [round(self.func1(i, 50), 3) for i in x_range]
+        chart = BarChart(
+                values=values,
+                bar_names=None,
+                y_range=[0, 1, 2],
+                y_length=2,
+                x_length=8,
+                x_axis_config={"font_size": 12},
+            ).scale(1.5)
+
+        self.vg_chart = chart
+
+        self.add(chart[0])
+
+    def trans_far(self):
+        self.play(FadeIn(self.vg_ax[-1], target_position=self.vg_chart))
+
+        self.wait(1)
+
+        for t in [60, 70, 80, 90, 100, 130, 150, 200, 250, 300]:
+            x_range = list(range(1, t))
+            values = [round(self.func1(i, t), 3) for i in x_range]
+            new_chart = BarChart(
+                values=values,
+                bar_names=None,
+                y_range=[0, 1, 2],
+                y_length=2,
+                x_length=8,
+                x_axis_config={"font_size": 12},
+            ).scale(1.5)
+            self.play(Transform(self.vg_chart[0], new_chart[0]),
+                      self.vg_ax[-1].tracker.animate.set_value(t))
+        self.wait(1)
+
+    def dis_function(self):
+        ax = CommonFunc.add_axes(x_range=[0, 100], y_range=[0, 1], x_length=8, y_length=8,
+                                 axis_config={"include_tip": True, "include_numbers": False}).scale(1.2)
+        graph = ax.plot(lambda x: self.func1(x, 100), x_range=[1, 99], use_smoothing=True)
+
+        graph_label = ax.get_graph_label(graph=graph,
+                                         label=MathTex('\mu'),
+                                         direction=DL)
+
+        ax_vg = VGroup(ax, graph, graph_label)
+
+        self.play(Create(ax_vg))
+
+        self.wait(3)
+
 
 
 
