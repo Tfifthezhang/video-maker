@@ -1,1 +1,1 @@
-manim -qh ost.py OST
+manim -qh ost.py OSTCalculus
